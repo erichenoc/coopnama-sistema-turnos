@@ -53,7 +53,7 @@ export default function AgentWorkstationPage() {
     const supabase = createClient()
     const { data } = await supabase
       .from('tickets')
-      .select('*, service:services(*), station:stations(*), agent:users(*)')
+      .select('*, service:services!tickets_service_id_fkey(*), station:stations(*), agent:users(*)')
       .eq('station_id', selectedStation)
       .in('status', ['called', 'serving'])
       .order('called_at', { ascending: false })

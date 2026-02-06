@@ -62,7 +62,7 @@ export async function getActiveQueue(branchId: string): Promise<TicketWithRelati
     .from('tickets')
     .select(`
       *,
-      service:services(*),
+      service:services!tickets_service_id_fkey(*),
       station:stations(*),
       agent:users(*)
     `)
@@ -280,7 +280,7 @@ export async function getTicketById(ticketId: string): Promise<TicketWithRelatio
     .from('tickets')
     .select(`
       *,
-      service:services(*),
+      service:services!tickets_service_id_fkey(*),
       station:stations(*),
       agent:users(*)
     `)
@@ -306,7 +306,7 @@ export async function getCurrentTicketByStation(stationId: string): Promise<Tick
     .from('tickets')
     .select(`
       *,
-      service:services(*),
+      service:services!tickets_service_id_fkey(*),
       agent:users(*)
     `)
     .eq('station_id', stationId)

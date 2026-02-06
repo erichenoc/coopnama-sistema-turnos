@@ -27,7 +27,7 @@ export default function MiTurnoPage() {
 
     const { data, error: fetchError } = await supabase
       .from('tickets')
-      .select('*, service:services(*), station:stations(*)')
+      .select('*, service:services!tickets_service_id_fkey(*), station:stations(*)')
       .ilike('ticket_number', ticketNumber.trim().toUpperCase())
       .gte('created_at', today)
       .order('created_at', { ascending: false })

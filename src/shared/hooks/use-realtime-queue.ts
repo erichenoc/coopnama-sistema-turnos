@@ -17,7 +17,7 @@ export function useRealtimeQueue(branchId: string | null) {
 
     const { data, error: fetchError } = await supabase
       .from('tickets')
-      .select(`*, service:services(*), station:stations(*), agent:users(*)`)
+      .select(`*, service:services!tickets_service_id_fkey(*), station:stations(*), agent:users(*)`)
       .eq('branch_id', branchId)
       .in('status', ['waiting', 'called', 'serving'])
       .gte('created_at', today)
