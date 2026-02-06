@@ -75,9 +75,19 @@ CREATE TABLE IF NOT EXISTS tickets (
   feedback_comment TEXT,
   feedback_sentiment TEXT CHECK (feedback_sentiment IN ('positive', 'neutral', 'negative')),
 
-  -- Constraint de unicidad por día
-  UNIQUE(branch_id, ticket_number, (created_at::date))
+  -- No functional UNIQUE constraint; use index below
+  CONSTRAINT tickets_branch_number_check CHECK (ticket_number IS NOT NULL)
 );
+
+-- Helper function for immutable date extraction (needed for unique index)
+CREATE OR REPLACE FUNCTION ticket_date(ts TIMESTAMPTZ)
+RETURNS DATE AS $$
+  SELECT ts::date;
+$$ LANGUAGE SQL IMMUTABLE;
+
+-- Unique index for ticket number per branch per day
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tickets_unique_per_day
+  ON tickets (branch_id, ticket_number, ticket_date(created_at));
 
 -- ticket_history (historial de cambios de estado)
 CREATE TABLE IF NOT EXISTS ticket_history (
@@ -106,8 +116,12 @@ CREATE TABLE IF NOT EXISTS agent_sessions (
   tickets_served INTEGER DEFAULT 0,
   total_service_time_seconds INTEGER DEFAULT 0,
   avg_service_time_seconds INTEGER,
-  UNIQUE(station_id, agent_id, (started_at::date))
+  CONSTRAINT agent_sessions_check CHECK (station_id IS NOT NULL)
 );
+
+-- Unique index for one session per agent per station per day
+CREATE UNIQUE INDEX IF NOT EXISTS idx_agent_sessions_unique_per_day
+  ON agent_sessions (station_id, agent_id, ticket_date(started_at));
 
 -- Índices para optimizar queries frecuentes
 CREATE INDEX IF NOT EXISTS idx_tickets_branch_status ON tickets(branch_id, status);
