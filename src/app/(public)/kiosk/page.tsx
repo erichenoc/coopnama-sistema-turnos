@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { createTicketAction } from '@/lib/actions/tickets'
 import { Spinner } from '@/shared/components/spinner'
+import { TicketReceipt } from '@/shared/components/ticket-receipt'
 import type { Service, Ticket } from '@/shared/types/domain'
 
 const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
@@ -235,9 +236,13 @@ export default function KioskPage() {
               </div>
             </div>
             <div className="flex gap-4 print:hidden">
-              <button onClick={() => window.print()} className="flex-1 py-4 text-lg font-semibold bg-neu-bg shadow-neu rounded-neu text-gray-700 hover:shadow-neu-sm active:shadow-neu-inset transition-all">
-                Imprimir
-              </button>
+              <TicketReceipt
+                ticketNumber={ticket.ticket_number}
+                serviceName={selectedService?.name || ''}
+                customerName={customerName || null}
+                createdAt={ticket.created_at}
+                estimatedMinutes={selectedService?.avg_duration_minutes}
+              />
               <button onClick={resetKiosk} className="flex-1 py-4 text-lg font-semibold bg-coopnama-primary text-white rounded-neu shadow-neu hover:bg-blue-700 active:shadow-neu-inset transition-all">
                 Nuevo Turno
               </button>

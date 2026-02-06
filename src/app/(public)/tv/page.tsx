@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useRealtimeQueue } from '@/shared/hooks/use-realtime-queue'
+import { useTicketAnnouncer } from '@/shared/hooks/use-ticket-announcer'
 
 const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
 
 export default function TVDisplayPage() {
   const { called, serving, waiting } = useRealtimeQueue(DEMO_BRANCH_ID)
+  const { announce } = useTicketAnnouncer()
   const [currentTime, setCurrentTime] = useState(new Date())
   const [lastCalledId, setLastCalledId] = useState<string | null>(null)
   const [isNew, setIsNew] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000)
@@ -26,19 +27,16 @@ export default function TVDisplayPage() {
       setLastCalledId(latestCalled.id)
       setIsNew(true)
 
-      if ('speechSynthesis' in window) {
-        const stationName = latestCalled.station?.name || `Ventanilla ${latestCalled.station?.station_number}`
-        const utterance = new SpeechSynthesisUtterance(
-          `Turno ${latestCalled.ticket_number}, ${stationName}`
-        )
-        utterance.lang = 'es-DO'
-        utterance.rate = 0.9
-        speechSynthesis.speak(utterance)
-      }
+      const stationName = latestCalled.station?.name || `Ventanilla ${latestCalled.station?.station_number}`
+      announce({
+        ticketNumber: latestCalled.ticket_number,
+        stationName,
+        customerName: latestCalled.customer_name,
+      })
 
       setTimeout(() => setIsNew(false), 5000)
     }
-  }, [called, serving, lastCalledId])
+  }, [called, serving, lastCalledId, announce])
 
   const currentlyServing = [...called, ...serving].sort(
     (a, b) => new Date(b.called_at || 0).getTime() - new Date(a.called_at || 0).getTime()
@@ -48,8 +46,6 @@ export default function TVDisplayPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden">
-      <audio ref={audioRef} />
-
       <header className="flex items-center justify-between px-8 py-4 bg-black/30">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-coopnama-primary rounded-xl flex items-center justify-center">

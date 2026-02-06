@@ -7,8 +7,9 @@ import { Spinner } from '@/shared/components/spinner'
 import { createClient } from '@/lib/supabase/client'
 import { callNextTicketAction, startServingAction, completeTicketAction, markNoShowAction } from '@/lib/actions/tickets'
 import { useRealtimeQueue } from '@/shared/hooks/use-realtime-queue'
+import { useTicketAnnouncer } from '@/shared/hooks/use-ticket-announcer'
 import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
-import type { TicketWithRelations, Station } from '@/shared/types/domain'
+import type { TicketWithRelations, Station, Service } from '@/shared/types/domain'
 import { useOrg } from '@/shared/providers/org-provider'
 
 export default function AgentWorkstationPage() {
@@ -22,6 +23,11 @@ export default function AgentWorkstationPage() {
   const [agentId, setAgentId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const { waiting, called, refresh } = useRealtimeQueue(branchId)
+  const { announce } = useTicketAnnouncer()
+  const [services, setServices] = useState<Service[]>([])
+  const [showTransfer, setShowTransfer] = useState(false)
+  const [transferServiceId, setTransferServiceId] = useState<string>('')
+  const [transferReason, setTransferReason] = useState('')
 
   // Get current authenticated user ID
   useEffect(() => {
@@ -33,10 +39,10 @@ export default function AgentWorkstationPage() {
     getUser()
   }, [])
 
-  // Fetch stations
+  // Fetch stations and services
   useEffect(() => {
+    const supabase = createClient()
     const fetchStations = async () => {
-      const supabase = createClient()
       const { data } = await supabase
         .from('stations')
         .select('*')
@@ -48,8 +54,17 @@ export default function AgentWorkstationPage() {
         setSelectedStation(data[0].id)
       }
     }
+    const fetchServices = async () => {
+      const { data } = await supabase
+        .from('services')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order')
+      setServices((data || []) as Service[])
+    }
     fetchStations()
-  }, [selectedStation])
+    fetchServices()
+  }, [branchId, selectedStation])
 
   // Service timer
   useEffect(() => {
@@ -86,7 +101,17 @@ export default function AgentWorkstationPage() {
     if (result.error) {
       setActionError(result.error)
     } else if (result.data) {
-      setCurrentTicket(result.data as TicketWithRelations)
+      const ticket = result.data as TicketWithRelations
+      setCurrentTicket(ticket)
+
+      // Announce the ticket call via Inworld TTS
+      const station = stations.find(s => s.id === selectedStation)
+      const stationName = station?.name || `Ventanilla ${station?.station_number}`
+      announce({
+        ticketNumber: ticket.ticket_number,
+        stationName,
+        customerName: ticket.customer_name,
+      })
     }
     refresh()
     setActionLoading(null)
@@ -133,6 +158,53 @@ export default function AgentWorkstationPage() {
       setCurrentTicket(null)
       setServiceTimer(0)
     }
+    refresh()
+    setActionLoading(null)
+  }
+
+  const handleRecall = () => {
+    if (!currentTicket || !selectedStation) return
+    const station = stations.find(s => s.id === selectedStation)
+    const stationName = station?.name || `Ventanilla ${station?.station_number}`
+    announce({
+      ticketNumber: currentTicket.ticket_number,
+      stationName,
+      customerName: currentTicket.customer_name,
+    })
+  }
+
+  const handleTransfer = async () => {
+    if (!currentTicket || !agentId || !transferServiceId) return
+    setActionLoading('transfer')
+    setActionError(null)
+
+    try {
+      const response = await fetch('/api/tickets/transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketId: currentTicket.id,
+          newServiceId: transferServiceId,
+          reason: transferReason || undefined,
+          agentId,
+        }),
+      })
+
+      if (!response.ok) {
+        const { error } = await response.json()
+        setActionError(error || 'Error al transferir')
+      } else {
+        setCurrentTicket(null)
+        setServiceTimer(0)
+        setNotes('')
+        setShowTransfer(false)
+        setTransferServiceId('')
+        setTransferReason('')
+      }
+    } catch {
+      setActionError('Error de conexion al transferir')
+    }
+
     refresh()
     setActionLoading(null)
   }
@@ -238,14 +310,22 @@ export default function AgentWorkstationPage() {
                 {/* Actions */}
                 <div className="flex flex-wrap gap-3 justify-center">
                   {currentTicket.status === 'called' && (
-                    <Button variant="primary" size="lg" isLoading={actionLoading === 'start'} onClick={handleStartServing}>
-                      Iniciar Atencion
-                    </Button>
+                    <>
+                      <Button variant="primary" size="lg" isLoading={actionLoading === 'start'} onClick={handleStartServing}>
+                        Iniciar Atencion
+                      </Button>
+                      <Button variant="secondary" onClick={handleRecall}>
+                        Re-llamar
+                      </Button>
+                    </>
                   )}
                   {currentTicket.status === 'serving' && (
                     <>
                       <Button variant="primary" size="lg" isLoading={actionLoading === 'complete'} onClick={handleComplete}>
                         Completar
+                      </Button>
+                      <Button variant="secondary" onClick={() => setShowTransfer(!showTransfer)}>
+                        Transferir
                       </Button>
                     </>
                   )}
@@ -253,6 +333,47 @@ export default function AgentWorkstationPage() {
                     No se Presento
                   </Button>
                 </div>
+
+                {/* Transfer Panel */}
+                {showTransfer && currentTicket.status === 'serving' && (
+                  <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
+                    <p className="text-sm font-medium text-amber-800">Transferir a otro servicio</p>
+                    <select
+                      value={transferServiceId}
+                      onChange={(e) => setTransferServiceId(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-amber-200 rounded text-sm"
+                    >
+                      <option value="">Seleccionar servicio...</option>
+                      {services
+                        .filter(s => s.id !== currentTicket.service_id)
+                        .map(s => (
+                          <option key={s.id} value={s.id}>{s.name}</option>
+                        ))
+                      }
+                    </select>
+                    <input
+                      type="text"
+                      value={transferReason}
+                      onChange={(e) => setTransferReason(e.target.value)}
+                      placeholder="Razon de transferencia (opcional)"
+                      className="w-full px-3 py-2 bg-white border border-amber-200 rounded text-sm"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        isLoading={actionLoading === 'transfer'}
+                        onClick={handleTransfer}
+                        disabled={!transferServiceId}
+                      >
+                        Confirmar Transferencia
+                      </Button>
+                      <Button variant="secondary" size="sm" onClick={() => setShowTransfer(false)}>
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Notes */}
                 {currentTicket.status === 'serving' && (
