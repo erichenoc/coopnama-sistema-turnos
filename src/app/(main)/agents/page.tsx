@@ -11,7 +11,6 @@ import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
 import type { TicketWithRelations, Station } from '@/shared/types/domain'
 
 const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
-const DEMO_AGENT_ID = '00000000-0000-0000-0000-000000000001'
 
 export default function AgentWorkstationPage() {
   const [stations, setStations] = useState<Station[]>([])
@@ -20,7 +19,19 @@ export default function AgentWorkstationPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [serviceTimer, setServiceTimer] = useState(0)
   const [notes, setNotes] = useState('')
+  const [agentId, setAgentId] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const { waiting, called, refresh } = useRealtimeQueue(DEMO_BRANCH_ID)
+
+  // Get current authenticated user ID
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setAgentId(user.id)
+    }
+    getUser()
+  }, [])
 
   // Fetch stations
   useEffect(() => {
@@ -68,10 +79,13 @@ export default function AgentWorkstationPage() {
   useEffect(() => { fetchCurrentTicket() }, [fetchCurrentTicket])
 
   const handleCallNext = async () => {
-    if (!selectedStation) return
+    if (!selectedStation || !agentId) return
     setActionLoading('call')
-    const result = await callNextTicketAction(selectedStation, DEMO_AGENT_ID)
-    if (result.data) {
+    setActionError(null)
+    const result = await callNextTicketAction(selectedStation, agentId)
+    if (result.error) {
+      setActionError(result.error)
+    } else if (result.data) {
       setCurrentTicket(result.data as TicketWithRelations)
     }
     refresh()
@@ -79,10 +93,13 @@ export default function AgentWorkstationPage() {
   }
 
   const handleStartServing = async () => {
-    if (!currentTicket) return
+    if (!currentTicket || !agentId) return
     setActionLoading('start')
-    const result = await startServingAction(currentTicket.id, DEMO_AGENT_ID)
-    if (result.data) {
+    setActionError(null)
+    const result = await startServingAction(currentTicket.id, agentId)
+    if (result.error) {
+      setActionError(result.error)
+    } else if (result.data) {
       setCurrentTicket(result.data as TicketWithRelations)
       setServiceTimer(0)
     }
@@ -90,22 +107,32 @@ export default function AgentWorkstationPage() {
   }
 
   const handleComplete = async () => {
-    if (!currentTicket) return
+    if (!currentTicket || !agentId) return
     setActionLoading('complete')
-    await completeTicketAction(currentTicket.id, DEMO_AGENT_ID, notes || undefined)
-    setCurrentTicket(null)
-    setServiceTimer(0)
-    setNotes('')
+    setActionError(null)
+    const result = await completeTicketAction(currentTicket.id, agentId, notes || undefined)
+    if (result.error) {
+      setActionError(result.error)
+    } else {
+      setCurrentTicket(null)
+      setServiceTimer(0)
+      setNotes('')
+    }
     refresh()
     setActionLoading(null)
   }
 
   const handleNoShow = async () => {
-    if (!currentTicket) return
+    if (!currentTicket || !agentId) return
     setActionLoading('noshow')
-    await markNoShowAction(currentTicket.id, DEMO_AGENT_ID)
-    setCurrentTicket(null)
-    setServiceTimer(0)
+    setActionError(null)
+    const result = await markNoShowAction(currentTicket.id, agentId)
+    if (result.error) {
+      setActionError(result.error)
+    } else {
+      setCurrentTicket(null)
+      setServiceTimer(0)
+    }
     refresh()
     setActionLoading(null)
   }
@@ -137,6 +164,17 @@ export default function AgentWorkstationPage() {
         </div>
       </div>
 
+      {actionError && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-center justify-between">
+          <span>{actionError}</span>
+          <button onClick={() => setActionError(null)} className="text-red-400 hover:text-red-600 ml-4">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Panel - Current Ticket */}
         <div className="lg:col-span-2 space-y-6">
@@ -145,7 +183,7 @@ export default function AgentWorkstationPage() {
             <div className="text-center py-12">
               <button
                 onClick={handleCallNext}
-                disabled={actionLoading === 'call' || waiting.length === 0}
+                disabled={actionLoading === 'call' || waiting.length === 0 || !agentId}
                 className={`
                   inline-flex items-center justify-center gap-3
                   px-12 py-6
