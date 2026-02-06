@@ -30,7 +30,7 @@ export function SubscriptionBanner() {
         .in('status', ['active', 'trialing', 'past_due'])
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       if (data) {
         const plan = data.plan as unknown as { name: string; slug: string }
