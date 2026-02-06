@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /queue
+Disallow: /agents
+Disallow: /members
+Disallow: /settings
+Disallow: /reports
+Disallow: /branches
+Disallow: /services

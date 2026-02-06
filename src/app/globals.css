@@ -1,0 +1,312 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   NEUMORPHISM DESIGN SYSTEM - COOPNAMA TURNOS
+   ============================================ */
+
+/* CSS Variables for Neumorphism */
+:root {
+  /* Neumorphism Light Mode */
+  --neu-bg: #e6e7ee;
+  --neu-surface: #e6e7ee;
+  --neu-shadow-dark: #b8b9be;
+  --neu-shadow-light: #ffffff;
+
+  /* Text Colors */
+  --neu-text-primary: #374151;
+  --neu-text-secondary: #6b7280;
+  --neu-text-muted: #9ca3af;
+
+  /* COOPNAMA Brand */
+  --coopnama-primary: #1e40af;
+  --coopnama-secondary: #10b981;
+  --coopnama-accent: #f59e0b;
+  --coopnama-danger: #ef4444;
+
+  /* Ticket Status */
+  --status-waiting: #3b82f6;
+  --status-called: #f59e0b;
+  --status-serving: #10b981;
+  --status-completed: #6b7280;
+  --status-cancelled: #ef4444;
+
+  /* Shadows */
+  --shadow-neu: 6px 6px 12px var(--neu-shadow-dark), -6px -6px 12px var(--neu-shadow-light);
+  --shadow-neu-sm: 4px 4px 8px var(--neu-shadow-dark), -4px -4px 8px var(--neu-shadow-light);
+  --shadow-neu-inset: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light);
+
+  /* Transitions */
+  --transition-fast: 150ms ease-out;
+  --transition-normal: 200ms ease-out;
+  --transition-slow: 300ms ease-out;
+
+  /* Border Radius */
+  --radius-neu: 16px;
+  --radius-neu-sm: 12px;
+  --radius-neu-lg: 24px;
+}
+
+/* Dark Mode Variables */
+.dark {
+  --neu-bg: #2d2d2d;
+  --neu-surface: #2d2d2d;
+  --neu-shadow-dark: #1a1a1a;
+  --neu-shadow-light: #404040;
+
+  --neu-text-primary: #f3f4f6;
+  --neu-text-secondary: #d1d5db;
+  --neu-text-muted: #9ca3af;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--neu-bg);
+  color: var(--neu-text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   NEUMORPHISM UTILITY CLASSES
+   ============================================ */
+
+/* Raised Effect */
+.neu-raised {
+  background-color: var(--neu-surface);
+  box-shadow: var(--shadow-neu);
+  border-radius: var(--radius-neu);
+}
+
+.neu-raised-sm {
+  background-color: var(--neu-surface);
+  box-shadow: var(--shadow-neu-sm);
+  border-radius: var(--radius-neu-sm);
+}
+
+/* Inset/Pressed Effect */
+.neu-inset {
+  background-color: var(--neu-surface);
+  box-shadow: var(--shadow-neu-inset);
+  border-radius: var(--radius-neu);
+}
+
+/* Interactive Button */
+.neu-button {
+  background-color: var(--neu-surface);
+  box-shadow: var(--shadow-neu);
+  border-radius: var(--radius-neu);
+  transition: box-shadow var(--transition-fast);
+}
+
+.neu-button:hover {
+  box-shadow: var(--shadow-neu-sm);
+}
+
+.neu-button:active {
+  box-shadow: var(--shadow-neu-inset);
+}
+
+/* Focus States (Accesibilidad) */
+.neu-focus:focus {
+  outline: none;
+  box-shadow: var(--shadow-neu-inset), 0 0 0 3px rgba(30, 64, 175, 0.3);
+}
+
+.neu-focus:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-neu-inset), 0 0 0 3px rgba(30, 64, 175, 0.5);
+}
+
+/* ============================================
+   INPUT STYLES (Neumorphism)
+   ============================================ */
+
+.neu-input {
+  background-color: var(--neu-surface);
+  box-shadow: var(--shadow-neu-inset);
+  border-radius: var(--radius-neu-sm);
+  border: none;
+  color: var(--neu-text-primary);
+  transition: box-shadow var(--transition-fast);
+}
+
+.neu-input::placeholder {
+  color: var(--neu-text-muted);
+}
+
+.neu-input:focus {
+  outline: none;
+  box-shadow: inset 6px 6px 12px var(--neu-shadow-dark),
+              inset -6px -6px 12px var(--neu-shadow-light),
+              0 0 0 3px rgba(30, 64, 175, 0.2);
+}
+
+/* ============================================
+   CARD STYLES
+   ============================================ */
+
+.neu-card {
+  background-color: var(--neu-surface);
+  box-shadow: var(--shadow-neu);
+  border-radius: var(--radius-neu-lg);
+}
+
+.neu-card-sm {
+  background-color: var(--neu-surface);
+  box-shadow: var(--shadow-neu-sm);
+  border-radius: var(--radius-neu);
+}
+
+/* ============================================
+   TICKET SPECIFIC STYLES
+   ============================================ */
+
+.ticket-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.ticket-waiting {
+  border-left: 4px solid var(--status-waiting);
+}
+
+.ticket-called {
+  border-left: 4px solid var(--status-called);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.ticket-serving {
+  border-left: 4px solid var(--status-serving);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: var(--shadow-neu);
+  }
+  50% {
+    box-shadow: var(--shadow-neu), 0 0 20px rgba(245, 158, 11, 0.3);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+/* ============================================
+   TV DISPLAY STYLES
+   ============================================ */
+
+.tv-display {
+  background: linear-gradient(135deg, var(--neu-bg) 0%, #dde1e7 100%);
+  min-height: 100vh;
+}
+
+.now-serving-number {
+  font-size: clamp(4rem, 15vw, 12rem);
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   KIOSK STYLES
+   ============================================ */
+
+.kiosk-button {
+  min-height: 120px;
+  font-size: 1.25rem;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.kiosk-input {
+  font-size: 2rem;
+  text-align: center;
+  letter-spacing: 0.5em;
+}
+
+/* ============================================
+   SCROLLBAR STYLES
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neu-bg);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neu-shadow-dark);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+@media (max-width: 640px) {
+  :root {
+    --radius-neu: 12px;
+    --radius-neu-sm: 8px;
+    --radius-neu-lg: 16px;
+  }
+}
+
+/* Print Styles for Tickets */
+@media print {
+  .neu-card,
+  .neu-raised,
+  .neu-button {
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb;
+  }
+}
