@@ -1,5 +1,8 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Metadata } from 'next'
+
+const LOGO_URL = 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png'
 
 export const metadata: Metadata = {
   title: 'COOPNAMA Turnos - Sistema Inteligente de Gestión de Turnos',
@@ -19,9 +22,7 @@ export default function Home() {
       {/* Header */}
       <header className="p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-coopnama-primary rounded-neu-sm shadow-neu-sm flex items-center justify-center">
-            <span className="text-white font-bold text-xl">C</span>
-          </div>
+          <Image src={LOGO_URL} alt="COOPNAMA" width={48} height={48} className="rounded-lg object-contain" priority />
           <span className="font-bold text-xl text-gray-800">COOPNAMA</span>
         </div>
         <nav className="flex items-center gap-4">
@@ -208,9 +209,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-coopnama-primary rounded-neu-sm shadow-neu-xs flex items-center justify-center">
-                <span className="text-white font-bold">C</span>
-              </div>
+              <Image src={LOGO_URL} alt="COOPNAMA" width={40} height={40} className="rounded-lg object-contain" />
               <div>
                 <p className="font-bold text-gray-800">COOPNAMA</p>
                 <p className="text-sm text-gray-500">Cooperativa Nacional de Maestros</p>

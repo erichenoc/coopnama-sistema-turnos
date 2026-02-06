@@ -72,6 +72,9 @@ export async function POST(request: NextRequest) {
       notes,
       slot_id,
       member_id,
+      is_recurring,
+      recurrence_pattern,
+      recurrence_end_date,
     } = body
 
     if (!organization_id || !branch_id || !service_id || !customer_name || !appointment_date || !appointment_time) {
@@ -125,6 +128,9 @@ export async function POST(request: NextRequest) {
         slot_id: slot_id || null,
         member_id: member_id || null,
         status: 'confirmed',
+        is_recurring: is_recurring || false,
+        recurrence_pattern: recurrence_pattern || null,
+        recurrence_end_date: recurrence_end_date || null,
       })
       .select('*')
       .single()

@@ -1,10 +1,24 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { estimateWaitTime } from '@/lib/estimations/wait-time'
 import { useRealtimeQueue } from '@/shared/hooks/use-realtime-queue'
 import { useTicketAnnouncer } from '@/shared/hooks/use-ticket-announcer'
+
+interface ServiceEstimate {
+  serviceId: string
+  serviceName: string
+  waitingCount: number
+  estimatedMinutes: number
+}
+
+interface OrgBranding {
+  name: string
+  logo_url: string | null
+  primary_color: string
+}
 
 export default function TVDisplayPage() {
   const searchParams = useSearchParams()
@@ -14,6 +28,58 @@ export default function TVDisplayPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [lastCalledId, setLastCalledId] = useState<string | null>(null)
   const [isNew, setIsNew] = useState(false)
+  const [serviceEstimates, setServiceEstimates] = useState<ServiceEstimate[]>([])
+  const [branding, setBranding] = useState<OrgBranding>({ name: 'COOPNAMA', logo_url: null, primary_color: '#1e40af' })
+
+  // Fetch wait time estimates per service + branding
+  const fetchEstimates = useCallback(async () => {
+    if (!branchId) return
+    const supabase = createClient()
+
+    // Get org_id from branch
+    const { data: branch } = await supabase
+      .from('branches')
+      .select('organization_id')
+      .eq('id', branchId)
+      .single()
+    if (!branch) return
+
+    const [servicesRes, orgRes] = await Promise.all([
+      supabase.from('services').select('id, name, avg_duration_minutes').eq('organization_id', branch.organization_id).eq('is_active', true).order('sort_order'),
+      supabase.from('organizations').select('name, logo_url, primary_color').eq('id', branch.organization_id).single(),
+    ])
+
+    if (orgRes.data) {
+      setBranding({
+        name: orgRes.data.name || 'COOPNAMA',
+        logo_url: orgRes.data.logo_url,
+        primary_color: orgRes.data.primary_color || '#1e40af',
+      })
+    }
+
+    const services = servicesRes.data
+    if (!services || services.length === 0) return
+
+    const estimates = await Promise.all(
+      services.map(async (svc) => {
+        const est = await estimateWaitTime(branchId, svc.id, svc.avg_duration_minutes)
+        return {
+          serviceId: svc.id,
+          serviceName: svc.name,
+          waitingCount: est.waitingCount,
+          estimatedMinutes: est.estimatedMinutes,
+        }
+      })
+    )
+    setServiceEstimates(estimates.filter(e => e.waitingCount > 0))
+  }, [branchId])
+
+  // Refresh estimates every 30 seconds
+  useEffect(() => {
+    fetchEstimates()
+    const interval = setInterval(fetchEstimates, 30000)
+    return () => clearInterval(interval)
+  }, [fetchEstimates])
 
   // Resolve branch ID from URL param or fetch first active branch
   useEffect(() => {
@@ -92,11 +158,15 @@ export default function TVDisplayPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden">
       <header className="flex items-center justify-between px-8 py-4 bg-black/30">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-coopnama-primary rounded-xl flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">C</span>
-          </div>
+          {branding.logo_url ? (
+            <img src={branding.logo_url} alt={branding.name} className="w-14 h-14 rounded-xl object-contain bg-white/10 p-1" />
+          ) : (
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ backgroundColor: branding.primary_color }}>
+              <span className="text-white font-bold text-2xl">{branding.name.charAt(0)}</span>
+            </div>
+          )}
           <div>
-            <h1 className="text-2xl font-bold">COOPNAMA</h1>
+            <h1 className="text-2xl font-bold">{branding.name}</h1>
             <p className="text-blue-300 text-sm">Sistema de Turnos</p>
           </div>
         </div>
@@ -181,6 +251,20 @@ export default function TVDisplayPage() {
               )}
             </div>
           </div>
+
+          {serviceEstimates.length > 0 && (
+            <div className="p-6 border-t border-white/10">
+              <h3 className="text-blue-300 font-semibold mb-3 uppercase tracking-wider text-sm">Tiempo Estimado</h3>
+              <div className="space-y-2">
+                {serviceEstimates.map((est) => (
+                  <div key={est.serviceId} className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                    <span className="text-sm text-blue-200 truncate flex-1">{est.serviceName}</span>
+                    <span className="text-sm font-bold text-amber-300 ml-2">~{est.estimatedMinutes}m</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

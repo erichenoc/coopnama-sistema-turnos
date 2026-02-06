@@ -31,7 +31,11 @@ export const metadata: Metadata = {
   generator: 'Next.js',
   manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.svg',
+    icon: 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png',
+    apple: 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png',
+  },
+  openGraph: {
+    images: ['https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png'],
   },
 }
 

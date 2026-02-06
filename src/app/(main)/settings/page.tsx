@@ -14,16 +14,29 @@ import {
   Badge,
   Spinner,
 } from '@/shared/components'
+import { LogoUploader } from '@/features/branding/components/logo-uploader'
+import { ColorPicker } from '@/features/branding/components/color-picker'
+import { updateBrandingAction } from '@/features/branding/actions/branding-actions'
+import { PricingCards } from '@/features/billing/components/pricing-cards'
+import { DomainManager } from '@/features/white-label/components/domain-manager'
+import { CSSEditor } from '@/features/white-label/components/css-editor'
+import { MFASetup } from '@/features/auth/components/mfa-setup'
+import { APIKeyManager } from '@/features/api/components/api-key-manager'
 import { toast } from 'sonner'
 import { useOrg } from '@/shared/providers/org-provider'
 
-type Tab = 'general' | 'notificaciones' | 'integraciones' | 'cuenta'
+type Tab = 'general' | 'marca' | 'facturacion' | 'whitelabel' | 'api' | 'notificaciones' | 'integraciones' | 'cuenta'
 
 interface OrgSettings {
   name: string
   primary_color: string
+  secondary_color: string
   timezone: string
   logo_url: string | null
+  custom_css: string | null
+  favicon_url: string | null
+  meta_title: string | null
+  meta_description: string | null
 }
 
 interface NotificationSettings {
@@ -52,9 +65,15 @@ export default function SettingsPage() {
   const [orgSettings, setOrgSettings] = useState<OrgSettings>({
     name: '',
     primary_color: '#1e40af',
+    secondary_color: '#059669',
     timezone: 'America/Santo_Domingo',
     logo_url: null,
+    custom_css: null,
+    favicon_url: null,
+    meta_title: null,
+    meta_description: null,
   })
+  const [savingBranding, setSavingBranding] = useState(false)
 
   // Notification settings
   const [notifications, setNotifications] = useState<NotificationSettings>({
@@ -97,12 +116,22 @@ export default function SettingsPage() {
       // Fetch organization settings
       const { data: org } = await supabase
         .from('organizations')
-        .select('name, primary_color, timezone, logo_url')
+        .select('name, primary_color, secondary_color, timezone, logo_url, custom_css, favicon_url, meta_title, meta_description')
         .eq('id', organizationId)
         .single()
 
       if (org) {
-        setOrgSettings(org)
+        setOrgSettings({
+          name: org.name || '',
+          primary_color: org.primary_color || '#1e40af',
+          secondary_color: org.secondary_color || '#059669',
+          timezone: org.timezone || 'America/Santo_Domingo',
+          logo_url: org.logo_url || null,
+          custom_css: org.custom_css || null,
+          favicon_url: org.favicon_url || null,
+          meta_title: org.meta_title || null,
+          meta_description: org.meta_description || null,
+        })
       }
 
       // Fetch notification settings from localStorage
@@ -131,11 +160,7 @@ export default function SettingsPage() {
     try {
       const { error } = await supabase
         .from('organizations')
-        .update({
-          name: orgSettings.name,
-          primary_color: orgSettings.primary_color,
-          logo_url: orgSettings.logo_url,
-        })
+        .update({ name: orgSettings.name })
         .eq('id', organizationId)
 
       if (error) throw error
@@ -147,6 +172,21 @@ export default function SettingsPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleSaveBranding = async () => {
+    setSavingBranding(true)
+    const result = await updateBrandingAction(organizationId, {
+      primary_color: orgSettings.primary_color,
+      secondary_color: orgSettings.secondary_color,
+      logo_url: orgSettings.logo_url,
+    })
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success('Marca actualizada exitosamente')
+    }
+    setSavingBranding(false)
   }
 
   const handleSaveNotifications = () => {
@@ -196,6 +236,10 @@ export default function SettingsPage() {
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: 'general', label: 'General', icon: '⚙️' },
+    { id: 'marca', label: 'Marca', icon: '🎨' },
+    { id: 'facturacion', label: 'Facturacion', icon: '💳' },
+    { id: 'whitelabel', label: 'White-label', icon: '🌐' },
+    { id: 'api', label: 'API', icon: '🔗' },
     { id: 'notificaciones', label: 'Notificaciones', icon: '🔔' },
     { id: 'integraciones', label: 'Integraciones', icon: '🔌' },
     { id: 'cuenta', label: 'Cuenta', icon: '👤' },
@@ -257,42 +301,12 @@ export default function SettingsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color Principal
-                </label>
-                <div className="flex gap-3 items-center">
-                  <Input
-                    type="color"
-                    value={orgSettings.primary_color}
-                    onChange={(e) => setOrgSettings({ ...orgSettings, primary_color: e.target.value })}
-                    className="w-20 h-10"
-                  />
-                  <Input
-                    value={orgSettings.primary_color}
-                    onChange={(e) => setOrgSettings({ ...orgSettings, primary_color: e.target.value })}
-                    placeholder="#1e40af"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Zona Horaria
                 </label>
                 <Input
                   value={orgSettings.timezone}
                   disabled
                   className="bg-gray-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  URL del Logo
-                </label>
-                <Input
-                  value={orgSettings.logo_url || ''}
-                  onChange={(e) => setOrgSettings({ ...orgSettings, logo_url: e.target.value })}
-                  placeholder="https://example.com/logo.png"
                 />
               </div>
 
@@ -307,6 +321,100 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {activeTab === 'marca' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Logo de la Organizacion</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <LogoUploader
+                currentLogoUrl={orgSettings.logo_url}
+                organizationId={organizationId}
+                onUploaded={(url) => setOrgSettings({ ...orgSettings, logo_url: url })}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Colores de Marca</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <ColorPicker
+                  label="Color Primario"
+                  value={orgSettings.primary_color}
+                  onChange={(color) => setOrgSettings({ ...orgSettings, primary_color: color })}
+                />
+                <ColorPicker
+                  label="Color Secundario"
+                  value={orgSettings.secondary_color}
+                  onChange={(color) => setOrgSettings({ ...orgSettings, secondary_color: color })}
+                />
+
+                {/* Live Preview */}
+                <div className="mt-6 p-4 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Vista Previa</p>
+                  <div className="flex gap-3">
+                    <div
+                      className="flex-1 h-16 rounded-lg flex items-center justify-center text-white font-bold"
+                      style={{ backgroundColor: orgSettings.primary_color }}
+                    >
+                      Primario
+                    </div>
+                    <div
+                      className="flex-1 h-16 rounded-lg flex items-center justify-center text-white font-bold"
+                      style={{ backgroundColor: orgSettings.secondary_color }}
+                    >
+                      Secundario
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleSaveBranding}
+                  disabled={savingBranding}
+                  variant="primary"
+                  className="w-full"
+                >
+                  {savingBranding ? 'Guardando...' : 'Guardar Colores'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {activeTab === 'facturacion' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Plan y Facturacion</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PricingCards />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {activeTab === 'whitelabel' && (
+        <div className="space-y-6">
+          <DomainManager />
+          <CSSEditor
+            initialCSS={orgSettings.custom_css || ''}
+            faviconUrl={orgSettings.favicon_url || null}
+            metaTitle={orgSettings.meta_title || null}
+            metaDescription={orgSettings.meta_description || null}
+          />
+        </div>
+      )}
+
+      {activeTab === 'api' && (
+        <APIKeyManager />
       )}
 
       {activeTab === 'notificaciones' && (
@@ -488,6 +596,9 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* 2FA/MFA */}
+          <MFASetup />
 
           {/* Change Password */}
           <Card>

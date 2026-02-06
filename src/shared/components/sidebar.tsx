@@ -2,8 +2,10 @@
 
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/shared/utils/cn'
+import { LOGO_URL } from './coopnama-logo'
 
 export interface NavItem {
   label: string
@@ -63,9 +65,7 @@ export function Sidebar({
       >
         {logo || (
           <div className={cn('flex items-center gap-3', collapsed && 'justify-center')}>
-            <div className="w-10 h-10 bg-coopnama-primary rounded-neu-sm shadow-neu-sm flex items-center justify-center">
-              <span className="text-white font-bold text-lg">C</span>
-            </div>
+            <Image src={LOGO_URL} alt="COOPNAMA" width={40} height={40} className="rounded-lg object-contain" priority />
             {!collapsed && (
               <div className="flex flex-col">
                 <span className="font-bold text-gray-800">COOPNAMA</span>

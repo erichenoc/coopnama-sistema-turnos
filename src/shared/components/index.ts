@@ -66,3 +66,6 @@ export {
   DashboardGrid,
   type DashboardLayoutProps,
 } from './dashboard-layout'
+
+// Branding
+export { CoopnamaLogo, LOGO_URL } from './coopnama-logo'

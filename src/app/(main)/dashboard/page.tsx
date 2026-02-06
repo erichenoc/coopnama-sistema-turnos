@@ -14,6 +14,8 @@ import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
 import type { DailyStats } from '@/shared/types/domain'
 import Link from 'next/link'
 import { useOrg } from '@/shared/providers/org-provider'
+import { AnomalyAlerts } from '@/features/ai/components/anomaly-alerts'
+import { SubscriptionBanner } from '@/features/billing/components/subscription-banner'
 
 export default function DashboardPage() {
   const { branchId } = useOrg()
@@ -122,11 +124,17 @@ export default function DashboardPage() {
         }
       />
 
+      <SubscriptionBanner />
+
       <DashboardGrid columns={4} className="mb-6">
         {statCards.map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}
       </DashboardGrid>
+
+      <div className="mb-6">
+        <AnomalyAlerts />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">

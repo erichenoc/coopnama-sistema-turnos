@@ -1,14 +1,17 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
+import { estimateWaitTimeForTicket } from '@/lib/estimations/wait-time'
+import { LOGO_URL } from '@/shared/components/coopnama-logo'
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from '@/shared/components'
 import { StatusBadge } from '@/shared/components/badge'
 import { Spinner } from '@/shared/components/spinner'
 import { STATUS_LABELS } from '@/shared/types/domain'
 import type { TicketWithRelations, TicketStatus } from '@/shared/types/domain'
 import Link from 'next/link'
-import { Bell, BellOff, Clock, TrendingUp, QrCode } from 'lucide-react'
+import { Bell, BellOff, Clock, TrendingUp, QrCode, Users } from 'lucide-react'
 
 const STEPS: { status: TicketStatus; label: string }[] = [
   { status: 'waiting', label: 'En Espera' },
@@ -24,6 +27,7 @@ export default function MiTurnoPage() {
   const [error, setError] = useState<string | null>(null)
   const [position, setPosition] = useState<number | null>(null)
   const [estimatedWait, setEstimatedWait] = useState<number | null>(null)
+  const [activeAgents, setActiveAgents] = useState<number | null>(null)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
   const prevStatusRef = useRef<TicketStatus | null>(null)
@@ -41,26 +45,26 @@ export default function MiTurnoPage() {
     if (ticketData.status !== 'waiting') {
       setPosition(null)
       setEstimatedWait(null)
+      setActiveAgents(null)
       return
     }
 
-    const supabase = createClient()
-    const today = new Date().toISOString().split('T')[0]
-
-    const { count } = await supabase
-      .from('tickets')
-      .select('*', { count: 'exact', head: true })
-      .eq('branch_id', ticketData.branch_id)
-      .eq('status', 'waiting')
-      .gte('created_at', today)
-      .lt('created_at', ticketData.created_at)
-
-    const pos = (count || 0) + 1
-    setPosition(pos)
-
-    // Calculate estimated wait time
-    const avgServiceTime = ticketData.service?.avg_duration_minutes || 5
-    setEstimatedWait(pos * avgServiceTime)
+    try {
+      const estimate = await estimateWaitTimeForTicket(
+        ticketData.branch_id,
+        ticketData.service_id,
+        ticketData.created_at,
+        ticketData.service?.avg_duration_minutes || 5
+      )
+      setPosition(estimate.position)
+      setEstimatedWait(estimate.estimatedMinutes)
+      setActiveAgents(estimate.activeAgents)
+    } catch {
+      // Fallback to simple calculation
+      setPosition(null)
+      setEstimatedWait(null)
+      setActiveAgents(null)
+    }
   }
 
   const searchTicket = async () => {
@@ -239,9 +243,7 @@ export default function MiTurnoPage() {
       <header className="bg-coopnama-primary text-white py-6 px-8 shadow-lg">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">C</span>
-            </div>
+            <Image src={LOGO_URL} alt="COOPNAMA" width={40} height={40} className="rounded-lg object-contain" priority />
             <span className="font-bold text-xl">COOPNAMA</span>
           </div>
           <Link href="/" className="text-blue-200 hover:text-white text-sm transition-colors">
@@ -335,19 +337,26 @@ export default function MiTurnoPage() {
 
                 {/* Position & Wait Time */}
                 {ticket.status === 'waiting' && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-3">
                     {position !== null && (
                       <div className="p-4 bg-coopnama-primary/5 rounded-neu text-center shadow-neu-inset">
-                        <TrendingUp className="w-6 h-6 mx-auto mb-2 text-coopnama-primary" />
-                        <p className="text-sm text-gray-500">Posición</p>
-                        <p className="text-3xl font-bold text-coopnama-primary">{position}</p>
+                        <TrendingUp className="w-5 h-5 mx-auto mb-1 text-coopnama-primary" />
+                        <p className="text-xs text-gray-500">Posicion</p>
+                        <p className="text-2xl font-bold text-coopnama-primary">{position}</p>
                       </div>
                     )}
                     {estimatedWait !== null && (
                       <div className="p-4 bg-coopnama-secondary/5 rounded-neu text-center shadow-neu-inset">
-                        <Clock className="w-6 h-6 mx-auto mb-2 text-coopnama-secondary" />
-                        <p className="text-sm text-gray-500">Espera Est.</p>
-                        <p className="text-3xl font-bold text-coopnama-secondary">{estimatedWait}m</p>
+                        <Clock className="w-5 h-5 mx-auto mb-1 text-coopnama-secondary" />
+                        <p className="text-xs text-gray-500">Espera Est.</p>
+                        <p className="text-2xl font-bold text-coopnama-secondary">~{estimatedWait}m</p>
+                      </div>
+                    )}
+                    {activeAgents !== null && (
+                      <div className="p-4 bg-blue-50 rounded-neu text-center shadow-neu-inset">
+                        <Users className="w-5 h-5 mx-auto mb-1 text-blue-500" />
+                        <p className="text-xs text-gray-500">Agentes</p>
+                        <p className="text-2xl font-bold text-blue-500">{activeAgents}</p>
                       </div>
                     )}
                   </div>

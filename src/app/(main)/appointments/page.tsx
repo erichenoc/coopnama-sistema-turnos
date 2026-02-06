@@ -35,9 +35,18 @@ interface Appointment {
   confirmation_code: string
   cancelled_at: string | null
   cancellation_reason: string | null
+  is_recurring: boolean
+  recurrence_pattern: string | null
+  parent_appointment_id: string | null
   created_at: string
   updated_at: string
   service: Service
+}
+
+const RECURRENCE_LABELS: Record<string, string> = {
+  weekly: 'Semanal',
+  biweekly: 'Quincenal',
+  monthly: 'Mensual',
 }
 
 const STATUS_LABELS: Record<AppointmentStatus, string> = {
@@ -312,9 +321,17 @@ export default function AppointmentsPage() {
                         </code>
                       </td>
                       <td className="py-3 px-4">
-                        <Badge size="sm" className={STATUS_STYLES[appointment.status]}>
-                          {STATUS_LABELS[appointment.status]}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge size="sm" className={STATUS_STYLES[appointment.status]}>
+                            {STATUS_LABELS[appointment.status]}
+                          </Badge>
+                          {(appointment.is_recurring || appointment.parent_appointment_id) && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-indigo-50 text-indigo-600 border border-indigo-200" title={appointment.recurrence_pattern ? RECURRENCE_LABELS[appointment.recurrence_pattern] : 'Recurrente'}>
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                              {appointment.recurrence_pattern ? RECURRENCE_LABELS[appointment.recurrence_pattern] : 'Rec.'}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-2">

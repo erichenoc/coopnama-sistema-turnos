@@ -59,6 +59,12 @@ Thumbs.db
 .claude/plugins
 *.mcp.json
 !example.mcp.json
+.playwright-mcp/
+tsconfig.tsbuildinfo
+
+# Screenshots (dev only)
+*.png
+!public/**/*.png
 
 # Supabase
 supabase/.branches

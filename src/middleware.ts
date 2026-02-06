@@ -27,6 +27,17 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // White-label: detect custom domain and pass org info via headers
+  const hostname = request.headers.get('host') || ''
+  const isCustomDomain = hostname &&
+    !hostname.includes('localhost') &&
+    !hostname.includes('vercel.app') &&
+    !hostname.includes('coopnama')
+
+  if (isCustomDomain) {
+    supabaseResponse.headers.set('x-custom-domain', hostname)
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
 
   const isPublicRoute = PUBLIC_ROUTES.some(route =>

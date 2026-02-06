@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { createTicketAction } from '@/lib/actions/tickets'
+import { estimateWaitTime } from '@/lib/estimations/wait-time'
 import { Spinner } from '@/shared/components/spinner'
 import { TicketReceipt } from '@/shared/components/ticket-receipt'
+import { useThermalPrinter } from '@/shared/hooks/use-thermal-printer'
 import type { Service, Ticket } from '@/shared/types/domain'
 
 interface Member {
@@ -18,6 +20,13 @@ interface Member {
   member_type: string  // 'socio' | 'cliente' | 'empleado' | 'vip'
   phone: string | null
   email: string | null
+}
+
+interface OrgBranding {
+  name: string
+  logo_url: string | null
+  primary_color: string
+  secondary_color: string
 }
 
 const INACTIVITY_TIMEOUT = 30000
@@ -46,6 +55,9 @@ export default function KioskPage() {
   const [error, setError] = useState<string | null>(null)
   const [memberFound, setMemberFound] = useState<Member | null>(null)
   const [lookingUp, setLookingUp] = useState(false)
+  const [waitEstimate, setWaitEstimate] = useState<{ waitingCount: number; estimatedMinutes: number } | null>(null)
+  const [branding, setBranding] = useState<OrgBranding>({ name: 'COOPNAMA', logo_url: null, primary_color: '#1e40af', secondary_color: '#059669' })
+  const thermalPrinter = useThermalPrinter()
 
   // Resolve org and branch IDs from URL params or fallback to first available
   useEffect(() => {
@@ -94,22 +106,28 @@ export default function KioskPage() {
     resolveOrgAndBranch()
   }, [searchParams])
 
-  // Fetch services once org ID is resolved
+  // Fetch services and branding once org ID is resolved
   useEffect(() => {
     if (!orgId) return
 
-    const fetchServices = async () => {
+    const fetchData = async () => {
       const supabase = createClient()
-      const { data } = await supabase
-        .from('services')
-        .select('*')
-        .eq('organization_id', orgId)
-        .eq('is_active', true)
-        .order('sort_order')
-      setServices((data || []) as Service[])
+      const [servicesRes, orgRes] = await Promise.all([
+        supabase.from('services').select('*').eq('organization_id', orgId).eq('is_active', true).order('sort_order'),
+        supabase.from('organizations').select('name, logo_url, primary_color, secondary_color').eq('id', orgId).single(),
+      ])
+      setServices((servicesRes.data || []) as Service[])
+      if (orgRes.data) {
+        setBranding({
+          name: orgRes.data.name || 'COOPNAMA',
+          logo_url: orgRes.data.logo_url,
+          primary_color: orgRes.data.primary_color || '#1e40af',
+          secondary_color: orgRes.data.secondary_color || '#059669',
+        })
+      }
       setLoading(false)
     }
-    fetchServices()
+    fetchData()
   }, [orgId])
 
   useEffect(() => {
@@ -117,6 +135,14 @@ export default function KioskPage() {
     const timeout = setTimeout(() => resetKiosk(), INACTIVITY_TIMEOUT)
     return () => clearTimeout(timeout)
   }, [step])
+
+  // Fetch wait time estimate when entering confirm step
+  useEffect(() => {
+    if (step !== 'confirm' || !selectedService || !branchId) return
+    estimateWaitTime(branchId, selectedService.id, selectedService.avg_duration_minutes)
+      .then(setWaitEstimate)
+      .catch(() => setWaitEstimate(null))
+  }, [step, selectedService, branchId])
 
   const resetKiosk = () => {
     setStep('services')
@@ -127,6 +153,7 @@ export default function KioskPage() {
     setError(null)
     setMemberFound(null)
     setLookingUp(false)
+    setWaitEstimate(null)
   }
 
   const lookupMember = async (cedula: string) => {
@@ -199,14 +226,18 @@ export default function KioskPage() {
 
   return (
     <div className="min-h-screen bg-neu-bg flex flex-col">
-      <header className="bg-coopnama-primary text-white py-6 px-8 text-center">
+      <header className="text-white py-6 px-8 text-center" style={{ backgroundColor: branding.primary_color }}>
         <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="text-white font-bold text-xl">C</span>
-          </div>
-          <h1 className="text-3xl font-bold">COOPNAMA</h1>
+          {branding.logo_url ? (
+            <img src={branding.logo_url} alt={branding.name} className="w-12 h-12 rounded-xl object-contain bg-white/20 p-1" />
+          ) : (
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-xl">{branding.name.charAt(0)}</span>
+            </div>
+          )}
+          <h1 className="text-3xl font-bold">{branding.name}</h1>
         </div>
-        <p className="text-blue-200 text-lg">Sistema de Turnos - Autoservicio</p>
+        <p className="text-white/70 text-lg">Sistema de Turnos - Autoservicio</p>
       </header>
 
       <main className="flex-1 flex items-center justify-center p-8">
@@ -331,7 +362,20 @@ export default function KioskPage() {
               <span className="text-5xl mb-4 block" dangerouslySetInnerHTML={{ __html: SERVICE_ICONS[selectedService.category] || '&#128196;' }} />
               <p className="text-2xl font-bold text-gray-800 mb-2">{selectedService.name}</p>
               {customerName && <p className="text-gray-600 text-lg">{customerName}</p>}
-              <p className="text-gray-400 mt-2">Tiempo estimado: ~{selectedService.avg_duration_minutes} min</p>
+              {waitEstimate ? (
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-coopnama-primary/5 rounded-lg">
+                    <p className="text-sm text-gray-400">En espera</p>
+                    <p className="text-2xl font-bold text-coopnama-primary">{waitEstimate.waitingCount}</p>
+                  </div>
+                  <div className="p-3 bg-coopnama-secondary/5 rounded-lg">
+                    <p className="text-sm text-gray-400">Espera est.</p>
+                    <p className="text-2xl font-bold text-coopnama-secondary">~{waitEstimate.estimatedMinutes} min</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-400 mt-2">Tiempo estimado: ~{selectedService.avg_duration_minutes} min</p>
+              )}
             </div>
             {error && (
               <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-neu-sm mb-4">
@@ -357,13 +401,17 @@ export default function KioskPage() {
           <div className="w-full max-w-lg text-center">
             <div className="p-10 bg-white shadow-neu-xl rounded-neu-xl mb-8 print:shadow-none">
               <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-coopnama-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">C</span>
-                </div>
-                <span className="font-bold text-xl text-gray-800">COOPNAMA</span>
+                {branding.logo_url ? (
+                  <img src={branding.logo_url} alt={branding.name} className="w-10 h-10 rounded-lg object-contain" />
+                ) : (
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: branding.primary_color }}>
+                    <span className="text-white font-bold text-lg">{branding.name.charAt(0)}</span>
+                  </div>
+                )}
+                <span className="font-bold text-xl text-gray-800">{branding.name}</span>
               </div>
               <p className="text-gray-500 mb-2">Su turno es</p>
-              <span className="font-mono font-black text-7xl text-coopnama-primary block mb-4">
+              <span className="font-mono font-black text-7xl block mb-4" style={{ color: branding.primary_color }}>
                 {ticket.ticket_number}
               </span>
               <p className="text-xl text-gray-700 mb-1">{selectedService?.name}</p>
@@ -377,13 +425,29 @@ export default function KioskPage() {
               </div>
             </div>
             <div className="flex gap-4 print:hidden">
-              <TicketReceipt
-                ticketNumber={ticket.ticket_number}
-                serviceName={selectedService?.name || ''}
-                customerName={customerName || null}
-                createdAt={ticket.created_at}
-                estimatedMinutes={selectedService?.avg_duration_minutes}
-              />
+              {thermalPrinter.connected ? (
+                <button
+                  onClick={() => thermalPrinter.printTicket({
+                    ticketNumber: ticket.ticket_number,
+                    serviceName: selectedService?.name || '',
+                    customerName: customerName || null,
+                    createdAt: ticket.created_at,
+                    estimatedMinutes: waitEstimate?.estimatedMinutes || selectedService?.avg_duration_minutes,
+                  })}
+                  disabled={thermalPrinter.printing}
+                  className="flex-1 py-4 text-lg font-semibold bg-coopnama-secondary text-white rounded-neu shadow-neu hover:bg-emerald-600 active:shadow-neu-inset transition-all disabled:opacity-50"
+                >
+                  {thermalPrinter.printing ? 'Imprimiendo...' : 'Imprimir Recibo'}
+                </button>
+              ) : (
+                <TicketReceipt
+                  ticketNumber={ticket.ticket_number}
+                  serviceName={selectedService?.name || ''}
+                  customerName={customerName || null}
+                  createdAt={ticket.created_at}
+                  estimatedMinutes={selectedService?.avg_duration_minutes}
+                />
+              )}
               <button onClick={resetKiosk} className="flex-1 py-4 text-lg font-semibold bg-coopnama-primary text-white rounded-neu shadow-neu hover:bg-blue-700 active:shadow-neu-inset transition-all">
                 Nuevo Turno
               </button>

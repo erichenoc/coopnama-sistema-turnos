@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { cn } from '@/shared/utils/cn'
+import { LOGO_URL } from '@/shared/components/coopnama-logo'
 
 interface CalledTicket {
   number: string
@@ -78,9 +80,7 @@ export function TVDisplay() {
       {/* Header */}
       <header className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-coopnama-primary rounded-neu shadow-neu-md flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">C</span>
-          </div>
+          <Image src={LOGO_URL} alt="COOPNAMA" width={64} height={64} className="rounded-xl object-contain" priority />
           <div>
             <h1 className="text-3xl font-bold text-gray-800">COOPNAMA</h1>
             <p className="text-lg text-gray-500">Sistema de Turnos - Santo Domingo Este</p>

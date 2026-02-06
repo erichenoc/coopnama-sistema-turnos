@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { cn } from '@/shared/utils/cn'
+import { LOGO_URL } from '@/shared/components/coopnama-logo'
 
 type Step = 'welcome' | 'cedula' | 'service' | 'priority' | 'confirm' | 'success'
 
@@ -122,9 +124,7 @@ export function KioskDisplay() {
       {/* Header */}
       <header className="p-6 flex items-center justify-between border-b border-gray-200">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-coopnama-primary rounded-neu-sm shadow-neu-sm flex items-center justify-center">
-            <span className="text-white font-bold text-xl">C</span>
-          </div>
+          <Image src={LOGO_URL} alt="COOPNAMA" width={56} height={56} className="rounded-lg object-contain" priority />
           <div>
             <h1 className="text-2xl font-bold text-gray-800">COOPNAMA</h1>
             <p className="text-gray-500">Sistema de Turnos</p>

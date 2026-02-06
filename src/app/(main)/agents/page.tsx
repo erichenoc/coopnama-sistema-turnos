@@ -11,6 +11,7 @@ import { useTicketAnnouncer } from '@/shared/hooks/use-ticket-announcer'
 import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
 import type { TicketWithRelations, Station, Service } from '@/shared/types/domain'
 import { useOrg } from '@/shared/providers/org-provider'
+import { FeedbackModal } from '@/features/feedback/components/feedback-modal'
 
 export default function AgentWorkstationPage() {
   const { branchId } = useOrg()
@@ -30,6 +31,7 @@ export default function AgentWorkstationPage() {
   const [transferReason, setTransferReason] = useState('')
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
+  const [feedbackTicket, setFeedbackTicket] = useState<{ id: string; number: string } | null>(null)
 
   // Get current authenticated user ID
   useEffect(() => {
@@ -141,6 +143,8 @@ export default function AgentWorkstationPage() {
     if (result.error) {
       setActionError(result.error)
     } else {
+      // Show feedback modal before clearing ticket
+      setFeedbackTicket({ id: currentTicket.id, number: currentTicket.ticket_number })
       setCurrentTicket(null)
       setServiceTimer(0)
       setNotes('')
@@ -505,6 +509,16 @@ export default function AgentWorkstationPage() {
           </Card>
         </div>
       </div>
+
+      {/* Feedback Modal - shown after completing a ticket */}
+      {feedbackTicket && (
+        <FeedbackModal
+          isOpen={!!feedbackTicket}
+          onClose={() => setFeedbackTicket(null)}
+          ticketId={feedbackTicket.id}
+          ticketNumber={feedbackTicket.number}
+        />
+      )}
     </>
   )
 }
