@@ -372,3 +372,155 @@ export interface ServiceOption {
   waitTime: number
   color: string
 }
+
+// ============================================
+// NOTIFICACIONES
+// ============================================
+
+export type NotificationChannel = 'whatsapp' | 'sms' | 'push' | 'email' | 'in_app'
+
+export type NotificationType =
+  | 'ticket_created'
+  | 'ticket_called'
+  | 'ticket_reminder'
+  | 'ticket_completed'
+  | 'appointment_reminder'
+  | 'appointment_confirmed'
+  | 'custom'
+
+export type NotificationStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'read'
+
+export interface Notification {
+  id: string
+  organization_id: string
+  ticket_id: string | null
+  member_id: string | null
+  recipient_phone: string | null
+  recipient_email: string | null
+  recipient_push_endpoint: string | null
+  channel: NotificationChannel
+  notification_type: NotificationType
+  title: string | null
+  body: string
+  metadata: Record<string, unknown>
+  status: NotificationStatus
+  external_id: string | null
+  error_message: string | null
+  sent_at: string | null
+  delivered_at: string | null
+  read_at: string | null
+  created_at: string
+}
+
+export interface PushSubscription {
+  id: string
+  organization_id: string
+  member_id: string | null
+  user_id: string | null
+  endpoint: string
+  p256dh: string
+  auth: string
+  device_type: string
+  user_agent: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// ============================================
+// CITAS (APPOINTMENTS)
+// ============================================
+
+export type AppointmentStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'checked_in'
+  | 'completed'
+  | 'cancelled'
+  | 'no_show'
+
+export interface AppointmentSlot {
+  id: string
+  organization_id: string
+  branch_id: string
+  service_id: string
+  slot_date: string
+  start_time: string
+  end_time: string
+  max_appointments: number
+  booked_count: number
+  is_available: boolean
+  created_at: string
+}
+
+export interface Appointment {
+  id: string
+  organization_id: string
+  branch_id: string
+  service_id: string
+  slot_id: string | null
+  member_id: string | null
+  ticket_id: string | null
+  customer_name: string
+  customer_phone: string | null
+  customer_cedula: string | null
+  customer_email: string | null
+  appointment_date: string
+  appointment_time: string
+  duration_minutes: number
+  notes: string | null
+  status: AppointmentStatus
+  confirmation_code: string
+  reminder_sent_at: string | null
+  reminder_24h_sent: boolean
+  reminder_1h_sent: boolean
+  cancelled_at: string | null
+  cancellation_reason: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AppointmentWithRelations extends Appointment {
+  service?: Service
+  branch?: Branch
+  member?: Member
+}
+
+export interface Holiday {
+  id: string
+  organization_id: string
+  branch_id: string | null
+  holiday_date: string
+  name: string
+  is_recurring: boolean
+  created_at: string
+}
+
+export interface CreateAppointmentInput {
+  organization_id: string
+  branch_id: string
+  service_id: string
+  customer_name: string
+  customer_phone?: string
+  customer_cedula?: string
+  customer_email?: string
+  appointment_date: string
+  appointment_time: string
+  duration_minutes?: number
+  notes?: string
+  slot_id?: string
+  member_id?: string
+}
+
+export interface SendNotificationInput {
+  organization_id: string
+  channel: NotificationChannel
+  notification_type: NotificationType
+  body: string
+  title?: string
+  ticket_id?: string
+  member_id?: string
+  recipient_phone?: string
+  recipient_email?: string
+  metadata?: Record<string, unknown>
+}

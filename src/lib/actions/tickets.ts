@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { Ticket, TicketWithRelations, DailyStats, CreateTicketInput } from '@/shared/types/domain'
+import { notifyTicketCreated, notifyTicketCalled, notifyTicketCompleted } from '@/lib/actions/notifications'
 
 export async function createTicketAction(
   input: CreateTicketInput
@@ -24,9 +25,14 @@ export async function createTicketAction(
 
   if (error) return { error: `Error al crear ticket: ${error.message}` }
 
+  const ticket = data as Ticket
+
+  // Fire-and-forget notification (don't block ticket creation)
+  notifyTicketCreated(ticket, input.service_id).catch(() => {})
+
   revalidatePath('/dashboard')
   revalidatePath('/queue')
-  return { data: data as Ticket }
+  return { data: ticket }
 }
 
 export async function callNextTicketAction(
@@ -42,9 +48,14 @@ export async function callNextTicketAction(
 
   if (error) return { error: `Error al llamar siguiente turno: ${error.message}` }
 
+  const ticket = data as Ticket
+
+  // Notify customer their ticket was called
+  notifyTicketCalled(ticket, stationId).catch(() => {})
+
   revalidatePath('/dashboard')
   revalidatePath('/queue')
-  return { data: data as Ticket }
+  return { data: ticket }
 }
 
 export async function startServingAction(
@@ -79,9 +90,14 @@ export async function completeTicketAction(
 
   if (error) return { error: `Error al completar atencion: ${error.message}` }
 
+  const ticket = data as Ticket
+
+  // Notify customer service is complete
+  notifyTicketCompleted(ticket).catch(() => {})
+
   revalidatePath('/dashboard')
   revalidatePath('/queue')
-  return { data: data as Ticket }
+  return { data: ticket }
 }
 
 export async function cancelTicketAction(
