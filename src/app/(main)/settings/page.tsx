@@ -34,9 +34,11 @@ interface NotificationSettings {
 }
 
 interface IntegrationStatus {
-  whatsapp: boolean
+  inworld_tts: boolean
+  whatsapp_n8n: boolean
+  twilio_sms: boolean
+  web_push: boolean
   claude_ai: boolean
-  elevenlabs: boolean
 }
 
 export default function SettingsPage() {
@@ -62,11 +64,13 @@ export default function SettingsPage() {
     sms_backup: false,
   })
 
-  // Integration settings
+  // Integration settings (detected from env)
   const [integrations, setIntegrations] = useState<IntegrationStatus>({
-    whatsapp: false,
+    inworld_tts: false,
+    whatsapp_n8n: false,
+    twilio_sms: false,
+    web_push: false,
     claude_ai: false,
-    elevenlabs: false,
   })
 
   // Password change
@@ -105,6 +109,12 @@ export default function SettingsPage() {
       const storedNotifs = localStorage.getItem('notification_settings')
       if (storedNotifs) {
         setNotifications(JSON.parse(storedNotifs))
+      }
+
+      // Fetch real integration status
+      const intRes = await fetch('/api/settings/integrations')
+      if (intRes.ok) {
+        setIntegrations(await intRes.json())
       }
     } catch (error) {
       console.error('Error fetching settings:', error)
@@ -316,30 +326,34 @@ export default function SettingsPage() {
               <Toggle
                 checked={notifications.tv_voice_enabled}
                 onChange={(e) => setNotifications({ ...notifications, tv_voice_enabled: e.target.checked })}
-                label="Voz en Pantalla TV"
-                description="Anuncio por voz usando Web Speech API"
+                label="Voz con Inworld TTS"
+                description="Anuncio por voz profesional en pantalla TV"
               />
 
               <div className="flex items-start gap-3">
                 <Toggle
                   checked={notifications.push_notifications}
                   onChange={(e) => setNotifications({ ...notifications, push_notifications: e.target.checked })}
-                  disabled
+                  disabled={!integrations.web_push}
                   label="Notificaciones Push"
-                  description="Recibir notificaciones en el navegador"
+                  description="Recibir notificaciones en el navegador de clientes"
                 />
-                <Badge variant="outline" className="mt-1 text-xs">Proximamente</Badge>
+                {!integrations.web_push && (
+                  <Badge variant="outline" className="mt-1 text-xs">Configurar VAPID</Badge>
+                )}
               </div>
 
               <div className="flex items-start gap-3">
                 <Toggle
                   checked={notifications.sms_backup}
                   onChange={(e) => setNotifications({ ...notifications, sms_backup: e.target.checked })}
-                  disabled
+                  disabled={!integrations.twilio_sms}
                   label="SMS de Respaldo"
-                  description="Enviar SMS cuando el cliente no responde"
+                  description="Enviar SMS al cliente cuando su turno es llamado"
                 />
-                <Badge variant="outline" className="mt-1 text-xs">Proximamente</Badge>
+                {!integrations.twilio_sms && (
+                  <Badge variant="outline" className="mt-1 text-xs">Configurar Twilio</Badge>
+                )}
               </div>
 
               <Button
@@ -356,35 +370,80 @@ export default function SettingsPage() {
 
       {activeTab === 'integraciones' && (
         <div className="space-y-4">
-          {/* WhatsApp */}
+          {/* Inworld TTS */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <span>WhatsApp Business</span>
-                </CardTitle>
-                <Badge variant={integrations.whatsapp ? 'default' : 'outline'}>
-                  {integrations.whatsapp ? 'Conectado' : 'No configurado'}
+                <CardTitle>Inworld TTS (Voz)</CardTitle>
+                <Badge variant={integrations.inworld_tts ? 'default' : 'outline'}>
+                  {integrations.inworld_tts ? 'Conectado' : 'No configurado'}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <p className="text-sm text-gray-500">
-                  Conecta WhatsApp para enviar notificaciones a tus clientes
-                </p>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    API Key
-                    <Badge variant="outline" className="ml-2 text-xs">Proximamente</Badge>
-                  </label>
-                  <Input
-                    type="password"
-                    disabled
-                    placeholder="Ingresa tu API key de WhatsApp"
-                  />
-                </div>
+              <p className="text-sm text-gray-500">
+                Voz profesional en espanol para anuncios de turnos en pantalla TV y estaciones.
+                {integrations.inworld_tts && ' Configurado via variables de entorno (INWORLD_TTS_WRITE_KEY).'}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* WhatsApp via n8n */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>WhatsApp (via n8n)</CardTitle>
+                <Badge variant={integrations.whatsapp_n8n ? 'default' : 'outline'}>
+                  {integrations.whatsapp_n8n ? 'Conectado' : 'No configurado'}
+                </Badge>
               </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">
+                Notificaciones por WhatsApp a clientes. Los clientes pueden crear turnos,
+                consultar estado y cancelar citas directamente desde WhatsApp.
+                {integrations.whatsapp_n8n && ' Webhook n8n configurado.'}
+                {!integrations.whatsapp_n8n && ' Configure N8N_WHATSAPP_WEBHOOK_URL en las variables de entorno.'}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Twilio SMS */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Twilio SMS</CardTitle>
+                <Badge variant={integrations.twilio_sms ? 'default' : 'outline'}>
+                  {integrations.twilio_sms ? 'Conectado' : 'No configurado'}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">
+                SMS de notificacion cuando se llama el turno de un cliente.
+                Soporta numeros dominicanos (809, 829, 849).
+                {integrations.twilio_sms && ' Credenciales Twilio configuradas.'}
+                {!integrations.twilio_sms && ' Configure TWILIO_ACCOUNT_SID y TWILIO_AUTH_TOKEN.'}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Web Push */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Web Push Notifications</CardTitle>
+                <Badge variant={integrations.web_push ? 'default' : 'outline'}>
+                  {integrations.web_push ? 'Conectado' : 'No configurado'}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">
+                Notificaciones del navegador para clientes y agentes. Funciona en desktop y movil.
+                {integrations.web_push && ' Claves VAPID configuradas.'}
+                {!integrations.web_push && ' Genere claves con: npx web-push generate-vapid-keys'}
+              </p>
             </CardContent>
           </Card>
 
@@ -392,59 +451,18 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <span>Claude AI</span>
-                </CardTitle>
+                <CardTitle>Claude AI</CardTitle>
                 <Badge variant={integrations.claude_ai ? 'default' : 'outline'}>
                   {integrations.claude_ai ? 'Conectado' : 'No configurado'}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <p className="text-sm text-gray-500">
-                  Asistente de IA para analisis y reportes automatizados
-                </p>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    API Key
-                  </label>
-                  <Input
-                    type="password"
-                    placeholder="sk-ant-..."
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ElevenLabs */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <span>ElevenLabs Voice</span>
-                </CardTitle>
-                <Badge variant={integrations.elevenlabs ? 'default' : 'outline'}>
-                  {integrations.elevenlabs ? 'Conectado' : 'No configurado'}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <p className="text-sm text-gray-500">
-                  Voz profesional para anuncios en pantalla TV
-                </p>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    API Key
-                  </label>
-                  <Input
-                    type="password"
-                    placeholder="Ingresa tu API key de ElevenLabs"
-                  />
-                </div>
-              </div>
+              <p className="text-sm text-gray-500">
+                Asistente de IA para prediccion de tiempos de espera y sugerencias a agentes.
+                {integrations.claude_ai && ' API key de Anthropic configurada.'}
+                {!integrations.claude_ai && ' Configure ANTHROPIC_API_KEY en las variables de entorno.'}
+              </p>
             </CardContent>
           </Card>
         </div>

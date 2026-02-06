@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardHeader, CardTitle, CardContent, Button } from '@/shared/components'
+import { Card, CardHeader, CardTitle, CardContent, Button, Badge } from '@/shared/components'
 import { Spinner } from '@/shared/components/spinner'
 import { format, subDays, startOfDay } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -146,6 +146,30 @@ export default function ReportsPage() {
     }
   ]
 
+  const exportCSV = () => {
+    if (tickets.length === 0) return
+
+    const serviceMap = Object.fromEntries(services.map(s => [s.id, s.name]))
+    const headers = ['Numero', 'Servicio', 'Estado', 'Creado', 'Espera (min)', 'Atencion (min)']
+    const rows = tickets.map(t => [
+      t.id.slice(0, 8),
+      serviceMap[t.service_id] || t.service_id,
+      t.status,
+      new Date(t.created_at).toLocaleString('es-DO'),
+      t.wait_time_seconds ? (t.wait_time_seconds / 60).toFixed(1) : '',
+      t.service_time_seconds ? (t.service_time_seconds / 60).toFixed(1) : '',
+    ])
+
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `reporte-turnos-${dateRange}-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -163,6 +187,17 @@ export default function ReportsPage() {
           <p className="text-gray-500 mt-1">Visualiza el rendimiento del sistema de turnos</p>
         </div>
 
+        <div className="flex items-center gap-3">
+          <Button
+            variant="secondary"
+            onClick={exportCSV}
+            disabled={tickets.length === 0}
+          >
+            <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            CSV
+          </Button>
         {/* Date Range Selector */}
         <div className="flex gap-2 bg-neu-bg p-1 rounded-neu-sm shadow-neu-sm">
           {[
@@ -182,6 +217,7 @@ export default function ReportsPage() {
               {option.label}
             </button>
           ))}
+        </div>
         </div>
       </div>
 

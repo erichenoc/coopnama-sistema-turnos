@@ -1,14 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { createTicketAction } from '@/lib/actions/tickets'
 import { Spinner } from '@/shared/components/spinner'
 import { TicketReceipt } from '@/shared/components/ticket-receipt'
 import type { Service, Ticket } from '@/shared/types/domain'
 
-const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
-const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
 const INACTIVITY_TIMEOUT = 30000
 
 const SERVICE_ICONS: Record<string, string> = {
@@ -21,6 +20,9 @@ const SERVICE_ICONS: Record<string, string> = {
 type Step = 'services' | 'identity' | 'confirm' | 'ticket'
 
 export default function KioskPage() {
+  const searchParams = useSearchParams()
+  const [orgId, setOrgId] = useState<string | null>(null)
+  const [branchId, setBranchId] = useState<string | null>(null)
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [step, setStep] = useState<Step>('services')
@@ -31,20 +33,70 @@ export default function KioskPage() {
   const [ticket, setTicket] = useState<Ticket | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // Resolve org and branch IDs from URL params or fallback to first available
   useEffect(() => {
+    const resolveOrgAndBranch = async () => {
+      const supabase = createClient()
+
+      // Try to get from URL params first
+      const urlOrgId = searchParams.get('org')
+      const urlBranchId = searchParams.get('branch')
+
+      if (urlOrgId && urlBranchId) {
+        setOrgId(urlOrgId)
+        setBranchId(urlBranchId)
+        return
+      }
+
+      // Fallback: query for first organization and its first active branch
+      const { data: orgs } = await supabase
+        .from('organizations')
+        .select('id')
+        .limit(1)
+        .single()
+
+      if (!orgs) {
+        setLoading(false)
+        return
+      }
+
+      const { data: branches } = await supabase
+        .from('branches')
+        .select('id')
+        .eq('organization_id', orgs.id)
+        .eq('is_active', true)
+        .limit(1)
+        .single()
+
+      if (!branches) {
+        setLoading(false)
+        return
+      }
+
+      setOrgId(orgs.id)
+      setBranchId(branches.id)
+    }
+
+    resolveOrgAndBranch()
+  }, [searchParams])
+
+  // Fetch services once org ID is resolved
+  useEffect(() => {
+    if (!orgId) return
+
     const fetchServices = async () => {
       const supabase = createClient()
       const { data } = await supabase
         .from('services')
         .select('*')
-        .eq('organization_id', DEMO_ORG_ID)
+        .eq('organization_id', orgId)
         .eq('is_active', true)
         .order('sort_order')
       setServices((data || []) as Service[])
       setLoading(false)
     }
     fetchServices()
-  }, [])
+  }, [orgId])
 
   useEffect(() => {
     if (step !== 'ticket') return
@@ -62,13 +114,13 @@ export default function KioskPage() {
   }
 
   const handleCreateTicket = async () => {
-    if (!selectedService) return
+    if (!selectedService || !orgId || !branchId) return
     setCreating(true)
     setError(null)
 
     const result = await createTicketAction({
-      organization_id: DEMO_ORG_ID,
-      branch_id: DEMO_BRANCH_ID,
+      organization_id: orgId,
+      branch_id: branchId,
       service_id: selectedService.id,
       customer_name: customerName || undefined,
       customer_cedula: customerCedula || undefined,

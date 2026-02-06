@@ -1,17 +1,49 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { useRealtimeQueue } from '@/shared/hooks/use-realtime-queue'
 import { useTicketAnnouncer } from '@/shared/hooks/use-ticket-announcer'
 
-const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
-
 export default function TVDisplayPage() {
-  const { called, serving, waiting } = useRealtimeQueue(DEMO_BRANCH_ID)
+  const searchParams = useSearchParams()
+  const [branchId, setBranchId] = useState<string | null>(null)
+  const { called, serving, waiting } = useRealtimeQueue(branchId)
   const { announce } = useTicketAnnouncer()
   const [currentTime, setCurrentTime] = useState(new Date())
   const [lastCalledId, setLastCalledId] = useState<string | null>(null)
   const [isNew, setIsNew] = useState(false)
+
+  // Resolve branch ID from URL param or fetch first active branch
+  useEffect(() => {
+    const resolveBranch = async () => {
+      const branchParam = searchParams.get('branch')
+
+      if (branchParam) {
+        setBranchId(branchParam)
+        return
+      }
+
+      // Fallback: fetch first active branch
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('branches')
+        .select('id')
+        .eq('is_active', true)
+        .order('name')
+        .limit(1)
+        .single()
+
+      if (data && !error) {
+        setBranchId(data.id)
+      } else {
+        console.error('No active branch found:', error)
+      }
+    }
+
+    resolveBranch()
+  }, [searchParams])
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000)
@@ -43,6 +75,18 @@ export default function TVDisplayPage() {
   )
 
   const latestTicket = currentlyServing[0]
+
+  // Show loading state while resolving branch
+  if (!branchId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-2xl text-blue-300">Configurando pantalla...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden">
