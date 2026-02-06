@@ -1,13 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Button, Input } from '@/shared/components'
+import { Button, Input, Card, CardHeader, CardTitle, CardContent } from '@/shared/components'
 import { StatusBadge } from '@/shared/components/badge'
 import { Spinner } from '@/shared/components/spinner'
 import { STATUS_LABELS } from '@/shared/types/domain'
 import type { TicketWithRelations, TicketStatus } from '@/shared/types/domain'
 import Link from 'next/link'
+import { Bell, BellOff, Clock, TrendingUp, QrCode } from 'lucide-react'
+
+const STEPS: { status: TicketStatus; label: string }[] = [
+  { status: 'waiting', label: 'En Espera' },
+  { status: 'called', label: 'Llamado' },
+  { status: 'serving', label: 'Atendiendo' },
+  { status: 'completed', label: 'Completado' },
+]
 
 export default function MiTurnoPage() {
   const [ticketNumber, setTicketNumber] = useState('')
@@ -15,12 +23,52 @@ export default function MiTurnoPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [position, setPosition] = useState<number | null>(null)
+  const [estimatedWait, setEstimatedWait] = useState<number | null>(null)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false)
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
+  const prevStatusRef = useRef<TicketStatus | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Check notification permission on mount
+  useEffect(() => {
+    if ('Notification' in window) {
+      setNotificationPermission(Notification.permission)
+    }
+  }, [])
+
+  const calculatePosition = async (ticketData: TicketWithRelations) => {
+    if (ticketData.status !== 'waiting') {
+      setPosition(null)
+      setEstimatedWait(null)
+      return
+    }
+
+    const supabase = createClient()
+    const today = new Date().toISOString().split('T')[0]
+
+    const { count } = await supabase
+      .from('tickets')
+      .select('*', { count: 'exact', head: true })
+      .eq('branch_id', ticketData.branch_id)
+      .eq('status', 'waiting')
+      .gte('created_at', today)
+      .lt('created_at', ticketData.created_at)
+
+    const pos = (count || 0) + 1
+    setPosition(pos)
+
+    // Calculate estimated wait time
+    const avgServiceTime = ticketData.service?.avg_duration_minutes || 5
+    setEstimatedWait(pos * avgServiceTime)
+  }
 
   const searchTicket = async () => {
     if (!ticketNumber.trim()) return
     setLoading(true)
     setError(null)
     setTicket(null)
+    prevStatusRef.current = null
 
     const supabase = createClient()
     const today = new Date().toISOString().split('T')[0]
@@ -41,24 +89,84 @@ export default function MiTurnoPage() {
     }
 
     setTicket(data as TicketWithRelations)
-
-    // Calculate position if waiting
-    if (data.status === 'waiting') {
-      const { count } = await supabase
-        .from('tickets')
-        .select('*', { count: 'exact', head: true })
-        .eq('branch_id', data.branch_id)
-        .eq('status', 'waiting')
-        .gte('created_at', today)
-        .lt('created_at', data.created_at)
-
-      setPosition((count || 0) + 1)
-    } else {
-      setPosition(null)
-    }
-
+    prevStatusRef.current = data.status as TicketStatus
+    await calculatePosition(data as TicketWithRelations)
     setLoading(false)
   }
+
+  // Request notification permission
+  const enableNotifications = async () => {
+    if (!('Notification' in window)) {
+      alert('Tu navegador no soporta notificaciones')
+      return
+    }
+
+    const permission = await Notification.requestPermission()
+    setNotificationPermission(permission)
+
+    if (permission === 'granted') {
+      setNotificationsEnabled(true)
+      new Notification('Notificaciones activadas', {
+        body: 'Te avisaremos cuando tu turno sea llamado',
+        icon: '/favicon.ico',
+      })
+    }
+  }
+
+  // Play sound when called
+  const playNotificationSound = () => {
+    try {
+      if (!audioRef.current) {
+        audioRef.current = new Audio('/sounds/notification.mp3')
+      }
+      audioRef.current.play().catch(() => {
+        // Fallback: use default beep if audio file not found
+        const ctx = new AudioContext()
+        const oscillator = ctx.createOscillator()
+        const gainNode = ctx.createGain()
+        oscillator.connect(gainNode)
+        gainNode.connect(ctx.destination)
+        oscillator.frequency.value = 800
+        gainNode.gain.value = 0.3
+        oscillator.start()
+        oscillator.stop(ctx.currentTime + 0.3)
+      })
+    } catch (err) {
+      console.error('Audio playback failed:', err)
+    }
+  }
+
+  // Send browser notification
+  const sendNotification = (title: string, body: string) => {
+    if (notificationsEnabled && notificationPermission === 'granted') {
+      new Notification(title, {
+        body,
+        icon: '/favicon.ico',
+        tag: 'ticket-notification',
+      })
+    }
+  }
+
+  // Auto-refresh position every 15 seconds
+  useEffect(() => {
+    if (!ticket || ticket.status !== 'waiting') {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current)
+        refreshIntervalRef.current = null
+      }
+      return
+    }
+
+    refreshIntervalRef.current = setInterval(() => {
+      calculatePosition(ticket)
+    }, 15000)
+
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current)
+      }
+    }
+  }, [ticket?.id, ticket?.status])
 
   // Real-time updates
   useEffect(() => {
@@ -76,7 +184,25 @@ export default function MiTurnoPage() {
           filter: `id=eq.${ticket.id}`,
         },
         (payload) => {
+          const newStatus = payload.new.status as TicketStatus
+          const prevStatus = prevStatusRef.current
+
+          // Detect status change to 'called'
+          if (newStatus === 'called' && prevStatus !== 'called') {
+            playNotificationSound()
+            sendNotification(
+              '¡Tu turno ha sido llamado!',
+              `Turno ${ticket.ticket_number} - Diríjase a la ventanilla`
+            )
+          }
+
           setTicket(prev => prev ? { ...prev, ...payload.new } as TicketWithRelations : null)
+          prevStatusRef.current = newStatus
+
+          // Recalculate position if status changed
+          if (newStatus !== prevStatus) {
+            calculatePosition({ ...ticket, ...payload.new } as TicketWithRelations)
+          }
         }
       )
       .subscribe()
@@ -87,21 +213,30 @@ export default function MiTurnoPage() {
   const getStatusMessage = (status: TicketStatus): string => {
     const messages: Record<TicketStatus, string> = {
       waiting: 'Su turno esta en espera. Por favor permanezca atento.',
-      called: 'Su turno ha sido llamado! Dirijase a la ventanilla indicada.',
+      called: '¡Su turno ha sido llamado! Dirijase a la ventanilla indicada.',
       serving: 'Esta siendo atendido actualmente.',
       on_hold: 'Su turno esta en pausa momentaneamente.',
       transferred: 'Su turno ha sido transferido a otro servicio.',
-      completed: 'Su atencion ha sido completada. Gracias por su visita!',
+      completed: 'Su atencion ha sido completada. ¡Gracias por su visita!',
       cancelled: 'Este turno ha sido cancelado.',
       no_show: 'No se presento cuando fue llamado.',
     }
     return messages[status]
   }
 
+  const getCurrentStepIndex = (status: TicketStatus): number => {
+    const index = STEPS.findIndex(s => s.status === status)
+    return index === -1 ? 0 : index
+  }
+
+  const ticketUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/mi-turno?ticket=${ticket?.ticket_number}`
+    : ''
+
   return (
     <div className="min-h-screen bg-neu-bg">
       {/* Header */}
-      <header className="bg-coopnama-primary text-white py-6 px-8">
+      <header className="bg-coopnama-primary text-white py-6 px-8 shadow-lg">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
@@ -135,66 +270,148 @@ export default function MiTurnoPage() {
 
         {/* Error */}
         {error && (
-          <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-neu-sm text-center mb-6">
+          <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-neu text-center mb-6">
             <p className="text-coopnama-danger">{error}</p>
           </div>
         )}
 
         {/* Ticket Info */}
         {ticket && (
-          <div className="bg-neu-bg shadow-neu-lg rounded-neu-lg overflow-hidden">
-            {/* Status Header */}
-            <div className={`p-6 text-center ${
-              ticket.status === 'called' ? 'bg-status-called/20' :
-              ticket.status === 'serving' ? 'bg-status-serving/20' :
-              ticket.status === 'waiting' ? 'bg-status-waiting/20' :
-              'bg-gray-100'
-            }`}>
-              <span className="font-mono font-black text-5xl text-coopnama-primary block mb-3">
-                {ticket.ticket_number}
-              </span>
-              <StatusBadge status={ticket.status} />
-            </div>
-
-            {/* Details */}
-            <div className="p-6 space-y-4">
-              <p className="text-center text-gray-600 text-lg">{getStatusMessage(ticket.status)}</p>
-
-              {ticket.status === 'waiting' && position !== null && (
-                <div className="text-center p-4 bg-coopnama-primary/5 rounded-neu-sm">
-                  <p className="text-sm text-gray-500">Posicion en la cola</p>
-                  <p className="text-4xl font-bold text-coopnama-primary">{position}</p>
-                </div>
-              )}
-
-              {(ticket.status === 'called' || ticket.status === 'serving') && ticket.station && (
-                <div className="text-center p-4 bg-status-called/10 rounded-neu-sm">
-                  <p className="text-sm text-gray-500">Dirijase a</p>
-                  <p className="text-2xl font-bold text-status-called">{ticket.station.name}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                <div>
-                  <p className="text-sm text-gray-400">Servicio</p>
-                  <p className="font-medium text-gray-700">{ticket.service?.name || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-400">Creado</p>
-                  <p className="font-medium text-gray-700">
-                    {new Date(ticket.created_at).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
+          <div className="space-y-6">
+            {/* Called Status - Large Pulsing Alert */}
+            {ticket.status === 'called' && (
+              <div className="bg-status-called/20 border-2 border-status-called shadow-neu-lg rounded-neu-lg p-8 text-center animate-pulse">
+                <Bell className="w-16 h-16 mx-auto mb-4 text-status-called" />
+                <p className="text-3xl font-black text-status-called mb-2">¡ES SU TURNO!</p>
+                {ticket.station && (
+                  <p className="text-xl text-gray-700">Diríjase a <span className="font-bold">{ticket.station.name}</span></p>
+                )}
               </div>
+            )}
 
-              {ticket.status === 'called' && (
-                <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-neu-sm animate-pulse-slow">
-                  <p className="text-center text-amber-800 font-semibold">
-                    Es su turno! Dirijase a la ventanilla.
-                  </p>
+            {/* Main Ticket Card */}
+            <Card className="shadow-neu-lg">
+              <CardHeader className={`text-center ${
+                ticket.status === 'called' ? 'bg-status-called/20' :
+                ticket.status === 'serving' ? 'bg-status-serving/20' :
+                ticket.status === 'waiting' ? 'bg-status-waiting/20' :
+                'bg-gray-100'
+              }`}>
+                <span className="font-mono font-black text-5xl text-coopnama-primary block mb-3">
+                  {ticket.ticket_number}
+                </span>
+                <StatusBadge status={ticket.status} />
+              </CardHeader>
+
+              <CardContent className="space-y-6">
+                <p className="text-center text-gray-600 text-lg">{getStatusMessage(ticket.status)}</p>
+
+                {/* Progress Steps */}
+                <div className="flex items-center justify-between px-4">
+                  {STEPS.map((step, index) => {
+                    const currentIndex = getCurrentStepIndex(ticket.status)
+                    const isActive = index <= currentIndex
+                    return (
+                      <div key={step.status} className="flex items-center">
+                        <div className="flex flex-col items-center">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
+                            isActive
+                              ? 'bg-coopnama-primary border-coopnama-primary text-white'
+                              : 'bg-gray-200 border-gray-300 text-gray-400'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          <p className={`text-xs mt-2 text-center ${isActive ? 'text-coopnama-primary font-semibold' : 'text-gray-400'}`}>
+                            {step.label}
+                          </p>
+                        </div>
+                        {index < STEPS.length - 1 && (
+                          <div className={`w-8 h-1 mx-1 mb-6 ${isActive ? 'bg-coopnama-primary' : 'bg-gray-300'}`} />
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
-              )}
-            </div>
+
+                {/* Position & Wait Time */}
+                {ticket.status === 'waiting' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {position !== null && (
+                      <div className="p-4 bg-coopnama-primary/5 rounded-neu text-center shadow-neu-inset">
+                        <TrendingUp className="w-6 h-6 mx-auto mb-2 text-coopnama-primary" />
+                        <p className="text-sm text-gray-500">Posición</p>
+                        <p className="text-3xl font-bold text-coopnama-primary">{position}</p>
+                      </div>
+                    )}
+                    {estimatedWait !== null && (
+                      <div className="p-4 bg-coopnama-secondary/5 rounded-neu text-center shadow-neu-inset">
+                        <Clock className="w-6 h-6 mx-auto mb-2 text-coopnama-secondary" />
+                        <p className="text-sm text-gray-500">Espera Est.</p>
+                        <p className="text-3xl font-bold text-coopnama-secondary">{estimatedWait}m</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Station Info */}
+                {(ticket.status === 'serving') && ticket.station && (
+                  <div className="text-center p-4 bg-status-serving/10 rounded-neu shadow-neu-inset">
+                    <p className="text-sm text-gray-500">Siendo atendido en</p>
+                    <p className="text-2xl font-bold text-status-serving">{ticket.station.name}</p>
+                  </div>
+                )}
+
+                {/* Details */}
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                  <div>
+                    <p className="text-sm text-gray-400">Servicio</p>
+                    <p className="font-medium text-gray-700">{ticket.service?.name || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">Creado</p>
+                    <p className="font-medium text-gray-700">
+                      {new Date(ticket.created_at).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Notification Button */}
+                {ticket.status === 'waiting' && (
+                  <Button
+                    variant={notificationsEnabled ? 'secondary' : 'primary'}
+                    onClick={enableNotifications}
+                    disabled={notificationPermission === 'denied' || notificationsEnabled}
+                    className="w-full"
+                  >
+                    {notificationsEnabled ? (
+                      <>
+                        <Bell className="w-4 h-4 mr-2" />
+                        Notificaciones Activadas
+                      </>
+                    ) : notificationPermission === 'denied' ? (
+                      <>
+                        <BellOff className="w-4 h-4 mr-2" />
+                        Notificaciones Bloqueadas
+                      </>
+                    ) : (
+                      <>
+                        <Bell className="w-4 h-4 mr-2" />
+                        Recibir Notificación
+                      </>
+                    )}
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* QR Section */}
+            <Card className="shadow-neu">
+              <CardContent className="text-center py-6">
+                <QrCode className="w-12 h-12 mx-auto mb-3 text-coopnama-primary" />
+                <p className="text-sm text-gray-500 mb-2">Escanea para ver tu turno</p>
+                <p className="text-xs text-gray-400 break-all">{ticketUrl}</p>
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>

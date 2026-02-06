@@ -28,6 +28,8 @@ export default function AgentWorkstationPage() {
   const [showTransfer, setShowTransfer] = useState(false)
   const [transferServiceId, setTransferServiceId] = useState<string>('')
   const [transferReason, setTransferReason] = useState('')
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null)
+  const [aiLoading, setAiLoading] = useState(false)
 
   // Get current authenticated user ID
   useEffect(() => {
@@ -214,6 +216,38 @@ export default function AgentWorkstationPage() {
     const s = seconds % 60
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
+
+  const fetchAISuggestion = async () => {
+    if (!currentTicket || currentTicket.status !== 'serving') return
+    setAiLoading(true)
+    try {
+      const res = await fetch('/api/ai/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceName: currentTicket.service?.name || '',
+          customerName: currentTicket.customer_name || null,
+          ticketNotes: notes || null,
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAiSuggestion(data.suggestion)
+      }
+    } catch {
+      // Silently fail - AI copilot is non-critical
+    }
+    setAiLoading(false)
+  }
+
+  // Trigger AI suggestion when ticket starts serving
+  useEffect(() => {
+    if (currentTicket?.status === 'serving') {
+      fetchAISuggestion()
+    } else {
+      setAiSuggestion(null)
+    }
+  }, [currentTicket?.status, currentTicket?.id])
 
   return (
     <>
@@ -419,6 +453,54 @@ export default function AgentWorkstationPage() {
                   )}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* AI Copilot Panel */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-coopnama-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+                Copilot IA
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {!currentTicket || currentTicket.status !== 'serving' ? (
+                <div className="text-center py-6">
+                  <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  <p className="text-sm text-gray-500">
+                    Llame un turno para recibir sugerencias
+                  </p>
+                </div>
+              ) : aiLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Spinner size="lg" />
+                  <span className="ml-3 text-sm text-gray-500">Analizando...</span>
+                </div>
+              ) : aiSuggestion ? (
+                <div>
+                  <div className="mb-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                      {aiSuggestion}
+                    </p>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={fetchAISuggestion}
+                    className="w-full"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Regenerar
+                  </Button>
+                </div>
+              ) : null}
             </CardContent>
           </Card>
         </div>

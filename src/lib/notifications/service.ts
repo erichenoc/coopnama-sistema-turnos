@@ -7,6 +7,7 @@ import type {
 import { sendPushNotification } from './channels/push'
 import { sendSMS } from './channels/sms'
 import { sendWhatsApp } from './channels/whatsapp'
+import { sendEmail } from './channels/email'
 
 interface NotificationResult {
   success: boolean
@@ -118,8 +119,15 @@ async function dispatchToChannel(
       return { success: true }
 
     case 'email':
-      // Email channel placeholder - can integrate with Resend/SendGrid later
-      return { success: false, error: 'Email channel not yet configured' }
+      if (!input.recipient_email) {
+        return { success: false, error: 'Email address required for email channel' }
+      }
+      const success = await sendEmail({
+        to: input.recipient_email,
+        subject: input.title || 'COOPNAMA Turnos',
+        body: input.body,
+      })
+      return { success }
 
     default:
       return { success: false, error: `Unknown channel: ${input.channel}` }

@@ -8,6 +8,18 @@ import { Spinner } from '@/shared/components/spinner'
 import { TicketReceipt } from '@/shared/components/ticket-receipt'
 import type { Service, Ticket } from '@/shared/types/domain'
 
+interface Member {
+  id: string
+  organization_id: string
+  first_name: string
+  last_name: string
+  full_name: string | null
+  cedula: string | null
+  member_type: string  // 'socio' | 'cliente' | 'empleado' | 'vip'
+  phone: string | null
+  email: string | null
+}
+
 const INACTIVITY_TIMEOUT = 30000
 
 const SERVICE_ICONS: Record<string, string> = {
@@ -32,6 +44,8 @@ export default function KioskPage() {
   const [creating, setCreating] = useState(false)
   const [ticket, setTicket] = useState<Ticket | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [memberFound, setMemberFound] = useState<Member | null>(null)
+  const [lookingUp, setLookingUp] = useState(false)
 
   // Resolve org and branch IDs from URL params or fallback to first available
   useEffect(() => {
@@ -111,6 +125,31 @@ export default function KioskPage() {
     setCustomerCedula('')
     setTicket(null)
     setError(null)
+    setMemberFound(null)
+    setLookingUp(false)
+  }
+
+  const lookupMember = async (cedula: string) => {
+    if (cedula.length < 11 || !orgId) return  // Dominican cedula is 11 digits (without dashes)
+    setLookingUp(true)
+    const supabase = createClient()
+    // Strip dashes for matching
+    const cleanCedula = cedula.replace(/\D/g, '')
+    const { data } = await supabase
+      .from('members')
+      .select('*')
+      .eq('organization_id', orgId)
+      .or(`cedula.eq.${cleanCedula},cedula.eq.${cedula}`)
+      .limit(1)
+      .maybeSingle()
+
+    if (data) {
+      setMemberFound(data)
+      setCustomerName(data.full_name || `${data.first_name} ${data.last_name}`)
+    } else {
+      setMemberFound(null)
+    }
+    setLookingUp(false)
   }
 
   const handleCreateTicket = async () => {
@@ -118,14 +157,25 @@ export default function KioskPage() {
     setCreating(true)
     setError(null)
 
+    // Determine priority based on member type
+    let priority: 0 | 1 | 2 | 3 = 0
+    if (memberFound) {
+      if (memberFound.member_type === 'vip') {
+        priority = 2
+      } else if (memberFound.member_type === 'socio') {
+        priority = 1
+      }
+    }
+
     const result = await createTicketAction({
       organization_id: orgId,
       branch_id: branchId,
       service_id: selectedService.id,
       customer_name: customerName || undefined,
       customer_cedula: customerCedula || undefined,
+      member_id: memberFound?.id || undefined,
       source: 'kiosk',
-      priority: 0,
+      priority,
     })
 
     if (result.error) {
@@ -195,24 +245,63 @@ export default function KioskPage() {
             <p className="text-gray-500 text-center mb-8">Para un servicio mas rapido</p>
             <div className="space-y-6">
               <div>
+                <label className="block text-lg font-medium text-gray-700 mb-2">Cedula</label>
+                <input
+                  type="text"
+                  value={customerCedula}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setCustomerCedula(value)
+                    // Clear previous member found if cedula changes
+                    if (memberFound && value !== memberFound.cedula) {
+                      setMemberFound(null)
+                      setCustomerName('')
+                    }
+                    // Trigger lookup when cedula is complete (11 digits without dashes)
+                    const cleanValue = value.replace(/\D/g, '')
+                    if (cleanValue.length >= 11) {
+                      lookupMember(value)
+                    }
+                  }}
+                  placeholder="001-0000000-0"
+                  className="w-full px-6 py-4 text-lg bg-neu-bg shadow-neu-inset rounded-neu text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                />
+                {lookingUp && (
+                  <p className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+                    <Spinner size="sm" />
+                    Buscando socio...
+                  </p>
+                )}
+                {memberFound && !lookingUp && (
+                  <div className="mt-3 p-4 bg-coopnama-secondary/10 border border-coopnama-secondary/30 rounded-neu-sm">
+                    <p className="text-coopnama-secondary font-semibold flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Socio encontrado: {memberFound.full_name || `${memberFound.first_name} ${memberFound.last_name}`}
+                    </p>
+                    <span className="inline-block mt-2 px-3 py-1 text-xs font-semibold bg-white/50 rounded-full">
+                      {memberFound.member_type === 'vip' && '⭐ VIP'}
+                      {memberFound.member_type === 'socio' && '👤 Socio'}
+                      {memberFound.member_type === 'empleado' && '💼 Empleado'}
+                      {memberFound.member_type === 'cliente' && '👥 Cliente'}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">Nombre</label>
                 <input
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Su nombre completo"
-                  className="w-full px-6 py-4 text-lg bg-neu-bg shadow-neu-inset rounded-neu text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                  disabled={!!memberFound}
+                  className="w-full px-6 py-4 text-lg bg-neu-bg shadow-neu-inset rounded-neu text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30 disabled:opacity-60 disabled:cursor-not-allowed"
                 />
-              </div>
-              <div>
-                <label className="block text-lg font-medium text-gray-700 mb-2">Cedula</label>
-                <input
-                  type="text"
-                  value={customerCedula}
-                  onChange={(e) => setCustomerCedula(e.target.value)}
-                  placeholder="001-0000000-0"
-                  className="w-full px-6 py-4 text-lg bg-neu-bg shadow-neu-inset rounded-neu text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
-                />
+                {memberFound && (
+                  <p className="text-xs text-gray-400 mt-1">Nombre auto-completado desde el sistema</p>
+                )}
               </div>
               <div className="flex gap-4">
                 <button

@@ -18,6 +18,13 @@ const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
 const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
 const DEMO_AGENT_ID = '00000000-0000-0000-0000-000000000001'
 
+interface Branch {
+  id: string
+  name: string
+  code: string
+  is_active: boolean
+}
+
 interface OrgContextValue {
   organizationId: string
   branchId: string
@@ -25,6 +32,8 @@ interface OrgContextValue {
   user: User | null
   supabaseUser: SupabaseUser | null
   loading: boolean
+  branches: Branch[]
+  switchBranch: (branchId: string) => void
 }
 
 const OrgContext = createContext<OrgContextValue | undefined>(undefined)
@@ -36,6 +45,7 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const [branches, setBranches] = useState<Branch[]>([])
 
   useEffect(() => {
     const supabase = createClient()
@@ -76,11 +86,33 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
           return
         }
 
-        // Set context from user profile
+        // Set organization context
         setOrganizationId(userProfile.organization_id)
-        setBranchId(userProfile.branch_id || DEMO_BRANCH_ID)
         setAgentId(userProfile.id)
         setUser(userProfile as User)
+
+        // Fetch branches for this organization
+        const { data: branchList } = await supabase
+          .from('branches')
+          .select('id, name, code, is_active')
+          .eq('organization_id', userProfile.organization_id)
+          .eq('is_active', true)
+          .order('name')
+
+        if (branchList) {
+          setBranches(branchList as Branch[])
+
+          // Check localStorage for saved branch preference
+          const savedBranch = localStorage.getItem('selected_branch_id')
+          if (savedBranch && branchList.some((b) => b.id === savedBranch)) {
+            setBranchId(savedBranch)
+          } else {
+            setBranchId(userProfile.branch_id || DEMO_BRANCH_ID)
+          }
+        } else {
+          setBranchId(userProfile.branch_id || DEMO_BRANCH_ID)
+        }
+
         setLoading(false)
       } catch (error) {
         console.error('Error in OrgProvider:', error)
@@ -97,6 +129,11 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
     fetchUserContext()
   }, [])
 
+  const switchBranch = (newBranchId: string) => {
+    setBranchId(newBranchId)
+    localStorage.setItem('selected_branch_id', newBranchId)
+  }
+
   const value: OrgContextValue = {
     organizationId,
     branchId,
@@ -104,6 +141,8 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
     user,
     supabaseUser,
     loading,
+    branches,
+    switchBranch,
   }
 
   return <OrgContext.Provider value={value}>{children}</OrgContext.Provider>
