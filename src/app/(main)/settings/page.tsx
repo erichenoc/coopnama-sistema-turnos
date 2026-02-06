@@ -17,6 +17,7 @@ import {
 import { LogoUploader } from '@/features/branding/components/logo-uploader'
 import { ColorPicker } from '@/features/branding/components/color-picker'
 import { updateBrandingAction } from '@/features/branding/actions/branding-actions'
+import { saveIntegrationConfig } from '@/features/integrations/actions/integration-actions'
 import { PricingCards } from '@/features/billing/components/pricing-cards'
 import { DomainManager } from '@/features/white-label/components/domain-manager'
 import { CSSEditor } from '@/features/white-label/components/css-editor'
@@ -52,6 +53,19 @@ interface IntegrationStatus {
   twilio_sms: boolean
   web_push: boolean
   claude_ai: boolean
+  resend_email: boolean
+}
+
+interface IntegrationConfig {
+  inworld_tts_key: string
+  whatsapp_webhook_url: string
+  twilio_account_sid: string
+  twilio_auth_token: string
+  twilio_phone_number: string
+  vapid_public_key: string
+  vapid_private_key: string
+  anthropic_api_key: string
+  resend_api_key: string
 }
 
 export default function SettingsPage() {
@@ -83,14 +97,27 @@ export default function SettingsPage() {
     sms_backup: false,
   })
 
-  // Integration settings (detected from env)
+  // Integration settings (detected from env + DB)
   const [integrations, setIntegrations] = useState<IntegrationStatus>({
     inworld_tts: false,
     whatsapp_n8n: false,
     twilio_sms: false,
     web_push: false,
     claude_ai: false,
+    resend_email: false,
   })
+  const [integrationConfig, setIntegrationConfig] = useState<IntegrationConfig>({
+    inworld_tts_key: '',
+    whatsapp_webhook_url: '',
+    twilio_account_sid: '',
+    twilio_auth_token: '',
+    twilio_phone_number: '',
+    vapid_public_key: '',
+    vapid_private_key: '',
+    anthropic_api_key: '',
+    resend_api_key: '',
+  })
+  const [savingIntegration, setSavingIntegration] = useState<string | null>(null)
 
   // Password change
   const [passwords, setPasswords] = useState({
@@ -140,8 +167,25 @@ export default function SettingsPage() {
         setNotifications(JSON.parse(storedNotifs))
       }
 
-      // Fetch real integration status
-      const intRes = await fetch('/api/settings/integrations')
+      // Fetch integration config from DB
+      const { data: orgConfig } = await supabase
+        .from('organizations')
+        .select('integration_config')
+        .eq('id', organizationId)
+        .single()
+
+      if (orgConfig?.integration_config) {
+        const cfg = orgConfig.integration_config as Record<string, string>
+        setIntegrationConfig((prev) => ({
+          ...prev,
+          ...Object.fromEntries(
+            Object.entries(cfg).filter(([, v]) => v !== undefined && v !== null)
+          ),
+        }))
+      }
+
+      // Fetch real integration status (checks env + DB)
+      const intRes = await fetch(`/api/settings/integrations?org_id=${organizationId}`)
       if (intRes.ok) {
         setIntegrations(await intRes.json())
       }
@@ -184,6 +228,9 @@ export default function SettingsPage() {
     if (result.error) {
       toast.error(result.error)
     } else {
+      // Apply colors immediately via CSS variables
+      document.documentElement.style.setProperty('--coopnama-primary', orgSettings.primary_color)
+      document.documentElement.style.setProperty('--coopnama-secondary', orgSettings.secondary_color)
       toast.success('Marca actualizada exitosamente')
     }
     setSavingBranding(false)
@@ -254,14 +301,14 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className={`mx-auto p-6 ${activeTab === 'facturacion' ? 'max-w-7xl' : 'max-w-5xl'}`}>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Configuracion</h1>
         <p className="text-gray-500 mt-1">Administra las preferencias del sistema</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto">
+      <div className="flex flex-wrap gap-2 mb-6">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -489,10 +536,36 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 mb-4">
                 Voz profesional en espanol para anuncios de turnos en pantalla TV y estaciones.
-                {integrations.inworld_tts && ' Configurado via variables de entorno (INWORLD_TTS_WRITE_KEY).'}
               </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                  <Input
+                    type="password"
+                    value={integrationConfig.inworld_tts_key}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, inworld_tts_key: e.target.value })}
+                    placeholder="Inworld TTS Write Key"
+                  />
+                </div>
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  disabled={savingIntegration === 'inworld'}
+                  onClick={async () => {
+                    setSavingIntegration('inworld')
+                    const result = await saveIntegrationConfig(organizationId, { inworld_tts_key: integrationConfig.inworld_tts_key })
+                    if (result.error) { toast.error(result.error) } else {
+                      toast.success('Inworld TTS configurado')
+                      setIntegrations((prev) => ({ ...prev, inworld_tts: Boolean(integrationConfig.inworld_tts_key) }))
+                    }
+                    setSavingIntegration(null)
+                  }}
+                >
+                  {savingIntegration === 'inworld' ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -507,12 +580,35 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">
-                Notificaciones por WhatsApp a clientes. Los clientes pueden crear turnos,
-                consultar estado y cancelar citas directamente desde WhatsApp.
-                {integrations.whatsapp_n8n && ' Webhook n8n configurado.'}
-                {!integrations.whatsapp_n8n && ' Configure N8N_WHATSAPP_WEBHOOK_URL en las variables de entorno.'}
+              <p className="text-sm text-gray-500 mb-4">
+                Notificaciones por WhatsApp a clientes via workflow n8n.
               </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Webhook URL</label>
+                  <Input
+                    value={integrationConfig.whatsapp_webhook_url}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, whatsapp_webhook_url: e.target.value })}
+                    placeholder="https://n8n.example.com/webhook/..."
+                  />
+                </div>
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  disabled={savingIntegration === 'whatsapp'}
+                  onClick={async () => {
+                    setSavingIntegration('whatsapp')
+                    const result = await saveIntegrationConfig(organizationId, { whatsapp_webhook_url: integrationConfig.whatsapp_webhook_url })
+                    if (result.error) { toast.error(result.error) } else {
+                      toast.success('WhatsApp webhook configurado')
+                      setIntegrations((prev) => ({ ...prev, whatsapp_n8n: Boolean(integrationConfig.whatsapp_webhook_url) }))
+                    }
+                    setSavingIntegration(null)
+                  }}
+                >
+                  {savingIntegration === 'whatsapp' ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -527,12 +623,56 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">
-                SMS de notificacion cuando se llama el turno de un cliente.
-                Soporta numeros dominicanos (809, 829, 849).
-                {integrations.twilio_sms && ' Credenciales Twilio configuradas.'}
-                {!integrations.twilio_sms && ' Configure TWILIO_ACCOUNT_SID y TWILIO_AUTH_TOKEN.'}
+              <p className="text-sm text-gray-500 mb-4">
+                SMS de notificacion cuando se llama el turno. Soporta numeros dominicanos (809, 829, 849).
               </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Account SID</label>
+                  <Input
+                    value={integrationConfig.twilio_account_sid}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, twilio_account_sid: e.target.value })}
+                    placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Auth Token</label>
+                  <Input
+                    type="password"
+                    value={integrationConfig.twilio_auth_token}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, twilio_auth_token: e.target.value })}
+                    placeholder="Auth Token"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Numero de Telefono</label>
+                  <Input
+                    value={integrationConfig.twilio_phone_number}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, twilio_phone_number: e.target.value })}
+                    placeholder="+18091234567"
+                  />
+                </div>
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  disabled={savingIntegration === 'twilio'}
+                  onClick={async () => {
+                    setSavingIntegration('twilio')
+                    const result = await saveIntegrationConfig(organizationId, {
+                      twilio_account_sid: integrationConfig.twilio_account_sid,
+                      twilio_auth_token: integrationConfig.twilio_auth_token,
+                      twilio_phone_number: integrationConfig.twilio_phone_number,
+                    })
+                    if (result.error) { toast.error(result.error) } else {
+                      toast.success('Twilio SMS configurado')
+                      setIntegrations((prev) => ({ ...prev, twilio_sms: Boolean(integrationConfig.twilio_account_sid && integrationConfig.twilio_auth_token) }))
+                    }
+                    setSavingIntegration(null)
+                  }}
+                >
+                  {savingIntegration === 'twilio' ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -547,11 +687,47 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 mb-4">
                 Notificaciones del navegador para clientes y agentes. Funciona en desktop y movil.
-                {integrations.web_push && ' Claves VAPID configuradas.'}
-                {!integrations.web_push && ' Genere claves con: npx web-push generate-vapid-keys'}
               </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">VAPID Public Key</label>
+                  <Input
+                    value={integrationConfig.vapid_public_key}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, vapid_public_key: e.target.value })}
+                    placeholder="Public key"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">VAPID Private Key</label>
+                  <Input
+                    type="password"
+                    value={integrationConfig.vapid_private_key}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, vapid_private_key: e.target.value })}
+                    placeholder="Private key"
+                  />
+                </div>
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  disabled={savingIntegration === 'vapid'}
+                  onClick={async () => {
+                    setSavingIntegration('vapid')
+                    const result = await saveIntegrationConfig(organizationId, {
+                      vapid_public_key: integrationConfig.vapid_public_key,
+                      vapid_private_key: integrationConfig.vapid_private_key,
+                    })
+                    if (result.error) { toast.error(result.error) } else {
+                      toast.success('Web Push configurado')
+                      setIntegrations((prev) => ({ ...prev, web_push: Boolean(integrationConfig.vapid_public_key && integrationConfig.vapid_private_key) }))
+                    }
+                    setSavingIntegration(null)
+                  }}
+                >
+                  {savingIntegration === 'vapid' ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -566,11 +742,80 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 mb-4">
                 Asistente de IA para prediccion de tiempos de espera y sugerencias a agentes.
-                {integrations.claude_ai && ' API key de Anthropic configurada.'}
-                {!integrations.claude_ai && ' Configure ANTHROPIC_API_KEY en las variables de entorno.'}
               </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Anthropic API Key</label>
+                  <Input
+                    type="password"
+                    value={integrationConfig.anthropic_api_key}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, anthropic_api_key: e.target.value })}
+                    placeholder="sk-ant-..."
+                  />
+                </div>
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  disabled={savingIntegration === 'claude'}
+                  onClick={async () => {
+                    setSavingIntegration('claude')
+                    const result = await saveIntegrationConfig(organizationId, { anthropic_api_key: integrationConfig.anthropic_api_key })
+                    if (result.error) { toast.error(result.error) } else {
+                      toast.success('Claude AI configurado')
+                      setIntegrations((prev) => ({ ...prev, claude_ai: Boolean(integrationConfig.anthropic_api_key) }))
+                    }
+                    setSavingIntegration(null)
+                  }}
+                >
+                  {savingIntegration === 'claude' ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Resend Email */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Resend Email</CardTitle>
+                <Badge variant={integrations.resend_email ? 'default' : 'outline'}>
+                  {integrations.resend_email ? 'Conectado' : 'No configurado'}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500 mb-4">
+                Envio de emails transaccionales (confirmaciones, recordatorios de citas).
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Resend API Key</label>
+                  <Input
+                    type="password"
+                    value={integrationConfig.resend_api_key}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, resend_api_key: e.target.value })}
+                    placeholder="re_..."
+                  />
+                </div>
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  disabled={savingIntegration === 'resend'}
+                  onClick={async () => {
+                    setSavingIntegration('resend')
+                    const result = await saveIntegrationConfig(organizationId, { resend_api_key: integrationConfig.resend_api_key })
+                    if (result.error) { toast.error(result.error) } else {
+                      toast.success('Resend Email configurado')
+                      setIntegrations((prev) => ({ ...prev, resend_email: Boolean(integrationConfig.resend_api_key) }))
+                    }
+                    setSavingIntegration(null)
+                  }}
+                >
+                  {savingIntegration === 'resend' ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

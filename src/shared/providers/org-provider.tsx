@@ -91,6 +91,22 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
         setAgentId(userProfile.id)
         setUser(userProfile as User)
 
+        // Fetch org branding colors and apply as CSS variables
+        const { data: orgData } = await supabase
+          .from('organizations')
+          .select('primary_color, secondary_color')
+          .eq('id', userProfile.organization_id)
+          .single()
+
+        if (orgData) {
+          if (orgData.primary_color) {
+            document.documentElement.style.setProperty('--coopnama-primary', orgData.primary_color)
+          }
+          if (orgData.secondary_color) {
+            document.documentElement.style.setProperty('--coopnama-secondary', orgData.secondary_color)
+          }
+        }
+
         // Fetch branches for this organization
         const { data: branchList } = await supabase
           .from('branches')

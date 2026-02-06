@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     .from('agent_sessions')
     .select('id', { count: 'exact', head: true })
     .eq('branch_id', branchId)
-    .eq('status', 'active')
+    .eq('is_active', true)
 
   return NextResponse.json({
     data: {

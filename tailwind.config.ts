@@ -26,13 +26,13 @@ const config: Config = {
           light: '#404040',
           surface: '#2d2d2d',
         },
-        // COOPNAMA Brand Colors
+        // COOPNAMA Brand Colors (CSS vars for dynamic theming)
         'coopnama': {
-          primary: '#1e40af',    // Azul institucional
-          secondary: '#10b981',  // Verde éxito
-          accent: '#f59e0b',     // Ámbar para destacar
-          danger: '#ef4444',     // Rojo error
-          warning: '#f97316',    // Naranja advertencia
+          primary: 'var(--coopnama-primary)',
+          secondary: 'var(--coopnama-secondary)',
+          accent: 'var(--coopnama-accent)',
+          danger: 'var(--coopnama-danger)',
+          warning: '#f97316',
         },
         // Ticket Status Colors
         'status': {
