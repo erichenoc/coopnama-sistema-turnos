@@ -9,10 +9,10 @@ import { callNextTicketAction, startServingAction, completeTicketAction, markNoS
 import { useRealtimeQueue } from '@/shared/hooks/use-realtime-queue'
 import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
 import type { TicketWithRelations, Station } from '@/shared/types/domain'
-
-const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 export default function AgentWorkstationPage() {
+  const { branchId } = useOrg()
   const [stations, setStations] = useState<Station[]>([])
   const [selectedStation, setSelectedStation] = useState<string | null>(null)
   const [currentTicket, setCurrentTicket] = useState<TicketWithRelations | null>(null)
@@ -21,7 +21,7 @@ export default function AgentWorkstationPage() {
   const [notes, setNotes] = useState('')
   const [agentId, setAgentId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
-  const { waiting, called, refresh } = useRealtimeQueue(DEMO_BRANCH_ID)
+  const { waiting, called, refresh } = useRealtimeQueue(branchId)
 
   // Get current authenticated user ID
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function AgentWorkstationPage() {
       const { data } = await supabase
         .from('stations')
         .select('*')
-        .eq('branch_id', DEMO_BRANCH_ID)
+        .eq('branch_id', branchId)
         .eq('is_active', true)
         .order('station_number')
       setStations((data || []) as Station[])

@@ -7,10 +7,10 @@ import { createClient } from '@/lib/supabase/client'
 import type { Member } from '@/shared/types/domain'
 import { PRIORITY_LABELS } from '@/shared/types/domain'
 import type { PriorityName } from '@/shared/types/domain'
-
-const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 export default function MembersPage() {
+  const { organizationId } = useOrg()
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -29,7 +29,7 @@ export default function MembersPage() {
     let query = supabase
       .from('members')
       .select('*', { count: 'exact' })
-      .eq('organization_id', DEMO_ORG_ID)
+      .eq('organization_id', organizationId)
       .eq('is_active', true)
 
     if (search) {
@@ -55,7 +55,7 @@ export default function MembersPage() {
     const form = new FormData(e.currentTarget)
 
     const memberData = {
-      organization_id: DEMO_ORG_ID,
+      organization_id: organizationId,
       full_name: `${form.get('firstName')} ${form.get('lastName')}`,
       first_name: form.get('firstName') as string,
       last_name: form.get('lastName') as string,

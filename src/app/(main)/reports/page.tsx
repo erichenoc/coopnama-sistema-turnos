@@ -11,9 +11,7 @@ import {
   PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts'
 import type { PieLabelRenderProps, PieLabel } from 'recharts'
-
-const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
-const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 const COLORS = ['#1e40af', '#10b981', '#f59e0b', '#6b7280', '#ef4444']
 
@@ -34,6 +32,7 @@ interface ServiceData {
 type DateRange = 'today' | '7days' | '30days'
 
 export default function ReportsPage() {
+  const { organizationId, branchId } = useOrg()
   const [dateRange, setDateRange] = useState<DateRange>('today')
   const [loading, setLoading] = useState(true)
   const [tickets, setTickets] = useState<Ticket[]>([])
@@ -62,7 +61,7 @@ export default function ReportsPage() {
     const { data: ticketsData } = await supabase
       .from('tickets')
       .select('id, created_at, status, service_id, wait_time_seconds, service_time_seconds')
-      .eq('branch_id', DEMO_BRANCH_ID)
+      .eq('branch_id', branchId)
       .gte('created_at', startDate.toISOString())
       .order('created_at', { ascending: true })
 
@@ -70,7 +69,7 @@ export default function ReportsPage() {
     const { data: servicesData } = await supabase
       .from('services')
       .select('id, name')
-      .eq('organization_id', DEMO_ORG_ID)
+      .eq('organization_id', organizationId)
 
     setTickets(ticketsData || [])
     setServices(servicesData || [])

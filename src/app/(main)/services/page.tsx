@@ -8,8 +8,7 @@ import {
   Select, Textarea,
 } from '@/shared/components'
 import type { SelectOption } from '@/shared/components'
-
-const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 type ServiceCategory = 'creditos' | 'ahorros' | 'servicios' | 'general'
 
@@ -66,6 +65,7 @@ const DEFAULT_COLORS = [
 ]
 
 export default function ServicesPage() {
+  const { organizationId } = useOrg()
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -88,7 +88,7 @@ export default function ServicesPage() {
     const { data } = await supabase
       .from('services')
       .select('*')
-      .eq('organization_id', DEMO_ORG_ID)
+      .eq('organization_id', organizationId)
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
 
@@ -140,7 +140,7 @@ export default function ServicesPage() {
     const supabase = createClient()
     const payload = {
       ...formData,
-      organization_id: DEMO_ORG_ID,
+      organization_id: organizationId,
       code: formData.code.toUpperCase().slice(0, 1),
       requires_appointment: false,
       requires_member_id: false,

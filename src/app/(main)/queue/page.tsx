@@ -9,12 +9,11 @@ import { Spinner } from '@/shared/components/spinner'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
-
-// Demo branch ID - in production, this comes from user context
-const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 export default function QueuePage() {
-  const { tickets, waiting, called, serving, loading, refresh } = useRealtimeQueue(DEMO_BRANCH_ID)
+  const { branchId } = useOrg()
+  const { tickets, waiting, called, serving, loading, refresh } = useRealtimeQueue(branchId)
   const [cancelling, setCancelling] = useState<string | null>(null)
 
   const handleCancel = async (ticketId: string) => {

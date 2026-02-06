@@ -8,8 +8,7 @@ import {
   Badge,
 } from '@/shared/components'
 import { Spinner } from '@/shared/components/spinner'
-
-const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 interface Branch {
   id: string
@@ -32,6 +31,7 @@ const WEEKDAY_LABELS = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D']
 const WEEKDAY_NAMES = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
 
 export default function BranchesPage() {
+  const { organizationId } = useOrg()
   const [branches, setBranches] = useState<Branch[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -55,7 +55,7 @@ export default function BranchesPage() {
     const { data, error } = await supabase
       .from('branches')
       .select('*')
-      .eq('organization_id', DEMO_ORG_ID)
+      .eq('organization_id', organizationId)
       .order('name', { ascending: true })
 
     if (!error && data) {
@@ -121,7 +121,7 @@ export default function BranchesPage() {
 
     const supabase = createClient()
     const payload = {
-      organization_id: DEMO_ORG_ID,
+      organization_id: organizationId,
       name: formData.name,
       code: formData.code,
       address: formData.address || null,

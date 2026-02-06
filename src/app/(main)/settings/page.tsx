@@ -15,8 +15,7 @@ import {
   Spinner,
 } from '@/shared/components'
 import { toast } from 'sonner'
-
-const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 type Tab = 'general' | 'notificaciones' | 'integraciones' | 'cuenta'
 
@@ -41,6 +40,7 @@ interface IntegrationStatus {
 }
 
 export default function SettingsPage() {
+  const { organizationId } = useOrg()
   const [activeTab, setActiveTab] = useState<Tab>('general')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -94,7 +94,7 @@ export default function SettingsPage() {
       const { data: org } = await supabase
         .from('organizations')
         .select('name, primary_color, timezone, logo_url')
-        .eq('id', DEMO_ORG_ID)
+        .eq('id', organizationId)
         .single()
 
       if (org) {
@@ -126,7 +126,7 @@ export default function SettingsPage() {
           primary_color: orgSettings.primary_color,
           logo_url: orgSettings.logo_url,
         })
-        .eq('id', DEMO_ORG_ID)
+        .eq('id', organizationId)
 
       if (error) throw error
 

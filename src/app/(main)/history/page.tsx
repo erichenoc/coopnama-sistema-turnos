@@ -8,8 +8,7 @@ import { Spinner } from '@/shared/components/spinner'
 import { format, subDays, startOfDay } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
-
-const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 interface TicketRecord {
   id: string
@@ -39,6 +38,7 @@ type DateRange = 'today' | '7days' | '30days' | 'all'
 type StatusFilter = 'all' | 'completed' | 'cancelled' | 'no_show'
 
 export default function HistoryPage() {
+  const { organizationId, branchId } = useOrg()
   const [tickets, setTickets] = useState<TicketRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [dateRange, setDateRange] = useState<DateRange>('today')
@@ -73,7 +73,7 @@ export default function HistoryPage() {
     let query = supabase
       .from('tickets')
       .select('*, service:services!tickets_service_id_fkey(id, name, code), station:stations(id, name, station_number), agent:users(id, full_name)')
-      .eq('branch_id', DEMO_BRANCH_ID)
+      .eq('branch_id', branchId)
       .in('status', ['completed', 'cancelled', 'no_show'])
       .order('completed_at', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false })
@@ -107,7 +107,7 @@ export default function HistoryPage() {
       const { data } = await supabase
         .from('services')
         .select('id, name')
-        .eq('organization_id', '00000000-0000-0000-0000-000000000001')
+        .eq('organization_id', organizationId)
         .eq('is_active', true)
         .order('name')
       setServices(data || [])

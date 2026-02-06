@@ -13,11 +13,11 @@ import { Spinner } from '@/shared/components/spinner'
 import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
 import type { DailyStats } from '@/shared/types/domain'
 import Link from 'next/link'
-
-const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
+import { useOrg } from '@/shared/providers/org-provider'
 
 export default function DashboardPage() {
-  const { tickets, waiting, called, serving, loading: queueLoading, refresh } = useRealtimeQueue(DEMO_BRANCH_ID)
+  const { branchId } = useOrg()
+  const { tickets, waiting, called, serving, loading: queueLoading, refresh } = useRealtimeQueue(branchId)
   const [stats, setStats] = useState<DailyStats | null>(null)
   const [statsLoading, setStatsLoading] = useState(true)
 
@@ -26,7 +26,7 @@ export default function DashboardPage() {
     const today = new Date().toISOString().split('T')[0]
 
     const { data } = await supabase.rpc('get_daily_stats', {
-      p_branch_id: DEMO_BRANCH_ID,
+      p_branch_id: branchId,
       p_date: today,
     })
 
