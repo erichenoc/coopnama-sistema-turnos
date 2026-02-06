@@ -241,6 +241,11 @@ CREATE POLICY "Public can manage counters"
 -- AGENT_SESSIONS POLICIES
 -- ============================================
 
+-- PÚBLICO: Sesiones activas visibles para estimación de tiempos (kiosk/TV)
+CREATE POLICY "Public can view active agent sessions"
+  ON agent_sessions FOR SELECT
+  USING (is_active = true);
+
 -- Usuarios pueden ver sesiones de su branch
 CREATE POLICY "Users can view branch sessions"
   ON agent_sessions FOR SELECT

@@ -36,7 +36,7 @@ export async function estimateWaitTime(
       .from('agent_sessions')
       .select('*', { count: 'exact', head: true })
       .eq('branch_id', branchId)
-      .eq('status', 'active'),
+      .eq('is_active', true),
 
     supabase
       .from('tickets')
@@ -103,7 +103,7 @@ export async function estimateWaitTimeForTicket(
       .from('agent_sessions')
       .select('*', { count: 'exact', head: true })
       .eq('branch_id', branchId)
-      .eq('status', 'active'),
+      .eq('is_active', true),
 
     supabase
       .from('tickets')
