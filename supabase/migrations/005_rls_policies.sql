@@ -53,6 +53,11 @@ CREATE POLICY "Users can view own organization"
   ON organizations FOR SELECT
   USING (id = get_user_organization_id());
 
+-- PÚBLICO: Cualquiera puede ver organizaciones (para kiosk/TV/booking)
+CREATE POLICY "Public can view organizations"
+  ON organizations FOR SELECT
+  USING (true);
+
 -- Solo superadmin y owner pueden modificar
 CREATE POLICY "Owners can update organization"
   ON organizations FOR UPDATE
@@ -69,6 +74,11 @@ CREATE POLICY "Owners can update organization"
 CREATE POLICY "Users can view org branches"
   ON branches FOR SELECT
   USING (organization_id = get_user_organization_id());
+
+-- PÚBLICO: Sucursales activas visibles para kiosk/TV/booking
+CREATE POLICY "Public can view active branches"
+  ON branches FOR SELECT
+  USING (is_active = true);
 
 -- Admins pueden gestionar branches
 CREATE POLICY "Admins can manage branches"
@@ -136,6 +146,11 @@ CREATE POLICY "Public can view active stations"
 CREATE POLICY "Users can view org members"
   ON members FOR SELECT
   USING (organization_id = get_user_organization_id());
+
+-- PÚBLICO: Kiosk puede buscar miembros por cédula
+CREATE POLICY "Public can lookup members"
+  ON members FOR SELECT
+  USING (true);
 
 -- Staff puede crear/actualizar miembros
 CREATE POLICY "Staff can manage members"

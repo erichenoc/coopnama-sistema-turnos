@@ -9,19 +9,19 @@ interface CoopnamaLogoProps {
 }
 
 const sizeMap = {
-  xs: 'w-8 h-8',
-  sm: 'w-10 h-10',
-  md: 'w-12 h-12',
-  lg: 'w-14 h-14',
-  xl: 'w-16 h-16',
+  xs: 'w-10 h-10',
+  sm: 'w-12 h-12',
+  md: 'w-14 h-14',
+  lg: 'w-16 h-16',
+  xl: 'w-20 h-20',
 }
 
 const pxMap = {
-  xs: 32,
-  sm: 40,
-  md: 48,
-  lg: 56,
-  xl: 64,
+  xs: 40,
+  sm: 48,
+  md: 56,
+  lg: 64,
+  xl: 80,
 }
 
 export function CoopnamaLogo({ size = 'md', className }: CoopnamaLogoProps) {

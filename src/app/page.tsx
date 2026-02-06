@@ -22,7 +22,7 @@ export default function Home() {
       {/* Header */}
       <header className="p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Image src={LOGO_URL} alt="COOPNAMA" width={48} height={48} className="rounded-lg object-contain" priority />
+          <Image src={LOGO_URL} alt="COOPNAMA" width={56} height={56} className="rounded-lg object-contain" priority />
           <span className="font-bold text-xl text-gray-800">COOPNAMA</span>
         </div>
         <nav className="flex items-center gap-4">
@@ -209,7 +209,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Image src={LOGO_URL} alt="COOPNAMA" width={40} height={40} className="rounded-lg object-contain" />
+              <Image src={LOGO_URL} alt="COOPNAMA" width={48} height={48} className="rounded-lg object-contain" />
               <div>
                 <p className="font-bold text-gray-800">COOPNAMA</p>
                 <p className="text-sm text-gray-500">Cooperativa Nacional de Maestros</p>

@@ -229,10 +229,10 @@ export default function KioskPage() {
       <header className="text-white py-6 px-8 text-center" style={{ backgroundColor: branding.primary_color }}>
         <div className="flex items-center justify-center gap-3 mb-2">
           {branding.logo_url ? (
-            <img src={branding.logo_url} alt={branding.name} className="w-12 h-12 rounded-xl object-contain bg-white/20 p-1" />
+            <img src={branding.logo_url} alt={branding.name} className="w-16 h-16 rounded-xl object-contain bg-white/20 p-1" />
           ) : (
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl">{branding.name.charAt(0)}</span>
+            <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-2xl">{branding.name.charAt(0)}</span>
             </div>
           )}
           <h1 className="text-3xl font-bold">{branding.name}</h1>
@@ -402,10 +402,10 @@ export default function KioskPage() {
             <div className="p-10 bg-white shadow-neu-xl rounded-neu-xl mb-8 print:shadow-none">
               <div className="flex items-center justify-center gap-3 mb-6">
                 {branding.logo_url ? (
-                  <img src={branding.logo_url} alt={branding.name} className="w-10 h-10 rounded-lg object-contain" />
+                  <img src={branding.logo_url} alt={branding.name} className="w-14 h-14 rounded-lg object-contain" />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: branding.primary_color }}>
-                    <span className="text-white font-bold text-lg">{branding.name.charAt(0)}</span>
+                  <div className="w-14 h-14 rounded-lg flex items-center justify-center" style={{ backgroundColor: branding.primary_color }}>
+                    <span className="text-white font-bold text-xl">{branding.name.charAt(0)}</span>
                   </div>
                 )}
                 <span className="font-bold text-xl text-gray-800">{branding.name}</span>

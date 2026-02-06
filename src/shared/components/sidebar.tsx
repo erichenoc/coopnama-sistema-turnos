@@ -65,7 +65,7 @@ export function Sidebar({
       >
         {logo || (
           <div className={cn('flex items-center gap-3', collapsed && 'justify-center')}>
-            <Image src={LOGO_URL} alt="COOPNAMA" width={40} height={40} className="rounded-lg object-contain" priority />
+            <Image src={LOGO_URL} alt="COOPNAMA" width={48} height={48} className="rounded-lg object-contain" priority />
             {!collapsed && (
               <div className="flex flex-col">
                 <span className="font-bold text-gray-800">COOPNAMA</span>

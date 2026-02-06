@@ -159,10 +159,10 @@ export default function TVDisplayPage() {
       <header className="flex items-center justify-between px-8 py-4 bg-black/30">
         <div className="flex items-center gap-4">
           {branding.logo_url ? (
-            <img src={branding.logo_url} alt={branding.name} className="w-14 h-14 rounded-xl object-contain bg-white/10 p-1" />
+            <img src={branding.logo_url} alt={branding.name} className="w-16 h-16 rounded-xl object-contain bg-white/10 p-1" />
           ) : (
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ backgroundColor: branding.primary_color }}>
-              <span className="text-white font-bold text-2xl">{branding.name.charAt(0)}</span>
+            <div className="w-16 h-16 rounded-xl flex items-center justify-center" style={{ backgroundColor: branding.primary_color }}>
+              <span className="text-white font-bold text-3xl">{branding.name.charAt(0)}</span>
             </div>
           )}
           <div>

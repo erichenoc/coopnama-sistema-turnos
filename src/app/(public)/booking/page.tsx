@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react'
+
+const LOGO_URL = 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png'
 
 type Step = 'branch' | 'service' | 'date' | 'time' | 'info' | 'confirm' | 'done'
 
@@ -219,9 +222,12 @@ export default function BookingPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
       <header className="bg-coopnama-primary text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold">COOPNAMA</h1>
-          <p className="text-blue-100 mt-1">Sistema de Turnos en Línea</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center gap-4">
+          <Image src={LOGO_URL} alt="COOPNAMA" width={56} height={56} className="rounded-lg object-contain" priority />
+          <div>
+            <h1 className="text-3xl font-bold">COOPNAMA</h1>
+            <p className="text-blue-100 mt-1">Sistema de Turnos en Linea</p>
+          </div>
         </div>
       </header>
 

@@ -32,7 +32,7 @@ export function AuthLayout({
       {/* Header */}
       <header className="p-4 lg:p-6">
         <Link href="/" className="inline-flex items-center gap-3">
-          <Image src={LOGO_URL} alt="COOPNAMA" width={40} height={40} className="rounded-lg object-contain" priority />
+          <Image src={LOGO_URL} alt="COOPNAMA" width={48} height={48} className="rounded-lg object-contain" priority />
           <span className="font-bold text-gray-800">COOPNAMA</span>
         </Link>
       </header>
@@ -50,7 +50,7 @@ export function AuthLayout({
           {/* Logo */}
           {showLogo && (
             <div className="flex justify-center mb-6">
-              <Image src={LOGO_URL} alt="COOPNAMA" width={64} height={64} className="rounded-xl object-contain" priority />
+              <Image src={LOGO_URL} alt="COOPNAMA" width={80} height={80} className="rounded-xl object-contain" priority />
             </div>
           )}
 
