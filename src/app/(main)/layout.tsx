@@ -2,6 +2,7 @@
 
 import { DashboardLayout, type NavItem } from '@/shared/components'
 import { Avatar } from '@/shared/components/avatar'
+import { NotificationDropdown } from '@/shared/components/notification-dropdown'
 import { useOrg } from '@/shared/providers/org-provider'
 import { logoutAction } from '@/features/auth/actions/auth-actions'
 
@@ -218,6 +219,7 @@ export default function MainLayout({
           role: user?.role || 'Administrador',
         },
         actions: <BranchSwitcher />,
+        notificationSlot: <NotificationDropdown />,
       }}
     >
       {children}

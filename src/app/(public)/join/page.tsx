@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
+import { estimateWaitTime } from '@/lib/estimations/wait-time'
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from '@/shared/components'
 import { Spinner } from '@/shared/components/spinner'
 import { LOGO_URL } from '@/shared/components/coopnama-logo'
+import { Clock, Users } from 'lucide-react'
 
 interface BranchInfo {
   id: string
@@ -23,6 +25,13 @@ interface Service {
   name: string
   code: string
   description: string | null
+  avg_duration_minutes: number | null
+}
+
+interface ServiceQueueInfo {
+  waitingCount: number
+  estimatedMinutes: number
+  activeAgents: number
 }
 
 export default function JoinQueuePage() {
@@ -38,6 +47,7 @@ export default function JoinQueuePage() {
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
+  const [queueInfo, setQueueInfo] = useState<Record<string, ServiceQueueInfo>>({})
 
   useEffect(() => {
     if (!branchParam) {
@@ -80,17 +90,50 @@ export default function JoinQueuePage() {
       // Fetch services
       const { data: servicesData } = await supabase
         .from('services')
-        .select('id, name, code, description')
+        .select('id, name, code, description, avg_duration_minutes')
         .eq('organization_id', branchData.organization_id)
         .eq('is_active', true)
         .order('sort_order')
 
       setServices(servicesData || [])
       setLoading(false)
+
+      // Fetch queue info per service
+      if (servicesData && servicesData.length > 0) {
+        fetchQueueInfo(branchData.id, servicesData)
+      }
     }
 
     fetchData()
   }, [branchParam])
+
+  const fetchQueueInfo = useCallback(async (bId: string, svcs: Service[]) => {
+    const results: Record<string, ServiceQueueInfo> = {}
+    await Promise.all(
+      svcs.map(async (svc) => {
+        try {
+          const est = await estimateWaitTime(bId, svc.id, svc.avg_duration_minutes || 5)
+          results[svc.id] = {
+            waitingCount: est.waitingCount,
+            estimatedMinutes: est.estimatedMinutes,
+            activeAgents: est.activeAgents,
+          }
+        } catch {
+          // Silently skip on error
+        }
+      })
+    )
+    setQueueInfo(results)
+  }, [])
+
+  // Refresh queue info every 30 seconds
+  useEffect(() => {
+    if (!branch || services.length === 0) return
+    const interval = setInterval(() => {
+      fetchQueueInfo(branch.id, services)
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [branch, services, fetchQueueInfo])
 
   const handleJoinQueue = async () => {
     if (!selectedServiceId || !branch) return
@@ -207,27 +250,48 @@ export default function JoinQueuePage() {
           <div>
             <p className="text-sm font-medium text-gray-700 mb-3">Seleccione un servicio</p>
             <div className="space-y-2">
-              {services.map((service) => (
-                <button
-                  key={service.id}
-                  onClick={() => setSelectedServiceId(service.id)}
-                  className={`w-full text-left p-4 rounded-neu-sm transition-all ${
-                    selectedServiceId === service.id
-                      ? 'bg-coopnama-primary/10 border-2 border-coopnama-primary shadow-neu-sm'
-                      : 'bg-white shadow-neu-xs hover:shadow-neu-sm border-2 border-transparent'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-800">{service.name}</p>
-                      {service.description && (
-                        <p className="text-xs text-gray-500 mt-1">{service.description}</p>
-                      )}
+              {services.map((service) => {
+                const info = queueInfo[service.id]
+                return (
+                  <button
+                    key={service.id}
+                    onClick={() => setSelectedServiceId(service.id)}
+                    className={`w-full text-left p-4 rounded-neu-sm transition-all ${
+                      selectedServiceId === service.id
+                        ? 'bg-coopnama-primary/10 border-2 border-coopnama-primary shadow-neu-sm'
+                        : 'bg-white shadow-neu-xs hover:shadow-neu-sm border-2 border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-800">{service.name}</p>
+                        {service.description && (
+                          <p className="text-xs text-gray-500 mt-1">{service.description}</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-400 font-mono">{service.code}</span>
                     </div>
-                    <span className="text-xs text-gray-400 font-mono">{service.code}</span>
-                  </div>
-                </button>
-              ))}
+                    {info && (
+                      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>
+                            {info.waitingCount === 0
+                              ? 'Sin espera'
+                              : `${info.waitingCount} en espera`}
+                          </span>
+                        </div>
+                        {info.waitingCount > 0 && (
+                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>~{info.estimatedMinutes} min</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
 
               {services.length === 0 && (
                 <p className="text-center text-gray-400 py-8">No hay servicios disponibles</p>
