@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { Providers } from '@/shared/providers/providers'
+import { OfflineBanner } from '@/features/offline/components/offline-banner'
 import './globals.css'
 
 // Fonts
@@ -62,6 +63,7 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
+        <OfflineBanner />
         <Toaster position="top-right" richColors closeButton />
       </body>
     </html>

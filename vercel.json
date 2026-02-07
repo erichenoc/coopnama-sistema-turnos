@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/detect-anomalies",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/sla-monitor",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

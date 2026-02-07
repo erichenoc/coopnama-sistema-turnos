@@ -10,7 +10,7 @@ interface IntegrationConfig {
   twilio_phone_number?: string
   vapid_public_key?: string
   vapid_private_key?: string
-  anthropic_api_key?: string
+  openrouter_api_key?: string
   resend_api_key?: string
 }
 

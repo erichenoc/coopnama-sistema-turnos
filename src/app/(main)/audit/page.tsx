@@ -1,368 +1,216 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import {
-  PageHeader,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  Button,
-  Input,
-  Spinner,
-  EmptyState,
-} from '@/shared/components'
-import { StatusBadge } from '@/shared/components/badge'
-import type { TicketStatus, TicketHistory } from '@/shared/types/domain'
+import { Button } from '@/shared/components/button'
+import { Input } from '@/shared/components/input'
+import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components/card'
+import { Select, type SelectOption } from '@/shared/components/select'
+import { Badge } from '@/shared/components/badge'
+import { Spinner } from '@/shared/components/spinner'
 import { useOrg } from '@/shared/providers/org-provider'
-import { ArrowRight, Search, Calendar, AlertCircle } from 'lucide-react'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { getAuditLogs, getAuditActions, type AuditEntry } from '@/features/compliance/services/audit-log-service'
 
-// ============================================
-// TYPES
-// ============================================
-
-interface HistoryEntry extends TicketHistory {
-  ticket?: {
-    id: string
-    ticket_number: string
-    branch_id: string
-  } | null
-  user?: {
-    id: string
-    full_name: string
-  } | null
-  station?: {
-    id: string
-    name: string
-  } | null
+const ACTION_COLORS: Record<string, string> = {
+  create: 'bg-green-100 text-green-800',
+  update: 'bg-blue-100 text-blue-800',
+  delete: 'bg-red-100 text-red-800',
+  login: 'bg-gray-100 text-gray-800',
 }
 
-// ============================================
-// MAIN COMPONENT
-// ============================================
-
 export default function AuditPage() {
-  const { branchId } = useOrg()
+  const { organizationId } = useOrg()
+  const [logs, setLogs] = useState<AuditEntry[]>([])
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [history, setHistory] = useState<HistoryEntry[]>([])
-  const [hasMore, setHasMore] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [dateRange, setDateRange] = useState({
-    start: format(new Date(), 'yyyy-MM-dd'),
-    end: format(new Date(), 'yyyy-MM-dd'),
+  const [actions, setActions] = useState<SelectOption[]>([])
+
+  const [filters, setFilters] = useState({
+    action: '',
+    entity_type: '',
+    dateFrom: '',
+    dateTo: '',
   })
-  const [error, setError] = useState<string | null>(null)
 
-  // ============================================
-  // FETCH HISTORY
-  // ============================================
-
-  async function fetchHistory(offset = 0) {
-    try {
-      const supabase = createClient()
-
-      // Get ticket IDs for current branch
-      const { data: branchTickets, error: ticketsError } = await supabase
-        .from('tickets')
-        .select('id')
-        .eq('branch_id', branchId)
-
-      if (ticketsError) throw ticketsError
-
-      const ticketIds = branchTickets?.map((t) => t.id) || []
-
-      if (ticketIds.length === 0) {
-        setHistory([])
-        setHasMore(false)
-        setLoading(false)
-        return
-      }
-
-      // Fetch history for these tickets
-      const { data, error: historyError } = await supabase
-        .from('ticket_history')
-        .select(
-          `
-          *,
-          ticket:tickets(id, ticket_number, branch_id),
-          user:users(id, full_name),
-          station:stations(id, name)
-        `
-        )
-        .in('ticket_id', ticketIds)
-        .gte('created_at', `${dateRange.start}T00:00:00`)
-        .lte('created_at', `${dateRange.end}T23:59:59`)
-        .order('created_at', { ascending: false })
-        .range(offset, offset + 49)
-
-      if (historyError) throw historyError
-
-      const newHistory = (data as HistoryEntry[]) || []
-
-      if (offset === 0) {
-        setHistory(newHistory)
-      } else {
-        setHistory((prev) => [...prev, ...newHistory])
-      }
-
-      setHasMore(newHistory.length === 50)
-      setError(null)
-    } catch (err) {
-      console.error('Error fetching history:', err)
-      setError(err instanceof Error ? err.message : 'Error al cargar historial')
-      setHasMore(false)
-    } finally {
-      setLoading(false)
-      setLoadingMore(false)
-    }
-  }
-
-  // ============================================
-  // EFFECTS
-  // ============================================
+  const [page, setPage] = useState(0)
+  const pageSize = 20
 
   useEffect(() => {
-    if (branchId) {
-      setLoading(true)
-      fetchHistory(0)
+    loadActions()
+    loadLogs()
+  }, [organizationId])
+
+  async function loadActions() {
+    const data = await getAuditActions(organizationId)
+    setActions([
+      { value: '', label: 'Todas las acciones' },
+      ...data.map(a => ({ value: a, label: a })),
+    ])
+  }
+
+  async function loadLogs() {
+    setLoading(true)
+    const { data, total } = await getAuditLogs(organizationId, {
+      action: filters.action || undefined,
+      entity_type: filters.entity_type || undefined,
+      dateFrom: filters.dateFrom || undefined,
+      dateTo: filters.dateTo || undefined,
+      limit: pageSize,
+      offset: page * pageSize,
+    })
+    setLogs(data)
+    setTotal(total)
+    setLoading(false)
+  }
+
+  function handleApplyFilters() {
+    setPage(0)
+    loadLogs()
+  }
+
+  function handleNextPage() {
+    if ((page + 1) * pageSize < total) {
+      setPage(p => p + 1)
+      loadLogs()
     }
-  }, [branchId, dateRange])
-
-  // ============================================
-  // HANDLERS
-  // ============================================
-
-  function handleLoadMore() {
-    setLoadingMore(true)
-    fetchHistory(history.length)
   }
 
-  function handleDateChange(field: 'start' | 'end', value: string) {
-    setDateRange((prev) => ({ ...prev, [field]: value }))
+  function handlePrevPage() {
+    if (page > 0) {
+      setPage(p => p - 1)
+      loadLogs()
+    }
   }
 
-  // ============================================
-  // FILTERING
-  // ============================================
-
-  const filteredHistory = history.filter((entry) => {
-    if (!searchQuery) return true
-    const ticketNumber = entry.ticket?.ticket_number || ''
-    return ticketNumber.toLowerCase().includes(searchQuery.toLowerCase())
-  })
-
-  // ============================================
-  // RENDER HELPERS
-  // ============================================
-
-  function formatDateTime(dateString: string) {
-    return format(new Date(dateString), "d MMM yyyy 'a las' HH:mm", { locale: es })
-  }
-
-  // ============================================
-  // RENDER
-  // ============================================
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner size="lg" />
-      </div>
-    )
+  function formatDate(iso: string) {
+    return new Date(iso).toLocaleString('es-DO', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
   }
 
   return (
-    <div className="min-h-screen bg-neu-bg p-4 md:p-6">
-      {/* Header */}
-      <PageHeader
-        title="Auditoría de Cambios"
-        description="Historial completo de cambios de estado de turnos"
-      />
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-neu-text mb-2">Auditoria</h1>
+        <p className="text-neu-text-secondary">
+          Registro de todas las acciones realizadas en el sistema
+        </p>
+      </div>
 
-      {/* Filters */}
-      <Card className="mb-6 shadow-neu">
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Buscar por número de turno..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Start Date */}
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="date"
-                value={dateRange.start}
-                onChange={(e) => handleDateChange('start', e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* End Date */}
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="date"
-                value={dateRange.end}
-                onChange={(e) => handleDateChange('end', e.target.value)}
-                className="pl-10"
-              />
-            </div>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Filtros</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Select
+              label="Accion"
+              options={actions}
+              value={filters.action}
+              onChange={e => setFilters(f => ({ ...f, action: e.target.value }))}
+            />
+            <Input
+              label="Tipo de Entidad"
+              value={filters.entity_type}
+              onChange={e => setFilters(f => ({ ...f, entity_type: e.target.value }))}
+              placeholder="ej: ticket"
+            />
+            <Input
+              label="Desde"
+              type="date"
+              value={filters.dateFrom}
+              onChange={e => setFilters(f => ({ ...f, dateFrom: e.target.value }))}
+            />
+            <Input
+              label="Hasta"
+              type="date"
+              value={filters.dateTo}
+              onChange={e => setFilters(f => ({ ...f, dateTo: e.target.value }))}
+            />
+          </div>
+          <div className="mt-4">
+            <Button variant="primary" onClick={handleApplyFilters}>
+              Aplicar Filtros
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Error State */}
-      {error && (
-        <Card className="mb-6 border-red-200 bg-red-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 text-red-700">
-              <AlertCircle className="h-5 w-5" />
-              <p>{error}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* History Table */}
-      <Card className="shadow-neu">
-        <CardHeader>
-          <CardTitle>
-            Cambios de Estado ({filteredHistory.length} registro
-            {filteredHistory.length !== 1 ? 's' : ''})
-          </CardTitle>
-        </CardHeader>
+      <Card>
         <CardContent>
-          {filteredHistory.length === 0 ? (
-            <EmptyState
-              icon={<Search className="h-12 w-12" />}
-              title="No hay registros"
-              description="No se encontraron cambios de estado en el rango seleccionado"
-            />
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Spinner />
+            </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Fecha/Hora
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Turno
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Cambio
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Usuario
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Ventanilla
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Notas
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredHistory.map((entry) => (
-                    <tr
-                      key={entry.id}
-                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                    >
-                      {/* Date/Time */}
-                      <td className="py-3 px-4 text-sm text-gray-600">
-                        {formatDateTime(entry.created_at)}
-                      </td>
-
-                      {/* Ticket Number */}
-                      <td className="py-3 px-4">
-                        <span className="font-mono font-semibold text-sm">
-                          {entry.ticket?.ticket_number || 'N/A'}
-                        </span>
-                      </td>
-
-                      {/* Status Change */}
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          {entry.previous_status && (
-                            <>
-                              <StatusBadge
-                                status={entry.previous_status as TicketStatus}
-                                size="sm"
-                              />
-                              <ArrowRight className="h-3 w-3 text-gray-400" />
-                            </>
-                          )}
-                          <StatusBadge
-                            status={entry.new_status as TicketStatus}
-                            size="sm"
-                          />
-                        </div>
-                      </td>
-
-                      {/* User */}
-                      <td className="py-3 px-4 text-sm text-gray-700">
-                        {entry.user?.full_name || (
-                          <span className="text-gray-400 italic">Sistema</span>
-                        )}
-                      </td>
-
-                      {/* Station */}
-                      <td className="py-3 px-4 text-sm text-gray-700">
-                        {entry.station?.name || (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-
-                      {/* Notes */}
-                      <td className="py-3 px-4 text-sm text-gray-600">
-                        {entry.notes ? (
-                          <span className="max-w-xs truncate block" title={entry.notes}>
-                            {entry.notes}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-neu-border">
+                      <th className="text-left py-3 px-4 font-semibold text-neu-text">Fecha</th>
+                      <th className="text-left py-3 px-4 font-semibold text-neu-text">Usuario</th>
+                      <th className="text-left py-3 px-4 font-semibold text-neu-text">Accion</th>
+                      <th className="text-left py-3 px-4 font-semibold text-neu-text">Entidad</th>
+                      <th className="text-left py-3 px-4 font-semibold text-neu-text">ID</th>
+                      <th className="text-left py-3 px-4 font-semibold text-neu-text">Detalles</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody>
+                    {logs.map(log => (
+                      <tr key={log.id} className="border-b border-neu-border hover:bg-neu-bg-hover">
+                        <td className="py-3 px-4 text-sm text-neu-text-secondary">
+                          {formatDate(log.created_at)}
+                        </td>
+                        <td className="py-3 px-4 text-sm">
+                          {log.user ? (
+                            <div>
+                              <div className="font-medium text-neu-text">{log.user.full_name}</div>
+                              <div className="text-xs text-neu-text-secondary">{log.user.email}</div>
+                            </div>
+                          ) : (
+                            <span className="text-neu-text-secondary italic">Sistema</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <Badge className={ACTION_COLORS[log.action] || 'bg-gray-100 text-gray-800'}>
+                            {log.action}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-neu-text">{log.entity_type}</td>
+                        <td className="py-3 px-4 text-sm text-neu-text-secondary">
+                          {log.entity_id || '-'}
+                        </td>
+                        <td className="py-3 px-4 text-xs text-neu-text-secondary max-w-xs truncate">
+                          {JSON.stringify(log.details)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-          {/* Load More */}
-          {hasMore && filteredHistory.length > 0 && (
-            <div className="mt-6 flex justify-center">
-              <Button
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                variant="secondary"
-                className="shadow-neu-sm"
-              >
-                {loadingMore ? (
-                  <>
-                    <Spinner size="sm" className="mr-2" />
-                    Cargando...
-                  </>
-                ) : (
-                  'Cargar más'
-                )}
-              </Button>
-            </div>
+              <div className="flex items-center justify-between mt-6">
+                <div className="text-sm text-neu-text-secondary">
+                  Mostrando {page * pageSize + 1} - {Math.min((page + 1) * pageSize, total)} de {total}
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="secondary" onClick={handlePrevPage} disabled={page === 0}>
+                    Anterior
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleNextPage}
+                    disabled={(page + 1) * pageSize >= total}
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

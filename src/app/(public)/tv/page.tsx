@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { estimateWaitTime } from '@/lib/estimations/wait-time'
 import { useRealtimeQueue } from '@/shared/hooks/use-realtime-queue'
 import { useTicketAnnouncer } from '@/shared/hooks/use-ticket-announcer'
+import { PromoCarousel } from '@/features/tv-signage/components/promo-carousel'
+import QRCode from 'react-qr-code'
 
 interface ServiceEstimate {
   serviceId: string
@@ -30,6 +32,7 @@ export default function TVDisplayPage() {
   const [isNew, setIsNew] = useState(false)
   const [serviceEstimates, setServiceEstimates] = useState<ServiceEstimate[]>([])
   const [branding, setBranding] = useState<OrgBranding>({ name: 'COOPNAMA', logo_url: null, primary_color: '#1e40af' })
+  const [orgId, setOrgId] = useState<string | null>(null)
 
   // Fetch wait time estimates per service + branding
   const fetchEstimates = useCallback(async () => {
@@ -55,6 +58,10 @@ export default function TVDisplayPage() {
         logo_url: orgRes.data.logo_url,
         primary_color: orgRes.data.primary_color || '#1e40af',
       })
+    }
+
+    if (branch) {
+      setOrgId(branch.organization_id)
     }
 
     const services = servicesRes.data
@@ -142,6 +149,9 @@ export default function TVDisplayPage() {
 
   const latestTicket = currentlyServing[0]
 
+  // Idle when there are no active tickets or after the "new" animation ends
+  const showPromo = !isNew && currentlyServing.length === 0
+
   // Show loading state while resolving branch
   if (!branchId) {
     return (
@@ -181,7 +191,16 @@ export default function TVDisplayPage() {
       </header>
 
       <div className="flex h-[calc(100vh-88px)]">
-        <div className="flex-1 flex items-center justify-center p-8">
+        <div className="flex-1 flex items-center justify-center p-8 relative">
+          {/* Promo carousel when idle */}
+          {orgId && (
+            <PromoCarousel
+              organizationId={orgId}
+              branchId={branchId}
+              isIdle={showPromo}
+            />
+          )}
+
           {latestTicket ? (
             <div className={`text-center ${isNew ? 'animate-ticket-call' : ''}`}>
               <p className="text-blue-300 text-xl mb-2 uppercase tracking-wider">Turno Actual</p>
@@ -263,6 +282,22 @@ export default function TVDisplayPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* QR Code to join queue remotely */}
+          {branchId && (
+            <div className="p-6 border-t border-white/10">
+              <h3 className="text-blue-300 font-semibold mb-3 uppercase tracking-wider text-sm text-center">Tomar Turno</h3>
+              <div className="flex justify-center">
+                <div className="bg-white p-2 rounded-lg">
+                  <QRCode
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/join?branch=${branchId}`}
+                    size={80}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-blue-300/50 text-center mt-2">Escanee para tomar turno</p>
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { generateText } from 'ai'
+import { getModel } from './provider'
 
 const SYSTEM_PROMPT = `Eres el asistente virtual de COOPNAMA, una cooperativa dominicana.
 Tu rol es ayudar a clientes y empleados con informacion sobre servicios, turnos y citas.
@@ -48,8 +49,10 @@ export async function chat(
 ): Promise<ChatResponse> {
   const lastMessage = messages[messages.length - 1]?.content || ''
 
-  // Try keyword fallback first if no API key
-  if (!process.env.ANTHROPIC_API_KEY) {
+  const model = getModel()
+
+  // Try keyword fallback first if no AI model available
+  if (!model) {
     const keywordReply = getKeywordResponse(lastMessage)
     return {
       reply: keywordReply || 'Gracias por tu mensaje. Un agente estara disponible pronto para ayudarte. Puedes visitar nuestra sucursal o llamarnos para asistencia inmediata.',
@@ -58,8 +61,6 @@ export async function chat(
   }
 
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-
     let systemPrompt = SYSTEM_PROMPT
     if (context?.services) {
       systemPrompt += `\n\nServicios disponibles: ${context.services.join(', ')}`
@@ -68,15 +69,14 @@ export async function chat(
       systemPrompt += `\nSucursal: ${context.branchName}`
     }
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 500,
+    const { text } = await generateText({
+      model,
+      maxOutputTokens: 500,
       system: systemPrompt,
-      messages: messages.map(m => ({ role: m.role, content: m.content })),
+      messages: messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
     })
 
-    const textBlock = response.content.find(b => b.type === 'text')
-    const reply = textBlock?.text || 'Disculpa, no pude procesar tu solicitud. Intenta de nuevo.'
+    const reply = text || 'Disculpa, no pude procesar tu solicitud. Intenta de nuevo.'
 
     return { reply, intent: 'ai' }
   } catch {

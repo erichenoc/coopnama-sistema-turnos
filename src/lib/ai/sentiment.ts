@@ -1,44 +1,32 @@
 'use server'
 
+import { generateText } from 'ai'
+import { getModel } from './provider'
+
 /**
  * AI-powered sentiment analysis for customer feedback.
- * Uses Claude API if available, falls back to 'neutral'.
+ * Uses OpenRouter via Vercel AI SDK if available, falls back to keyword-based analysis.
  */
-
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || ''
 
 type Sentiment = 'positive' | 'neutral' | 'negative'
 
 export async function analyzeSentiment(text: string): Promise<Sentiment> {
-  if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === 'your_anthropic_api_key') {
+  const model = getModel(true) // Use fast model for simple classification
+
+  if (!model) {
     return inferBasicSentiment(text)
   }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 10,
-        messages: [{
-          role: 'user',
-          content: `Clasifica el sentimiento de este comentario de servicio al cliente en exactamente una palabra: "positive", "neutral", o "negative".\n\nComentario: "${text}"`,
-        }],
-      }),
+    const { text: result } = await generateText({
+      model,
+      maxOutputTokens: 10,
+      prompt: `Clasifica el sentimiento de este comentario de servicio al cliente en exactamente una palabra: "positive", "neutral", o "negative".\n\nComentario: "${text}"`,
     })
 
-    if (!response.ok) return inferBasicSentiment(text)
-
-    const data = await response.json()
-    const result = (data.content?.[0]?.text || '').toLowerCase().trim()
-
-    if (result.includes('positive')) return 'positive'
-    if (result.includes('negative')) return 'negative'
+    const lower = (result || '').toLowerCase().trim()
+    if (lower.includes('positive')) return 'positive'
+    if (lower.includes('negative')) return 'negative'
     return 'neutral'
   } catch {
     return inferBasicSentiment(text)

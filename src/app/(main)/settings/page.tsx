@@ -25,8 +25,11 @@ import { MFASetup } from '@/features/auth/components/mfa-setup'
 import { APIKeyManager } from '@/features/api/components/api-key-manager'
 import { toast } from 'sonner'
 import { useOrg } from '@/shared/providers/org-provider'
+import { SLAConfigPanel } from '@/features/sla/components/sla-config-panel'
+import { PriorityRulesManager } from '@/features/priority-rules/components/priority-rules-manager'
+import { SignageContentManager } from '@/features/tv-signage/components/signage-content-manager'
 
-type Tab = 'general' | 'marca' | 'facturacion' | 'whitelabel' | 'api' | 'notificaciones' | 'integraciones' | 'cuenta'
+type Tab = 'general' | 'marca' | 'facturacion' | 'whitelabel' | 'api' | 'sla' | 'prioridad' | 'signage' | 'notificaciones' | 'integraciones' | 'cuenta'
 
 interface OrgSettings {
   name: string
@@ -52,7 +55,7 @@ interface IntegrationStatus {
   whatsapp_n8n: boolean
   twilio_sms: boolean
   web_push: boolean
-  claude_ai: boolean
+  openrouter_ai: boolean
   resend_email: boolean
 }
 
@@ -64,7 +67,7 @@ interface IntegrationConfig {
   twilio_phone_number: string
   vapid_public_key: string
   vapid_private_key: string
-  anthropic_api_key: string
+  openrouter_api_key: string
   resend_api_key: string
 }
 
@@ -103,7 +106,7 @@ export default function SettingsPage() {
     whatsapp_n8n: false,
     twilio_sms: false,
     web_push: false,
-    claude_ai: false,
+    openrouter_ai: false,
     resend_email: false,
   })
   const [integrationConfig, setIntegrationConfig] = useState<IntegrationConfig>({
@@ -114,7 +117,7 @@ export default function SettingsPage() {
     twilio_phone_number: '',
     vapid_public_key: '',
     vapid_private_key: '',
-    anthropic_api_key: '',
+    openrouter_api_key: '',
     resend_api_key: '',
   })
   const [savingIntegration, setSavingIntegration] = useState<string | null>(null)
@@ -287,6 +290,9 @@ export default function SettingsPage() {
     { id: 'facturacion', label: 'Facturacion', icon: '💳' },
     { id: 'whitelabel', label: 'White-label', icon: '🌐' },
     { id: 'api', label: 'API', icon: '🔗' },
+    { id: 'sla', label: 'SLA', icon: '⏱️' },
+    { id: 'prioridad', label: 'Prioridad', icon: '🎯' },
+    { id: 'signage', label: 'TV Signage', icon: '📺' },
     { id: 'notificaciones', label: 'Notificaciones', icon: '🔔' },
     { id: 'integraciones', label: 'Integraciones', icon: '🔌' },
     { id: 'cuenta', label: 'Cuenta', icon: '👤' },
@@ -462,6 +468,18 @@ export default function SettingsPage() {
 
       {activeTab === 'api' && (
         <APIKeyManager />
+      )}
+
+      {activeTab === 'sla' && (
+        <SLAConfigPanel organizationId={organizationId} />
+      )}
+
+      {activeTab === 'prioridad' && (
+        <PriorityRulesManager organizationId={organizationId} />
+      )}
+
+      {activeTab === 'signage' && (
+        <SignageContentManager organizationId={organizationId} />
       )}
 
       {activeTab === 'notificaciones' && (
@@ -731,45 +749,45 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Claude AI */}
+          {/* OpenRouter AI */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Claude AI</CardTitle>
-                <Badge variant={integrations.claude_ai ? 'default' : 'outline'}>
-                  {integrations.claude_ai ? 'Conectado' : 'No configurado'}
+                <CardTitle>OpenRouter AI</CardTitle>
+                <Badge variant={integrations.openrouter_ai ? 'default' : 'outline'}>
+                  {integrations.openrouter_ai ? 'Conectado' : 'No configurado'}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-500 mb-4">
-                Asistente de IA para prediccion de tiempos de espera y sugerencias a agentes.
+                IA para prediccion de tiempos, copilot de agentes, analisis de sentimiento y chatbot. Soporta 300+ modelos via OpenRouter.
               </p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Anthropic API Key</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">OpenRouter API Key</label>
                   <Input
                     type="password"
-                    value={integrationConfig.anthropic_api_key}
-                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, anthropic_api_key: e.target.value })}
-                    placeholder="sk-ant-..."
+                    value={integrationConfig.openrouter_api_key}
+                    onChange={(e) => setIntegrationConfig({ ...integrationConfig, openrouter_api_key: e.target.value })}
+                    placeholder="sk-or-..."
                   />
                 </div>
                 <Button
                   variant="primary"
                   className="w-full"
-                  disabled={savingIntegration === 'claude'}
+                  disabled={savingIntegration === 'openrouter'}
                   onClick={async () => {
-                    setSavingIntegration('claude')
-                    const result = await saveIntegrationConfig(organizationId, { anthropic_api_key: integrationConfig.anthropic_api_key })
+                    setSavingIntegration('openrouter')
+                    const result = await saveIntegrationConfig(organizationId, { openrouter_api_key: integrationConfig.openrouter_api_key })
                     if (result.error) { toast.error(result.error) } else {
-                      toast.success('Claude AI configurado')
-                      setIntegrations((prev) => ({ ...prev, claude_ai: Boolean(integrationConfig.anthropic_api_key) }))
+                      toast.success('OpenRouter AI configurado')
+                      setIntegrations((prev) => ({ ...prev, openrouter_ai: Boolean(integrationConfig.openrouter_api_key) }))
                     }
                     setSavingIntegration(null)
                   }}
                 >
-                  {savingIntegration === 'claude' ? 'Guardando...' : 'Guardar'}
+                  {savingIntegration === 'openrouter' ? 'Guardando...' : 'Guardar'}
                 </Button>
               </div>
             </CardContent>

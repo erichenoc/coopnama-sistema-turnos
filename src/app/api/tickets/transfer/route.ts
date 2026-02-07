@@ -61,13 +61,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: createError.message }, { status: 500 })
     }
 
-    // Update new ticket with transfer reference
+    // Update new ticket with transfer reference and journey tracking
+    const currentStep = currentTicket.journey_step || 1
+    const originalTicketId = currentTicket.original_ticket_id || currentTicket.id
+
     await supabase
       .from('tickets')
       .update({
         transferred_from_ticket_id: ticketId,
         transferred_from_service_id: currentTicket.service_id,
         transfer_reason: reason || null,
+        journey_step: currentStep + 1,
+        original_ticket_id: originalTicketId,
       })
       .eq('id', newTicket.id)
 

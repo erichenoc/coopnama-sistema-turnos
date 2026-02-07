@@ -15,6 +15,7 @@ import type { DailyStats, BranchDailyStats } from '@/shared/types/domain'
 import Link from 'next/link'
 import { useOrg } from '@/shared/providers/org-provider'
 import { AnomalyAlerts } from '@/features/ai/components/anomaly-alerts'
+import { SLAAlerts } from '@/features/sla/components/sla-alerts'
 import { SubscriptionBanner } from '@/features/billing/components/subscription-banner'
 
 export default function DashboardPage() {
@@ -208,6 +209,8 @@ export default function DashboardPage() {
           <StatCard key={index} {...stat} />
         ))}
       </DashboardGrid>
+
+      <SLAAlerts />
 
       {!isAllBranches && (
         <div className="mb-6">

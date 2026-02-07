@@ -6,7 +6,7 @@ interface IntegrationConfig {
   whatsapp_webhook_url?: string
   twilio_account_sid?: string
   twilio_auth_token?: string
-  anthropic_api_key?: string
+  openrouter_api_key?: string
   resend_api_key?: string
   vapid_public_key?: string
   vapid_private_key?: string
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
       (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) ||
       (dbConfig.vapid_public_key && dbConfig.vapid_private_key)
     ),
-    claude_ai: Boolean(process.env.ANTHROPIC_API_KEY || dbConfig.anthropic_api_key),
+    openrouter_ai: Boolean(process.env.OPENROUTER_API_KEY || dbConfig.openrouter_api_key),
     resend_email: Boolean(process.env.RESEND_API_KEY || dbConfig.resend_api_key),
   })
 }

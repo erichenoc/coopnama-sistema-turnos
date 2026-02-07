@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateAgentSuggestion } from '@/lib/ai/claude'
+import { generateAgentSuggestion } from '@/lib/ai/queue-ai'
 
 export async function POST(request: NextRequest) {
   try {
