@@ -233,7 +233,7 @@ export default function TVDisplayPage() {
         </div>
 
         {/* Right sidebar: queue info */}
-        <div className="w-44 sm:w-64 md:w-72 lg:w-80 xl:w-96 bg-black/20 border-l border-white/10 flex flex-col shrink-0 overflow-y-auto">
+        <div className="w-44 sm:w-64 md:w-72 lg:w-80 xl:w-96 bg-black/20 border-l border-white/10 flex flex-col shrink-0">
           {currentlyServing.length > 1 && (
             <div className="p-2 sm:p-4 lg:p-6 border-b border-white/10 shrink-0">
               <h3 className="text-blue-300 font-semibold mb-1.5 sm:mb-3 lg:mb-4 uppercase tracking-wider text-xs sm:text-sm">Recientes</h3>
@@ -251,11 +251,11 @@ export default function TVDisplayPage() {
             </div>
           )}
 
-          <div className="flex-1 p-2 sm:p-4 lg:p-6 min-h-0 shrink-0">
+          <div className="flex-1 p-2 sm:p-4 lg:p-6 min-h-0 overflow-hidden">
             <h3 className="text-blue-300 font-semibold mb-1.5 sm:mb-3 lg:mb-4 uppercase tracking-wider text-xs sm:text-sm">
               En Espera ({waiting.length})
             </h3>
-            <div className="space-y-0.5 sm:space-y-2">
+            <div className="space-y-0.5 sm:space-y-2 overflow-y-auto h-full">
               {waiting.slice(0, 10).map((ticket, i) => (
                 <div key={ticket.id} className="flex items-center gap-1.5 sm:gap-3 p-1 sm:p-2 rounded-lg hover:bg-white/5 transition-colors">
                   <span className="text-xs text-blue-300/40 w-3 sm:w-5">{i + 1}</span>
@@ -289,7 +289,7 @@ export default function TVDisplayPage() {
             </div>
           )}
 
-          {/* QR Code to join queue remotely - hidden on very small screens */}
+          {/* QR Code - always pinned to bottom */}
           {branchId && (
             <div className="p-2 sm:p-4 lg:p-6 border-t border-white/10 shrink-0">
               <div className="flex sm:flex-col items-center sm:items-center gap-2 sm:gap-0">
