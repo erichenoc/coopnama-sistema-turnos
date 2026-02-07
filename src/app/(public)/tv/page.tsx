@@ -168,21 +168,21 @@ export default function TVDisplayPage() {
     <div className="h-screen w-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 lg:py-4 bg-black/30 shrink-0">
-        <div className="flex items-center gap-3 lg:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
           {branding.logo_url ? (
-            <img src={branding.logo_url} alt={branding.name} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-xl object-contain bg-white/10 p-1" />
+            <img src={branding.logo_url} alt={branding.name} className="w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-xl object-contain bg-white/10 p-1 shrink-0" />
           ) : (
-            <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center" style={{ backgroundColor: branding.primary_color }}>
-              <span className="text-white font-bold text-xl sm:text-2xl lg:text-3xl">{branding.name.charAt(0)}</span>
+            <div className="w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: branding.primary_color }}>
+              <span className="text-white font-bold text-lg sm:text-2xl lg:text-3xl">{branding.name.charAt(0)}</span>
             </div>
           )}
-          <div>
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold">{branding.name}</h1>
-            <p className="text-blue-300 text-xs sm:text-sm">Sistema de Turnos</p>
+          <div className="min-w-0">
+            <h1 className="text-sm sm:text-xl lg:text-2xl font-bold truncate">{branding.name}</h1>
+            <p className="text-blue-300 text-xs sm:text-sm hidden sm:block">Sistema de Turnos</p>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-xl sm:text-2xl lg:text-3xl font-mono font-bold">
+        <div className="text-right shrink-0">
+          <p className="text-base sm:text-2xl lg:text-3xl font-mono font-bold">
             {currentTime.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })}
           </p>
           <p className="text-blue-300 text-xs sm:text-sm">
@@ -233,16 +233,16 @@ export default function TVDisplayPage() {
         </div>
 
         {/* Right sidebar: queue info */}
-        <div className="w-56 sm:w-64 md:w-72 lg:w-80 xl:w-96 bg-black/20 border-l border-white/10 flex flex-col shrink-0">
+        <div className="w-44 sm:w-64 md:w-72 lg:w-80 xl:w-96 bg-black/20 border-l border-white/10 flex flex-col shrink-0 overflow-y-auto">
           {currentlyServing.length > 1 && (
-            <div className="p-3 sm:p-4 lg:p-6 border-b border-white/10">
-              <h3 className="text-blue-300 font-semibold mb-2 sm:mb-3 lg:mb-4 uppercase tracking-wider text-xs sm:text-sm">Recientes</h3>
-              <div className="space-y-2 sm:space-y-3">
+            <div className="p-2 sm:p-4 lg:p-6 border-b border-white/10 shrink-0">
+              <h3 className="text-blue-300 font-semibold mb-1.5 sm:mb-3 lg:mb-4 uppercase tracking-wider text-xs sm:text-sm">Recientes</h3>
+              <div className="space-y-1.5 sm:space-y-3">
                 {currentlyServing.slice(1, 5).map((ticket) => (
-                  <div key={ticket.id} className="flex items-center justify-between p-2 sm:p-3 bg-white/5 rounded-xl">
-                    <span className="font-mono font-bold text-base sm:text-lg lg:text-xl">{ticket.ticket_number}</span>
+                  <div key={ticket.id} className="flex items-center justify-between p-1.5 sm:p-3 bg-white/5 rounded-xl">
+                    <span className="font-mono font-bold text-sm sm:text-lg lg:text-xl">{ticket.ticket_number}</span>
                     <div className="text-right">
-                      <p className="text-xs sm:text-sm text-blue-200">{ticket.station?.name}</p>
+                      <p className="text-xs sm:text-sm text-blue-200 truncate max-w-[60px] sm:max-w-none">{ticket.station?.name}</p>
                       <p className="text-xs text-blue-300/50 hidden sm:block">{ticket.service?.name}</p>
                     </div>
                   </div>
@@ -251,32 +251,32 @@ export default function TVDisplayPage() {
             </div>
           )}
 
-          <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-hidden min-h-0">
-            <h3 className="text-blue-300 font-semibold mb-2 sm:mb-3 lg:mb-4 uppercase tracking-wider text-xs sm:text-sm">
+          <div className="flex-1 p-2 sm:p-4 lg:p-6 min-h-0 shrink-0">
+            <h3 className="text-blue-300 font-semibold mb-1.5 sm:mb-3 lg:mb-4 uppercase tracking-wider text-xs sm:text-sm">
               En Espera ({waiting.length})
             </h3>
-            <div className="space-y-1 sm:space-y-2 overflow-y-auto h-full">
-              {waiting.slice(0, 15).map((ticket, i) => (
-                <div key={ticket.id} className="flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 rounded-lg hover:bg-white/5 transition-colors">
-                  <span className="text-xs sm:text-sm text-blue-300/40 w-4 sm:w-5">{i + 1}</span>
-                  <span className="font-mono font-bold text-sm sm:text-base text-blue-100">{ticket.ticket_number}</span>
-                  <span className="text-xs sm:text-sm text-blue-300/60 flex-1 truncate">{ticket.service?.name}</span>
+            <div className="space-y-0.5 sm:space-y-2">
+              {waiting.slice(0, 10).map((ticket, i) => (
+                <div key={ticket.id} className="flex items-center gap-1.5 sm:gap-3 p-1 sm:p-2 rounded-lg hover:bg-white/5 transition-colors">
+                  <span className="text-xs text-blue-300/40 w-3 sm:w-5">{i + 1}</span>
+                  <span className="font-mono font-bold text-xs sm:text-base text-blue-100">{ticket.ticket_number}</span>
+                  <span className="text-xs text-blue-300/60 flex-1 truncate hidden sm:inline">{ticket.service?.name}</span>
                   {ticket.priority > 0 && (
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${
+                    <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shrink-0 ${
                       ticket.priority === 3 ? 'bg-red-400' :
                       ticket.priority === 2 ? 'bg-amber-400' : 'bg-blue-400'
                     }`} />
                   )}
                 </div>
               ))}
-              {waiting.length > 15 && (
-                <p className="text-center text-blue-300/40 text-xs sm:text-sm pt-2">+{waiting.length - 15} mas</p>
+              {waiting.length > 10 && (
+                <p className="text-center text-blue-300/40 text-xs pt-1">+{waiting.length - 10} mas</p>
               )}
             </div>
           </div>
 
           {serviceEstimates.length > 0 && (
-            <div className="p-3 sm:p-4 lg:p-6 border-t border-white/10 shrink-0">
+            <div className="hidden sm:block p-3 sm:p-4 lg:p-6 border-t border-white/10 shrink-0">
               <h3 className="text-blue-300 font-semibold mb-2 sm:mb-3 uppercase tracking-wider text-xs sm:text-sm">Tiempo Estimado</h3>
               <div className="space-y-1 sm:space-y-2">
                 {serviceEstimates.map((est) => (
@@ -289,19 +289,28 @@ export default function TVDisplayPage() {
             </div>
           )}
 
-          {/* QR Code to join queue remotely */}
+          {/* QR Code to join queue remotely - hidden on very small screens */}
           {branchId && (
-            <div className="p-3 sm:p-4 lg:p-6 border-t border-white/10 shrink-0">
-              <h3 className="text-blue-300 font-semibold mb-2 sm:mb-3 uppercase tracking-wider text-xs sm:text-sm text-center">Tomar Turno</h3>
-              <div className="flex justify-center">
-                <div className="bg-white p-1.5 sm:p-2 rounded-lg">
+            <div className="p-2 sm:p-4 lg:p-6 border-t border-white/10 shrink-0">
+              <div className="flex sm:flex-col items-center sm:items-center gap-2 sm:gap-0">
+                <div className="bg-white p-1 sm:p-2 rounded-lg shrink-0">
+                  <QRCode
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/join?branch=${branchId}`}
+                    size={48}
+                    className="sm:hidden"
+                  />
                   <QRCode
                     value={`${typeof window !== 'undefined' ? window.location.origin : ''}/join?branch=${branchId}`}
                     size={64}
+                    className="hidden sm:block"
                   />
                 </div>
+                <div className="sm:text-center">
+                  <p className="text-xs text-blue-300 font-semibold sm:hidden">Tomar Turno</p>
+                  <h3 className="text-blue-300 font-semibold mb-2 uppercase tracking-wider text-xs sm:text-sm text-center hidden sm:block">Tomar Turno</h3>
+                  <p className="text-xs text-blue-300/50 sm:text-center mt-0 sm:mt-1">Escanee el QR</p>
+                </div>
               </div>
-              <p className="text-xs text-blue-300/50 text-center mt-1 sm:mt-2">Escanee para tomar turno</p>
             </div>
           )}
         </div>
