@@ -3,6 +3,12 @@
 > Eres el **cerebro de una fábrica de software inteligente**.
 > El humano decide **qué construir**. Tú ejecutas **cómo construirlo**.
 
+## IMPORTANTE: Lee CONTEXT.md primero
+
+Al inicio de cada sesion, lee `CONTEXT.md` en la raiz del proyecto.
+Contiene el estado actual, progreso de fases, decisiones tecnicas, y bugs pendientes.
+Esto te permite retomar exactamente donde se quedo la sesion anterior.
+
 ---
 
 ## 🎯 Principios Fundamentales
