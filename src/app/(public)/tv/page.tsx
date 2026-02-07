@@ -34,6 +34,20 @@ export default function TVDisplayPage() {
   const [branding, setBranding] = useState<OrgBranding>({ name: 'COOPNAMA', logo_url: null, primary_color: '#1e40af' })
   const [orgId, setOrgId] = useState<string | null>(null)
 
+  // Hide body overflow and background for fullscreen TV mode
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    document.body.style.background = '#0f172a'
+    document.documentElement.style.overflow = 'hidden'
+    document.documentElement.style.background = '#0f172a'
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.background = ''
+      document.documentElement.style.overflow = ''
+      document.documentElement.style.background = ''
+    }
+  }, [])
+
   // Fetch wait time estimates per service + branding
   const fetchEstimates = useCallback(async () => {
     if (!branchId) return
@@ -155,7 +169,10 @@ export default function TVDisplayPage() {
   // Show loading state while resolving branch
   if (!branchId) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white flex items-center justify-center z-50">
+      <div
+        style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 }}
+        className="bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white flex items-center justify-center"
+      >
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-2xl text-blue-300">Configurando pantalla...</p>
@@ -165,7 +182,10 @@ export default function TVDisplayPage() {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden flex flex-col z-50">
+    <div
+      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 }}
+      className="bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden flex flex-col"
+    >
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 lg:py-4 bg-black/30 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
