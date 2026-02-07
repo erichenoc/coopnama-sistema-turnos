@@ -155,7 +155,7 @@ export default function TVDisplayPage() {
   // Show loading state while resolving branch
   if (!branchId) {
     return (
-      <div className="h-screen w-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white flex items-center justify-center">
+      <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white flex items-center justify-center z-50">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-2xl text-blue-300">Configurando pantalla...</p>
@@ -165,7 +165,7 @@ export default function TVDisplayPage() {
   }
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden flex flex-col z-50">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 lg:py-4 bg-black/30 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
