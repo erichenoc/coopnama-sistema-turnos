@@ -317,6 +317,12 @@ export interface DailyStats {
   avg_service_time_seconds: number | null
 }
 
+export interface BranchDailyStats extends DailyStats {
+  branch_id: string
+  branch_name: string
+  active_agents: number
+}
+
 export interface ServiceStats {
   service_id: string
   service_name: string

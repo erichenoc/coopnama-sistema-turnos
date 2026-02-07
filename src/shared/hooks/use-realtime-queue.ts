@@ -10,7 +10,10 @@ export function useRealtimeQueue(branchId: string | null) {
   const [error, setError] = useState<string | null>(null)
 
   const fetchQueue = useCallback(async () => {
-    if (!branchId) return
+    if (!branchId || branchId === 'all') {
+      setLoading(false)
+      return
+    }
 
     const supabase = createClient()
     const today = new Date().toISOString().split('T')[0]
@@ -36,7 +39,7 @@ export function useRealtimeQueue(branchId: string | null) {
   useEffect(() => {
     fetchQueue()
 
-    if (!branchId) return
+    if (!branchId || branchId === 'all') return
 
     const supabase = createClient()
 

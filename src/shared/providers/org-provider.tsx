@@ -120,7 +120,9 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
 
           // Check localStorage for saved branch preference
           const savedBranch = localStorage.getItem('selected_branch_id')
-          if (savedBranch && branchList.some((b) => b.id === savedBranch)) {
+          if (savedBranch === 'all') {
+            setBranchId('all')
+          } else if (savedBranch && branchList.some((b) => b.id === savedBranch)) {
             setBranchId(savedBranch)
           } else {
             setBranchId(userProfile.branch_id || DEMO_BRANCH_ID)

@@ -166,6 +166,7 @@ function BranchSwitcher() {
       onChange={(e) => switchBranch(e.target.value)}
       className="px-3 py-1.5 text-sm bg-neu-bg shadow-neu-xs rounded-neu-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
     >
+      <option value="all">Todas las sucursales</option>
       {branches.map((b) => (
         <option key={b.id} value={b.id}>{b.name}</option>
       ))}
