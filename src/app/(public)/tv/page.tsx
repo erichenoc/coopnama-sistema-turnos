@@ -192,7 +192,7 @@ export default function TVDisplayPage() {
       </header>
 
       {/* Main content - fills remaining height */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left: Current ticket */}
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
           {/* Promo carousel when idle */}
@@ -233,7 +233,7 @@ export default function TVDisplayPage() {
         </div>
 
         {/* Right sidebar: queue info */}
-        <div className="w-44 sm:w-64 md:w-72 lg:w-80 xl:w-96 bg-black/20 border-l border-white/10 flex flex-col shrink-0">
+        <div className="w-44 sm:w-64 md:w-72 lg:w-80 xl:w-96 h-full bg-black/20 border-l border-white/10 flex flex-col shrink-0 overflow-hidden">
           {currentlyServing.length > 1 && (
             <div className="p-2 sm:p-4 lg:p-6 border-b border-white/10 shrink-0">
               <h3 className="text-blue-300 font-semibold mb-1.5 sm:mb-3 lg:mb-4 uppercase tracking-wider text-xs sm:text-sm">Recientes</h3>
@@ -251,8 +251,8 @@ export default function TVDisplayPage() {
             </div>
           )}
 
-          <div className="flex-1 p-2 sm:p-4 lg:p-6 min-h-0 overflow-hidden">
-            <h3 className="text-blue-300 font-semibold mb-1.5 sm:mb-3 lg:mb-4 uppercase tracking-wider text-xs sm:text-sm">
+          <div className="flex-1 p-2 sm:p-3 lg:p-4 min-h-0 overflow-hidden">
+            <h3 className="text-blue-300 font-semibold mb-1 sm:mb-2 lg:mb-3 uppercase tracking-wider text-xs sm:text-sm">
               En Espera ({waiting.length})
             </h3>
             <div className="space-y-0.5 sm:space-y-2 overflow-y-auto h-full">
@@ -291,24 +291,29 @@ export default function TVDisplayPage() {
 
           {/* QR Code - always pinned to bottom */}
           {branchId && (
-            <div className="p-2 sm:p-4 lg:p-6 border-t border-white/10 shrink-0">
-              <div className="flex sm:flex-col items-center sm:items-center gap-2 sm:gap-0">
-                <div className="bg-white p-1 sm:p-2 rounded-lg shrink-0">
+            <div className="p-1.5 sm:p-3 lg:p-4 border-t border-white/10 shrink-0">
+              <div className="flex sm:flex-col items-center sm:items-center gap-1.5 sm:gap-1">
+                <div className="bg-white p-1 sm:p-1.5 rounded-lg shrink-0">
                   <QRCode
                     value={`${typeof window !== 'undefined' ? window.location.origin : ''}/join?branch=${branchId}`}
-                    size={48}
+                    size={40}
                     className="sm:hidden"
                   />
                   <QRCode
                     value={`${typeof window !== 'undefined' ? window.location.origin : ''}/join?branch=${branchId}`}
-                    size={64}
-                    className="hidden sm:block"
+                    size={56}
+                    className="hidden sm:block lg:hidden"
+                  />
+                  <QRCode
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/join?branch=${branchId}`}
+                    size={72}
+                    className="hidden lg:block"
                   />
                 </div>
                 <div className="sm:text-center">
-                  <p className="text-xs text-blue-300 font-semibold sm:hidden">Tomar Turno</p>
-                  <h3 className="text-blue-300 font-semibold mb-2 uppercase tracking-wider text-xs sm:text-sm text-center hidden sm:block">Tomar Turno</h3>
-                  <p className="text-xs text-blue-300/50 sm:text-center mt-0 sm:mt-1">Escanee el QR</p>
+                  <p className="text-[10px] text-blue-300 font-semibold sm:hidden">Tomar Turno</p>
+                  <p className="text-blue-300 font-semibold uppercase tracking-wider text-xs text-center hidden sm:block">Tomar Turno</p>
+                  <p className="text-[10px] sm:text-xs text-blue-300/50 sm:text-center">Escanee el QR</p>
                 </div>
               </div>
             </div>
