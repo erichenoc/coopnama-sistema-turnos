@@ -21,7 +21,7 @@ Ver `.claude/plans/wild-cooking-hedgehog.md` para el plan completo de 10 fases.
 
 | Fase | Descripcion | Estado | Migracion |
 |------|------------|--------|-----------|
-| 1 | OpenRouter Migration | PENDIENTE | N/A |
+| 1 | OpenRouter Migration | COMPLETADA | N/A |
 | 2 | SLA + Priority Rules | Estructura creada | 009 |
 | 3 | AI Copilot + Wait Time | Estructura creada | 010 |
 | 4 | TV Signage + Virtual Queue | Estructura creada + TV responsive FIX | 011 |
@@ -114,7 +114,7 @@ src/features/
 2. **Realtime**: Supabase Postgres Changes para cola en tiempo real
 3. **Ticket numbering**: Contador diario atomico por branch (RPC generate_ticket)
 4. **8 roles**: super_admin, org_admin, branch_manager, supervisor, agent, receptionist, kiosk, viewer
-5. **AI**: Actualmente usa @anthropic-ai/sdk directo. Plan: migrar a Vercel AI SDK + OpenRouter
+5. **AI**: Vercel AI SDK v6 + OpenRouter (migracion completada). Provider centralizado en src/lib/ai/provider.ts
 6. **TTS**: Inworld AI para anuncios de voz
 7. **TV Display**: position:fixed con inline styles + body override para fullscreen garantizado
 8. **QR Code**: 3 tamanios responsivos (40/56/72px) con shrink-0 pinned al bottom del sidebar
@@ -123,7 +123,7 @@ src/features/
 
 - [ ] TV display: el usuario reporto area gris debajo en su pantalla - se aplico fix con inline styles + body override, pendiente verificar
 - [ ] Cron SLA monitor: ajustado a daily para Vercel Hobby plan (no soporta < 1 dia)
-- [ ] AI features requieren ANTHROPIC_API_KEY configurada - la mayoria tiene fallback
+- [ ] AI features requieren OPENROUTER_API_KEY configurada (en Settings > Integraciones o env var)
 
 ## Env Vars Requeridas
 
@@ -131,7 +131,7 @@ src/features/
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-ANTHROPIC_API_KEY= (opcional, para features IA)
+OPENROUTER_API_KEY= (opcional, para features IA via OpenRouter)
 INWORLD_API_KEY= (opcional, para TTS)
 STRIPE_SECRET_KEY= (opcional, para billing)
 TWILIO_ACCOUNT_SID= (opcional, para SMS)

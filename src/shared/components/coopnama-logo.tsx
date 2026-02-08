@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { cn } from '@/shared/utils/cn'
 
-const LOGO_URL = 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png'
+const LOGO_URL = 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770567396/COOPNAMA-ISOLOGO-scaled-e1759506874509-1024x1018_aoobai.png'
 
 interface CoopnamaLogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'

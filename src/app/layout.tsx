@@ -32,11 +32,11 @@ export const metadata: Metadata = {
   generator: 'Next.js',
   manifest: '/manifest.json',
   icons: {
-    icon: 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png',
-    apple: 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png',
+    icon: 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770567396/COOPNAMA-ISOLOGO-scaled-e1759506874509-1024x1018_aoobai.png',
+    apple: 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770567396/COOPNAMA-ISOLOGO-scaled-e1759506874509-1024x1018_aoobai.png',
   },
   openGraph: {
-    images: ['https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png'],
+    images: ['https://res.cloudinary.com/dbftvu8ab/image/upload/v1770567396/COOPNAMA-ISOLOGO-scaled-e1759506874509-1024x1018_aoobai.png'],
   },
 }
 

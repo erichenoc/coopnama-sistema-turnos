@@ -3,11 +3,24 @@
 > Eres el **cerebro de una fábrica de software inteligente**.
 > El humano decide **qué construir**. Tú ejecutas **cómo construirlo**.
 
-## IMPORTANTE: Lee CONTEXT.md primero
+## OBLIGATORIO: Protocolo CONTEXT.md (Inicio y Fin de Sesion)
 
-Al inicio de cada sesion, lee `CONTEXT.md` en la raiz del proyecto.
-Contiene el estado actual, progreso de fases, decisiones tecnicas, y bugs pendientes.
-Esto te permite retomar exactamente donde se quedo la sesion anterior.
+### Al INICIO de cada sesion:
+Lee `CONTEXT.md` en la raiz del proyecto. Contiene el estado actual, progreso de fases,
+decisiones tecnicas, y bugs pendientes. Esto te permite retomar exactamente donde se quedo
+la sesion anterior.
+
+### Al FINAL de cada sesion (AUTOMATICO - NO requiere que el usuario lo pida):
+Antes de terminar cualquier sesion donde se hicieron cambios, DEBES actualizar `CONTEXT.md` con:
+1. **Ultima actualizacion**: Cambiar la fecha al dia actual
+2. **Progreso de Fases**: Actualizar estado de fases que avanzaron
+3. **Bugs Conocidos**: Agregar nuevos bugs descubiertos o marcar como resueltos
+4. **Decisiones Tecnicas**: Agregar nuevas decisiones importantes
+5. **Paginas/Features**: Actualizar si se agregaron paginas o features nuevas
+6. **Migraciones**: Actualizar si se aplicaron nuevas migraciones
+
+**ESTO ES MANDATORIO.** No esperes a que el usuario lo pida. Hazlo automaticamente
+antes de que la sesion termine o cuando sientas que el contexto esta por agotarse.
 
 ---
 

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react'
 
-const LOGO_URL = 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770398227/coopnama_logo_iqzzj2.png'
+const LOGO_URL = 'https://res.cloudinary.com/dbftvu8ab/image/upload/v1770567396/COOPNAMA-ISOLOGO-scaled-e1759506874509-1024x1018_aoobai.png'
 
 type Step = 'branch' | 'service' | 'date' | 'time' | 'info' | 'confirm' | 'done'
 
