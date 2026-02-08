@@ -20,7 +20,7 @@ interface Service {
   id: string
   name: string
   description: string | null
-  estimated_duration_minutes: number
+  avg_duration_minutes: number
 }
 
 interface Slot {
@@ -121,7 +121,7 @@ export default function BookingPage() {
 
       const { data, error: err } = await supabase
         .from('services')
-        .select('id, name, description, estimated_duration_minutes')
+        .select('id, name, description, avg_duration_minutes')
         .eq('organization_id', branchData.organization_id)
         .eq('is_active', true)
         .order('sort_order')
@@ -319,7 +319,7 @@ export default function BookingPage() {
                           ...prev,
                           serviceId: service.id,
                           serviceName: service.name,
-                          duration: service.estimated_duration_minutes,
+                          duration: service.avg_duration_minutes,
                         }))
                         setStep('date')
                       }}
@@ -330,7 +330,7 @@ export default function BookingPage() {
                         <p className="text-gray-600 text-sm mt-1">{service.description}</p>
                       )}
                       <p className="text-coopnama-primary text-sm mt-2 font-medium">
-                        Duración estimada: {service.estimated_duration_minutes} min
+                        Duración estimada: {service.avg_duration_minutes} min
                       </p>
                     </button>
                   ))}
