@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { logoutAction } from '@/features/auth/actions/auth-actions'
+import { uploadAvatarAction } from '@/features/auth/actions/profile-actions'
 import {
   Card,
   CardHeader,
@@ -14,6 +16,7 @@ import {
   Badge,
   Spinner,
 } from '@/shared/components'
+import { Avatar } from '@/shared/components/avatar'
 import { LogoUploader } from '@/features/branding/components/logo-uploader'
 import { ColorPicker } from '@/features/branding/components/color-picker'
 import { updateBrandingAction } from '@/features/branding/actions/branding-actions'
@@ -72,11 +75,16 @@ interface IntegrationConfig {
 }
 
 export default function SettingsPage() {
-  const { organizationId } = useOrg()
-  const [activeTab, setActiveTab] = useState<Tab>('general')
+  const { organizationId, user: orgUser } = useOrg()
+  const searchParams = useSearchParams()
+  const initialTab = (searchParams.get('tab') as Tab) || 'general'
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [userEmail, setUserEmail] = useState<string>('')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
 
   // General settings
   const [orgSettings, setOrgSettings] = useState<OrgSettings>({
@@ -141,6 +149,13 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserEmail(user.email || '')
+        // Fetch avatar from users table
+        const { data: profile } = await supabase
+          .from('users')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .single()
+        if (profile?.avatar_url) setAvatarUrl(profile.avatar_url)
       }
 
       // Fetch organization settings
@@ -841,6 +856,65 @@ export default function SettingsPage() {
 
       {activeTab === 'cuenta' && (
         <div className="space-y-4">
+          {/* Avatar & Profile */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Foto de Perfil</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-6">
+                <div className="relative group">
+                  <Avatar
+                    name={orgUser?.full_name || 'Usuario'}
+                    src={avatarUrl || orgUser?.avatar_url || undefined}
+                    size="xl"
+                  />
+                  <button
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    {uploadingAvatar ? (
+                      <Spinner size="sm" />
+                    ) : (
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    )}
+                  </button>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      setUploadingAvatar(true)
+                      const fd = new FormData()
+                      fd.append('avatar', file)
+                      const result = await uploadAvatarAction(fd)
+                      if (result.error) {
+                        toast.error(result.error)
+                      } else if (result.url) {
+                        setAvatarUrl(result.url)
+                        toast.success('Foto de perfil actualizada')
+                      }
+                      setUploadingAvatar(false)
+                      e.target.value = ''
+                    }}
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{orgUser?.full_name || 'Usuario'}</p>
+                  <p className="text-xs text-gray-500 capitalize">{orgUser?.role || 'admin'}</p>
+                  <p className="text-xs text-gray-400 mt-2">PNG, JPG o WebP. Max 2MB.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* User Info */}
           <Card>
             <CardHeader>
