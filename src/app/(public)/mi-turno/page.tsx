@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { estimateWaitTimeForTicket } from '@/lib/estimations/wait-time'
@@ -21,6 +22,7 @@ const STEPS: { status: TicketStatus; label: string }[] = [
 ]
 
 export default function MiTurnoPage() {
+  const searchParams = useSearchParams()
   const [ticketNumber, setTicketNumber] = useState('')
   const [ticket, setTicket] = useState<TicketWithRelations | null>(null)
   const [loading, setLoading] = useState(false)
@@ -33,6 +35,7 @@ export default function MiTurnoPage() {
   const prevStatusRef = useRef<TicketStatus | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const autoSearchedRef = useRef(false)
 
   // Check notification permission on mount
   useEffect(() => {
@@ -40,6 +43,15 @@ export default function MiTurnoPage() {
       setNotificationPermission(Notification.permission)
     }
   }, [])
+
+  // Auto-search from URL parameter (e.g., /mi-turno?ticket=A-001)
+  useEffect(() => {
+    const ticketParam = searchParams.get('ticket')
+    if (ticketParam && !autoSearchedRef.current) {
+      autoSearchedRef.current = true
+      setTicketNumber(ticketParam.toUpperCase())
+    }
+  }, [searchParams])
 
   const calculatePosition = async (ticketData: TicketWithRelations) => {
     if (ticketData.status !== 'waiting') {
@@ -67,8 +79,9 @@ export default function MiTurnoPage() {
     }
   }
 
-  const searchTicket = async () => {
-    if (!ticketNumber.trim()) return
+  const searchTicket = useCallback(async (searchValue?: string) => {
+    const query = (searchValue || ticketNumber).trim()
+    if (!query) return
     setLoading(true)
     setError(null)
     setTicket(null)
@@ -80,7 +93,7 @@ export default function MiTurnoPage() {
     const { data, error: fetchError } = await supabase
       .from('tickets')
       .select('*, service:services!tickets_service_id_fkey(*), station:stations(*)')
-      .ilike('ticket_number', ticketNumber.trim().toUpperCase())
+      .ilike('ticket_number', query.toUpperCase())
       .gte('created_at', today)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -96,7 +109,15 @@ export default function MiTurnoPage() {
     prevStatusRef.current = data.status as TicketStatus
     await calculatePosition(data as TicketWithRelations)
     setLoading(false)
-  }
+  }, [ticketNumber])
+
+  // Trigger auto-search when ticket number is set from URL
+  useEffect(() => {
+    const ticketParam = searchParams.get('ticket')
+    if (ticketParam && autoSearchedRef.current && !ticket && !loading) {
+      searchTicket(ticketParam)
+    }
+  }, [ticketNumber, searchParams, ticket, loading, searchTicket])
 
   // Request notification permission
   const enableNotifications = async () => {
@@ -265,7 +286,7 @@ export default function MiTurnoPage() {
             className="font-mono text-lg"
             onKeyDown={(e) => e.key === 'Enter' && searchTicket()}
           />
-          <Button variant="primary" onClick={searchTicket} isLoading={loading}>
+          <Button variant="primary" onClick={() => searchTicket()} isLoading={loading}>
             Buscar
           </Button>
         </div>
