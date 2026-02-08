@@ -16,6 +16,7 @@ export interface HeaderProps {
   onMenuClick?: () => void
   actions?: ReactNode
   notificationSlot?: ReactNode
+  userSlot?: ReactNode
   breadcrumbs?: { label: string; href?: string }[]
   className?: string
 }
@@ -27,6 +28,7 @@ export function Header({
   onMenuClick,
   actions,
   notificationSlot,
+  userSlot,
   breadcrumbs,
   className,
 }: HeaderProps) {
@@ -100,7 +102,7 @@ export function Header({
         {notificationSlot}
 
         {/* User Profile */}
-        {user && (
+        {userSlot || (user && (
           <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
             <div className="hidden sm:block text-right">
               <p className="text-sm font-medium text-gray-800">{user.name}</p>
@@ -125,7 +127,7 @@ export function Header({
               />
             </button>
           </div>
-        )}
+        ))}
       </div>
     </header>
   )
