@@ -9,13 +9,13 @@ import { callNextTicketAction, startServingAction, completeTicketAction, markNoS
 import { useRealtimeQueue } from '@/shared/hooks/use-realtime-queue'
 import { useTicketAnnouncer } from '@/shared/hooks/use-ticket-announcer'
 import { PRIORITY_NAME_MAP } from '@/shared/types/domain'
-import type { TicketWithRelations, Station, Service } from '@/shared/types/domain'
+import type { TicketWithRelations, Station, Service, Priority } from '@/shared/types/domain'
 import { useOrg } from '@/shared/providers/org-provider'
 import { FeedbackModal } from '@/features/feedback/components/feedback-modal'
 import { CopilotPanel } from '@/features/agent-copilot/components/copilot-panel'
 
 export default function AgentWorkstationPage() {
-  const { branchId } = useOrg()
+  const { organizationId, branchId, agentId: orgAgentId } = useOrg()
   const [stations, setStations] = useState<Station[]>([])
   const [selectedStation, setSelectedStation] = useState<string | null>(null)
   const [currentTicket, setCurrentTicket] = useState<TicketWithRelations | null>(null)
@@ -429,7 +429,43 @@ export default function AgentWorkstationPage() {
 
           {/* AI Copilot Panel */}
           <div className="mt-6">
-            <CopilotPanel ticket={currentTicket} notes={notes} />
+            <CopilotPanel
+              ticket={currentTicket}
+              notes={notes}
+              callbacks={{
+                onAppendToNotes: (text: string) =>
+                  setNotes((prev) => (prev ? `${prev}\n${text}` : text)),
+                onReplaceNotes: (text: string) => setNotes(text),
+                onTriggerTransfer: (serviceId: string, reason: string) => {
+                  setTransferServiceId(serviceId)
+                  setTransferReason(reason)
+                  setShowTransfer(true)
+                },
+                onTriggerComplete: (summary: string) => {
+                  setNotes(summary)
+                  handleComplete()
+                },
+                onEscalatePriority: async (newPriority: Priority) => {
+                  if (!currentTicket) return
+                  const supabase = createClient()
+                  await supabase
+                    .from('tickets')
+                    .update({ priority: newPriority })
+                    .eq('id', currentTicket.id)
+                  setCurrentTicket((prev) =>
+                    prev ? { ...prev, priority: newPriority } : null
+                  )
+                },
+              }}
+              context={{
+                organizationId,
+                branchId,
+                agentId: agentId || orgAgentId,
+                waitingCount: waiting.length,
+                serviceTimerSeconds: serviceTimer,
+                services,
+              }}
+            />
           </div>
         </div>
       </div>
