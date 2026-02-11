@@ -213,10 +213,10 @@ export default function BookingPage() {
 
   const currentStepIndex = steps.findIndex(s => s.id === step)
 
-  // Get tomorrow's date as minimum
+  // Get tomorrow's date as minimum (use local date to avoid UTC timezone shift)
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
-  const minDate = tomorrow.toISOString().split('T')[0]
+  const minDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`
 
   return (
     <div className="min-h-screen bg-slate-950">

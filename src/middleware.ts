@@ -5,9 +5,11 @@ const PUBLIC_ROUTES = ['/', '/login', '/signup', '/forgot-password', '/reset-pas
 
 // API routes that are intentionally public (have their own auth/secret validation)
 const PUBLIC_API_PREFIXES = [
-  '/api/public/',      // Public endpoints (kiosk ticket creation, etc.)
-  '/api/webhooks/',    // Webhooks (validate their own secrets)
-  '/api/cron/',        // Cron jobs (validate their own secrets)
+  '/api/public/',        // Public endpoints (kiosk ticket creation, etc.)
+  '/api/webhooks/',      // Webhooks (validate their own secrets)
+  '/api/cron/',          // Cron jobs (validate their own secrets)
+  '/api/appointments/',  // Public booking flow (slots query + appointment creation)
+  '/api/appointments',   // POST /api/appointments (exact match)
 ]
 
 export async function middleware(request: NextRequest) {
