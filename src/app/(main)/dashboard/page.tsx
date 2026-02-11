@@ -30,6 +30,37 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DailyStats | null>(null)
   const [branchStats, setBranchStats] = useState<BranchDailyStats[]>([])
   const [statsLoading, setStatsLoading] = useState(true)
+  const [statsDate, setStatsDate] = useState<string | null>(null) // null = today, string = fallback date
+
+  // Helper to aggregate branch stats into totals
+  function aggregateBranchStats(data: BranchDailyStats[]): DailyStats {
+    const totals: DailyStats = {
+      total_tickets: 0, completed_tickets: 0, waiting_tickets: 0,
+      serving_tickets: 0, no_show_tickets: 0, cancelled_tickets: 0,
+      avg_wait_time_seconds: 0, avg_service_time_seconds: 0,
+    }
+    let waitTimeCount = 0
+    let serviceTimeCount = 0
+    for (const b of data) {
+      totals.total_tickets += Number(b.total_tickets)
+      totals.completed_tickets += Number(b.completed_tickets)
+      totals.waiting_tickets += Number(b.waiting_tickets)
+      totals.serving_tickets += Number(b.serving_tickets)
+      totals.no_show_tickets += Number(b.no_show_tickets)
+      totals.cancelled_tickets += Number(b.cancelled_tickets)
+      if (b.avg_wait_time_seconds && Number(b.avg_wait_time_seconds) > 0) {
+        totals.avg_wait_time_seconds = (totals.avg_wait_time_seconds || 0) + Number(b.avg_wait_time_seconds)
+        waitTimeCount++
+      }
+      if (b.avg_service_time_seconds && Number(b.avg_service_time_seconds) > 0) {
+        totals.avg_service_time_seconds = (totals.avg_service_time_seconds || 0) + Number(b.avg_service_time_seconds)
+        serviceTimeCount++
+      }
+    }
+    if (waitTimeCount > 0) totals.avg_wait_time_seconds = (totals.avg_wait_time_seconds || 0) / waitTimeCount
+    if (serviceTimeCount > 0) totals.avg_service_time_seconds = (totals.avg_service_time_seconds || 0) / serviceTimeCount
+    return totals
+  }
 
   const fetchStats = useCallback(async () => {
     const supabase = createClient()
@@ -43,50 +74,52 @@ export default function DashboardPage() {
       })
 
       if (data && data.length > 0) {
-        setBranchStats(data as BranchDailyStats[])
-        // Aggregate totals
-        const totals: DailyStats = {
-          total_tickets: 0,
-          completed_tickets: 0,
-          waiting_tickets: 0,
-          serving_tickets: 0,
-          no_show_tickets: 0,
-          cancelled_tickets: 0,
-          avg_wait_time_seconds: 0,
-          avg_service_time_seconds: 0,
-        }
-        let waitTimeCount = 0
-        let serviceTimeCount = 0
-        for (const b of data as BranchDailyStats[]) {
-          totals.total_tickets += Number(b.total_tickets)
-          totals.completed_tickets += Number(b.completed_tickets)
-          totals.waiting_tickets += Number(b.waiting_tickets)
-          totals.serving_tickets += Number(b.serving_tickets)
-          totals.no_show_tickets += Number(b.no_show_tickets)
-          totals.cancelled_tickets += Number(b.cancelled_tickets)
-          if (b.avg_wait_time_seconds && Number(b.avg_wait_time_seconds) > 0) {
-            totals.avg_wait_time_seconds = (totals.avg_wait_time_seconds || 0) + Number(b.avg_wait_time_seconds)
-            waitTimeCount++
-          }
-          if (b.avg_service_time_seconds && Number(b.avg_service_time_seconds) > 0) {
-            totals.avg_service_time_seconds = (totals.avg_service_time_seconds || 0) + Number(b.avg_service_time_seconds)
-            serviceTimeCount++
+        const totals = aggregateBranchStats(data as BranchDailyStats[])
+        if (totals.total_tickets > 0) {
+          setBranchStats(data as BranchDailyStats[])
+          setStats(totals)
+          setStatsDate(null)
+        } else {
+          // Today has no tickets - fetch last active day
+          const { data: recentData } = await supabase.rpc('get_recent_org_daily_stats', {
+            p_organization_id: organizationId,
+          })
+          if (recentData && recentData.length > 0) {
+            const recentBranch = recentData as (BranchDailyStats & { stats_date: string })[]
+            setBranchStats(recentBranch)
+            setStats(aggregateBranchStats(recentBranch))
+            setStatsDate(recentBranch[0]?.stats_date || null)
+          } else {
+            setBranchStats([])
+            setStats(null)
+            setStatsDate(null)
           }
         }
-        if (waitTimeCount > 0) totals.avg_wait_time_seconds = (totals.avg_wait_time_seconds || 0) / waitTimeCount
-        if (serviceTimeCount > 0) totals.avg_service_time_seconds = (totals.avg_service_time_seconds || 0) / serviceTimeCount
-        setStats(totals)
       } else {
         setBranchStats([])
         setStats(null)
+        setStatsDate(null)
       }
     } else {
       const { data } = await supabase.rpc('get_daily_stats', {
         p_branch_id: branchId,
         p_date: today,
       })
-      if (data?.[0]) {
+      if (data?.[0] && Number(data[0].total_tickets) > 0) {
         setStats(data[0] as DailyStats)
+        setStatsDate(null)
+      } else {
+        // Today has no tickets - fetch last active day
+        const { data: recentData } = await supabase.rpc('get_recent_daily_stats', {
+          p_branch_id: branchId,
+        })
+        if (recentData?.[0] && recentData[0].stats_date) {
+          setStats(recentData[0] as DailyStats)
+          setStatsDate(recentData[0].stats_date)
+        } else {
+          setStats(null)
+          setStatsDate(null)
+        }
       }
     }
     setStatsLoading(false)
@@ -180,7 +213,10 @@ export default function DashboardPage() {
     <>
       <PageHeader
         title={isAllBranches ? 'Dashboard - Todas las Sucursales' : 'Dashboard'}
-        description={isAllBranches ? 'Vista consolidada de toda la organizacion' : 'Resumen del dia - Datos en tiempo real'}
+        description={isAllBranches
+          ? (statsDate ? `Ultimo dia activo: ${new Date(statsDate + 'T12:00:00').toLocaleDateString('es-DO', { weekday: 'long', day: 'numeric', month: 'long' })}` : 'Vista consolidada de toda la organizacion')
+          : (statsDate ? `Sin actividad hoy - Mostrando: ${new Date(statsDate + 'T12:00:00').toLocaleDateString('es-DO', { weekday: 'long', day: 'numeric', month: 'long' })}` : 'Resumen del dia - Datos en tiempo real')
+        }
         actions={
           <div className="flex gap-3">
             <Button variant="ghost" onClick={() => { refresh(); fetchStats() }}>
@@ -424,7 +460,14 @@ export default function DashboardPage() {
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Distribucion por Estado</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Distribucion por Estado</CardTitle>
+                  {statsDate && (
+                    <span className="text-xs text-gray-400 bg-white/[0.06] px-2 py-1 rounded-full">
+                      {new Date(statsDate + 'T12:00:00').toLocaleDateString('es-DO', { day: 'numeric', month: 'short' })}
+                    </span>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -454,7 +497,14 @@ export default function DashboardPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Informacion</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Informacion</CardTitle>
+                  {statsDate && (
+                    <span className="text-xs text-gray-400 bg-white/[0.06] px-2 py-1 rounded-full">
+                      {new Date(statsDate + 'T12:00:00').toLocaleDateString('es-DO', { day: 'numeric', month: 'short' })}
+                    </span>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -471,7 +521,9 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <div className="p-4 bg-white/[0.04] rounded-neu-sm">
-                    <p className="text-sm text-gray-300">Total completados hoy</p>
+                    <p className="text-sm text-gray-300">
+                      Total completados{statsDate ? '' : ' hoy'}
+                    </p>
                     <p className="text-2xl font-bold text-gray-200">{stats?.completed_tickets ?? 0}</p>
                   </div>
                 </div>
