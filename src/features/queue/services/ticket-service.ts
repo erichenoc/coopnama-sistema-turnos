@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/shared/utils/date'
 import type {
   Ticket,
   TicketWithRelations,
@@ -68,7 +69,7 @@ export async function getActiveQueue(branchId: string): Promise<TicketWithRelati
     `)
     .eq('branch_id', branchId)
     .in('status', ['waiting', 'called', 'serving'])
-    .gte('created_at', new Date().toISOString().split('T')[0]) // Solo del día actual
+    .gte('created_at', getLocalDateString()) // Solo del día actual
     .order('priority', { ascending: false })
     .order('created_at', { ascending: true })
 
@@ -334,7 +335,7 @@ export async function getCompletedTicketsToday(branchId: string): Promise<Ticket
     .select('*')
     .eq('branch_id', branchId)
     .eq('status', 'completed')
-    .gte('created_at', new Date().toISOString().split('T')[0])
+    .gte('created_at', getLocalDateString())
     .order('completed_at', { ascending: false })
 
   if (error) {
@@ -360,7 +361,7 @@ export async function getDailyStats(
 
   const { data, error } = await supabase.rpc('get_daily_stats', {
     p_branch_id: branchId,
-    p_date: date || new Date().toISOString().split('T')[0],
+    p_date: date || getLocalDateString(),
   })
 
   if (error) {
@@ -391,7 +392,7 @@ export async function getWaitingCountByService(branchId: string): Promise<Record
     .select('service_id')
     .eq('branch_id', branchId)
     .eq('status', 'waiting')
-    .gte('created_at', new Date().toISOString().split('T')[0])
+    .gte('created_at', getLocalDateString())
 
   if (error) {
     console.error('Error fetching waiting count:', error)

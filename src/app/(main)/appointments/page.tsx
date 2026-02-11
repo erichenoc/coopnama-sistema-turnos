@@ -7,6 +7,7 @@ import {
   Input, Modal, ModalHeader, ModalBody, ModalFooter, Badge, Spinner,
 } from '@/shared/components'
 import { useOrg } from '@/shared/providers/org-provider'
+import { getLocalDateString } from '@/shared/utils/date'
 
 type AppointmentStatus = 'pending' | 'confirmed' | 'checked_in' | 'completed' | 'cancelled' | 'no_show'
 
@@ -74,7 +75,7 @@ export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus | 'all'>('all')
-  const [dateFilter, setDateFilter] = useState<string>(new Date().toISOString().split('T')[0])
+  const [dateFilter, setDateFilter] = useState<string>(() => getLocalDateString())
   const [searchQuery, setSearchQuery] = useState('')
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)

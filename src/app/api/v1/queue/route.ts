@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { authenticateAPIKey, checkRateLimit } from '@/lib/api/auth'
+import { getLocalDateString } from '@/shared/utils/date'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = createServiceClient(supabaseUrl, supabaseServiceKey)
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   // Get active tickets
   const { data: tickets } = await supabase

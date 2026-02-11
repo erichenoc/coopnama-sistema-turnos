@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/shared/utils/date'
 
 interface WaitTimeEstimate {
   position: number
@@ -20,7 +21,7 @@ export async function estimateWaitTime(
   fallbackAvgMinutes: number = 5
 ): Promise<Omit<WaitTimeEstimate, 'position'> & { waitingCount: number }> {
   const supabase = createClient()
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   // Parallel queries: waiting count, active agents, recent completed tickets
   const [waitingRes, agentsRes, completedRes] = await Promise.all([
@@ -86,7 +87,7 @@ export async function estimateWaitTimeForTicket(
   fallbackAvgMinutes: number = 5
 ): Promise<WaitTimeEstimate> {
   const supabase = createClient()
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   // Count tickets ahead in queue (same service, created before this one)
   const [positionRes, agentsRes, completedRes] = await Promise.all([

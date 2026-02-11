@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState, useCallback } from 'react'
 import type { TicketWithRelations } from '@/shared/types/domain'
+import { getLocalDateString } from '@/shared/utils/date'
 
 export function useRealtimeQueue(branchId: string | null) {
   const [tickets, setTickets] = useState<TicketWithRelations[]>([])
@@ -16,7 +17,7 @@ export function useRealtimeQueue(branchId: string | null) {
     }
 
     const supabase = createClient()
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
 
     const { data, error: fetchError } = await supabase
       .from('tickets')

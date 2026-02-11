@@ -10,6 +10,7 @@ import {
   type DailyForecast,
   type StaffingRecommendation,
 } from '@/features/forecasting/services/demand-forecaster'
+import { getLocalDateString } from '@/shared/utils/date'
 
 export default function ForecastingPage() {
   const { organizationId, branchId } = useOrg()
@@ -19,7 +20,7 @@ export default function ForecastingPage() {
   const [targetDate, setTargetDate] = useState(() => {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
-    return tomorrow.toISOString().split('T')[0]
+    return getLocalDateString(tomorrow)
   })
 
   useEffect(() => {

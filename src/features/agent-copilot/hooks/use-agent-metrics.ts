@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/shared/utils/date'
 import type { AgentMetrics } from '../types'
 
 export function useAgentMetrics(agentId: string | null) {
@@ -19,7 +20,7 @@ export function useAgentMetrics(agentId: string | null) {
     setLoading(true)
     try {
       const supabase = createClient()
-      const today = new Date().toISOString().split('T')[0]
+      const today = getLocalDateString()
 
       const { data, error } = await supabase
         .from('tickets')

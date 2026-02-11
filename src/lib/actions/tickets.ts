@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getLocalDateString } from '@/shared/utils/date'
 import type { Ticket, TicketWithRelations, DailyStats, CreateTicketInput } from '@/shared/types/domain'
 import { notifyTicketCreated, notifyTicketCalled, notifyTicketCompleted } from '@/lib/actions/notifications'
 
@@ -194,7 +195,7 @@ export async function getActiveQueueAction(
   branchId: string
 ): Promise<TicketWithRelations[]> {
   const supabase = await createClient()
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const { data, error } = await supabase
     .from('tickets')
@@ -215,7 +216,7 @@ export async function getActiveQueueAction(
 
 export async function getDailyStatsAction(branchId: string): Promise<DailyStats> {
   const supabase = await createClient()
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const { data, error } = await supabase.rpc('get_daily_stats', {
     p_branch_id: branchId,

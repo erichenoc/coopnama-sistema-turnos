@@ -1,4 +1,5 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
+import { getLocalDateString } from '@/shared/utils/date'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -70,7 +71,7 @@ export async function detectAnomalies(): Promise<{ detected: number; checked: nu
     }
 
     // 2. Check no-show rate (today)
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
     const { data: todayTickets } = await supabase
       .from('tickets')
       .select('status')

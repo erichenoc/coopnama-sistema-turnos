@@ -7,6 +7,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getEffectiveSLA } from './sla-service'
+import { getLocalDateString } from '@/shared/utils/date'
 
 // ============================================
 // SLA MONITORING
@@ -53,7 +54,7 @@ export async function checkSLABreaches(
       .select('id, service_id, priority, created_at, ticket_number, customer_name, status')
       .eq('branch_id', branchId)
       .eq('status', 'waiting')
-      .gte('created_at', new Date().toISOString().split('T')[0]) // Solo tickets del día
+      .gte('created_at', getLocalDateString()) // Solo tickets del día
 
     if (ticketsError) {
       console.error('Error fetching waiting tickets:', ticketsError)

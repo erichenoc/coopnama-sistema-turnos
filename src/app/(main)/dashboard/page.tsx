@@ -33,7 +33,8 @@ export default function DashboardPage() {
 
   const fetchStats = useCallback(async () => {
     const supabase = createClient()
-    const today = new Date().toISOString().split('T')[0]
+    const now = new Date()
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
     if (isAllBranches) {
       const { data } = await supabase.rpc('get_org_daily_stats', {

@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client'
+import { getLocalDateString } from '@/shared/utils/date'
 import type {
   RealtimeChannel,
   RealtimePostgresChangesPayload,
@@ -122,7 +123,7 @@ export function subscribeToActiveTickets(
       .select('*')
       .eq('branch_id', branchId)
       .in('status', ['waiting', 'called', 'serving'])
-      .gte('created_at', new Date().toISOString().split('T')[0])
+      .gte('created_at', getLocalDateString())
       .order('priority', { ascending: false })
       .order('created_at', { ascending: true })
 

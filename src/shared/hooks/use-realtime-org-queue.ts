@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState, useCallback } from 'react'
 import type { TicketWithRelations } from '@/shared/types/domain'
+import { getLocalDateString } from '@/shared/utils/date'
 
 interface BranchQueueData {
   branchId: string
@@ -22,7 +23,7 @@ export function useRealtimeOrgQueue(organizationId: string | null) {
     if (!organizationId) return
 
     const supabase = createClient()
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
 
     const { data, error: fetchError } = await supabase
       .from('tickets')
