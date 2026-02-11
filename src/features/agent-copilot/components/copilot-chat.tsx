@@ -103,15 +103,34 @@ export function CopilotChat({ ticket, notes, callbacks }: CopilotChatProps) {
         )
       }
 
-      setLastCopySuggestion(assistantContent)
+      // If stream completed but content is empty, add fallback
+      if (!assistantContent.trim()) {
+        const fallback = `Bienvenido${ticket?.customer_name ? ` ${ticket.customer_name}` : ''}. Servicio: ${ticket?.service?.name || 'N/A'}. Atienda con cortesia y profesionalismo.`
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId ? { ...m, content: fallback } : m
+          )
+        )
+        setLastCopySuggestion(fallback)
+      } else {
+        setLastCopySuggestion(assistantContent)
+      }
     } catch (error) {
       console.error('Error in copilot chat:', error)
-      const fallbackId = (Date.now() + 1).toString()
       const fallbackText = `Bienvenido${ticket?.customer_name ? ` ${ticket.customer_name}` : ''}. Servicio: ${ticket?.service?.name || 'N/A'}. Atienda con cortesia y profesionalismo.`
-      setMessages((prev) => [
-        ...prev,
-        { id: fallbackId, role: 'assistant', content: fallbackText },
-      ])
+      // Replace empty assistant message if it exists, otherwise add new one
+      setMessages((prev) => {
+        const emptyIdx = prev.findIndex((m) => m.role === 'assistant' && !m.content)
+        if (emptyIdx !== -1) {
+          return prev.map((m, i) =>
+            i === emptyIdx ? { ...m, content: fallbackText } : m
+          )
+        }
+        return [
+          ...prev,
+          { id: (Date.now() + 1).toString(), role: 'assistant', content: fallbackText },
+        ]
+      })
       setLastCopySuggestion(fallbackText)
     } finally {
       setIsLoading(false)

@@ -4,3 +4,4 @@
  */
 
 export { SLAAlerts } from './sla-alerts'
+export { SLAConfigPanel } from './sla-config-panel'

@@ -24,12 +24,10 @@ export async function POST(request: NextRequest) {
     const model = getModel(true) // Use fast model for quick responses
 
     if (!model) {
-      return new Response(
-        JSON.stringify({
-          reply: `Bienvenido${context?.customerName ? ` ${context.customerName}` : ''}. Servicio: ${context?.serviceName || 'N/A'}. Atienda con cortesia y profesionalismo.`,
-        }),
-        { headers: { 'Content-Type': 'application/json' } }
-      )
+      const fallback = `Bienvenido${context?.customerName ? ` ${context.customerName}` : ''}. Servicio: ${context?.serviceName || 'N/A'}. Atienda con cortesia y profesionalismo.`
+      return new Response(fallback, {
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      })
     }
 
     // Build enriched system prompt with context
@@ -125,8 +123,8 @@ REGLAS:
   } catch (error) {
     console.error('Copilot chat error:', error)
     return new Response(
-      JSON.stringify({ reply: 'Error al procesar tu mensaje. Intenta de nuevo.' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      'Error al procesar tu mensaje. Intenta de nuevo.',
+      { status: 500, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
     )
   }
 }
