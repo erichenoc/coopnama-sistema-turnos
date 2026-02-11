@@ -32,6 +32,14 @@ export default function DashboardPage() {
   const [statsLoading, setStatsLoading] = useState(true)
   const [statsDate, setStatsDate] = useState<string | null>(null) // null = today, string = fallback date
 
+  // Date navigation for stats
+  const getToday = () => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  }
+  const [selectedDate, setSelectedDate] = useState<string>(getToday)
+  const isToday = selectedDate === getToday()
+
   // Helper to aggregate branch stats into totals
   function aggregateBranchStats(data: BranchDailyStats[]): DailyStats {
     const totals: DailyStats = {
@@ -62,15 +70,14 @@ export default function DashboardPage() {
     return totals
   }
 
-  const fetchStats = useCallback(async () => {
+  const fetchStats = useCallback(async (dateOverride?: string) => {
     const supabase = createClient()
-    const now = new Date()
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    const targetDate = dateOverride ?? selectedDate
 
     if (isAllBranches) {
       const { data } = await supabase.rpc('get_org_daily_stats', {
         p_organization_id: organizationId,
-        p_date: today,
+        p_date: targetDate,
       })
 
       if (data && data.length > 0) {
@@ -78,59 +85,83 @@ export default function DashboardPage() {
         if (totals.total_tickets > 0) {
           setBranchStats(data as BranchDailyStats[])
           setStats(totals)
-          setStatsDate(null)
-        } else {
-          // Today has no tickets - fetch last active day
+          setStatsDate(targetDate === getToday() ? null : targetDate)
+        } else if (targetDate === getToday()) {
+          // Today has no tickets on initial load - auto-jump to last active day
           const { data: recentData } = await supabase.rpc('get_recent_org_daily_stats', {
             p_organization_id: organizationId,
           })
           if (recentData && recentData.length > 0) {
             const recentBranch = recentData as (BranchDailyStats & { stats_date: string })[]
+            const recentDate = recentBranch[0]?.stats_date
             setBranchStats(recentBranch)
             setStats(aggregateBranchStats(recentBranch))
-            setStatsDate(recentBranch[0]?.stats_date || null)
+            setStatsDate(recentDate || null)
+            if (recentDate) setSelectedDate(recentDate)
           } else {
             setBranchStats([])
             setStats(null)
             setStatsDate(null)
           }
+        } else {
+          setBranchStats(data as BranchDailyStats[])
+          setStats(totals)
+          setStatsDate(targetDate)
         }
       } else {
         setBranchStats([])
         setStats(null)
-        setStatsDate(null)
+        setStatsDate(targetDate === getToday() ? null : targetDate)
       }
     } else {
       const { data } = await supabase.rpc('get_daily_stats', {
         p_branch_id: branchId,
-        p_date: today,
+        p_date: targetDate,
       })
       if (data?.[0] && Number(data[0].total_tickets) > 0) {
         setStats(data[0] as DailyStats)
-        setStatsDate(null)
-      } else {
-        // Today has no tickets - fetch last active day
+        setStatsDate(targetDate === getToday() ? null : targetDate)
+      } else if (targetDate === getToday()) {
+        // Today has no tickets on initial load - auto-jump to last active day
         const { data: recentData } = await supabase.rpc('get_recent_daily_stats', {
           p_branch_id: branchId,
         })
         if (recentData?.[0] && recentData[0].stats_date) {
           setStats(recentData[0] as DailyStats)
           setStatsDate(recentData[0].stats_date)
+          setSelectedDate(recentData[0].stats_date)
         } else {
           setStats(null)
           setStatsDate(null)
         }
+      } else {
+        setStats(data?.[0] as DailyStats || null)
+        setStatsDate(targetDate)
       }
     }
     setStatsLoading(false)
-  }, [branchId, organizationId, isAllBranches])
+  }, [branchId, organizationId, isAllBranches, selectedDate])
 
   useEffect(() => {
     setStatsLoading(true)
     fetchStats()
-    const interval = setInterval(fetchStats, 30000)
-    return () => clearInterval(interval)
-  }, [fetchStats])
+    // Only auto-refresh when viewing today
+    if (isToday) {
+      const interval = setInterval(fetchStats, 30000)
+      return () => clearInterval(interval)
+    }
+  }, [fetchStats, isToday])
+
+  const navigateDate = (direction: 'prev' | 'next') => {
+    const d = new Date(selectedDate + 'T12:00:00')
+    d.setDate(d.getDate() + (direction === 'next' ? 1 : -1))
+    const newDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    // Don't allow future dates
+    if (newDate > getToday()) return
+    setSelectedDate(newDate)
+  }
+
+  const goToToday = () => setSelectedDate(getToday())
 
   // Pick the right queue data
   const tickets = isAllBranches ? orgQueue.tickets : singleQueue.tickets
@@ -176,7 +207,7 @@ export default function DashboardPage() {
       ]
     : [
         {
-          title: 'Turnos Hoy',
+          title: isToday ? 'Turnos Hoy' : 'Turnos',
           value: stats?.total_tickets ?? 0,
           change: { value: stats?.completed_tickets ?? 0, label: 'completados', positive: true },
           icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>,
@@ -214,8 +245,8 @@ export default function DashboardPage() {
       <PageHeader
         title={isAllBranches ? 'Dashboard - Todas las Sucursales' : 'Dashboard'}
         description={isAllBranches
-          ? (statsDate ? `Ultimo dia activo: ${new Date(statsDate + 'T12:00:00').toLocaleDateString('es-DO', { weekday: 'long', day: 'numeric', month: 'long' })}` : 'Vista consolidada de toda la organizacion')
-          : (statsDate ? `Sin actividad hoy - Mostrando: ${new Date(statsDate + 'T12:00:00').toLocaleDateString('es-DO', { weekday: 'long', day: 'numeric', month: 'long' })}` : 'Resumen del dia - Datos en tiempo real')
+          ? (isToday ? 'Vista consolidada de toda la organizacion' : `Estadisticas del ${new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-DO', { weekday: 'long', day: 'numeric', month: 'long' })}`)
+          : (isToday ? 'Resumen del dia - Datos en tiempo real' : `Estadisticas del ${new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-DO', { weekday: 'long', day: 'numeric', month: 'long' })}`)
         }
         actions={
           <div className="flex gap-3">
@@ -240,6 +271,45 @@ export default function DashboardPage() {
       />
 
       <SubscriptionBanner />
+
+      {/* Date navigation */}
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          onClick={() => navigateDate('prev')}
+          className="p-2 rounded-lg bg-white/[0.06] border border-white/[0.08] text-gray-300 hover:bg-white/[0.10] transition-colors"
+          title="Dia anterior"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <input
+          type="date"
+          value={selectedDate}
+          max={getToday()}
+          onChange={(e) => { if (e.target.value) setSelectedDate(e.target.value) }}
+          className="px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.08] text-white text-sm focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20 outline-none [color-scheme:dark]"
+        />
+        <button
+          onClick={() => navigateDate('next')}
+          disabled={selectedDate >= getToday()}
+          className="p-2 rounded-lg bg-white/[0.06] border border-white/[0.08] text-gray-300 hover:bg-white/[0.10] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          title="Dia siguiente"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        </button>
+        {!isToday && (
+          <button
+            onClick={goToToday}
+            className="px-3 py-2 rounded-lg bg-coopnama-primary/20 text-coopnama-primary text-sm font-medium hover:bg-coopnama-primary/30 transition-colors"
+          >
+            Hoy
+          </button>
+        )}
+        {statsDate && (
+          <span className="text-sm text-gray-400">
+            {new Date(statsDate + 'T12:00:00').toLocaleDateString('es-DO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
+        )}
+      </div>
 
       <DashboardGrid columns={4} className="mb-6">
         {statCards.map((stat, index) => (
