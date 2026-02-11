@@ -118,7 +118,7 @@ export function SignageContentManager({ organizationId }: Props) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-gray-500">Cargando contenido...</p>
+        <p className="text-gray-300">Cargando contenido...</p>
       </div>
     )
   }
@@ -127,8 +127,8 @@ export function SignageContentManager({ organizationId }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-800">Contenido TV / Signage</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl font-semibold text-white">Contenido TV / Signage</h2>
+          <p className="text-sm text-gray-300 mt-1">
             Gestiona el contenido promocional que se muestra en las pantallas TV
           </p>
         </div>
@@ -138,7 +138,7 @@ export function SignageContentManager({ organizationId }: Props) {
       </div>
 
       {showForm && (
-        <Card className="bg-neu-bg shadow-neu">
+        <Card className="bg-white/[0.06]">
           <CardHeader>
             <CardTitle>{formData.id ? 'Editar Contenido' : 'Nuevo Contenido'}</CardTitle>
           </CardHeader>
@@ -168,14 +168,14 @@ export function SignageContentManager({ organizationId }: Props) {
 
             {(formData.content_type === 'text' || formData.content_type === 'html') && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-200 mb-1">
                   {formData.content_type === 'html' ? 'Código HTML' : 'Texto del mensaje'}
                 </label>
                 <textarea
                   value={formData.content_text}
                   onChange={(e) => setFormData({ ...formData, content_text: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-3 bg-neu-bg shadow-neu-inset rounded-neu-sm text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                  className="w-full px-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30 placeholder:text-gray-400"
                   placeholder={formData.content_type === 'html' ? '<div>...</div>' : 'Escribe tu mensaje...'}
                 />
               </div>
@@ -205,24 +205,24 @@ export function SignageContentManager({ organizationId }: Props) {
       )}
 
       {items.length === 0 ? (
-        <Card className="bg-neu-bg shadow-neu">
+        <Card className="bg-white/[0.06]">
           <CardContent className="py-12 text-center">
-            <p className="text-gray-500">No hay contenido de signage. Agrega contenido para las pantallas TV.</p>
+            <p className="text-gray-300">No hay contenido de signage. Agrega contenido para las pantallas TV.</p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-3">
           {items.map((item) => (
-            <Card key={item.id} className="bg-neu-bg shadow-neu-sm">
+            <Card key={item.id} className="bg-white/[0.06]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-coopnama-primary/10 flex items-center justify-center text-sm">
+                    <div className="w-10 h-10 rounded-lg bg-[#009e59]/10 flex items-center justify-center text-sm">
                       {item.content_type === 'image' ? '🖼️' : item.content_type === 'video' ? '🎬' : item.content_type === 'html' ? '🌐' : '📝'}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-800">{item.title || 'Sin título'}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="font-medium text-white">{item.title || 'Sin título'}</p>
+                      <p className="text-xs text-gray-300">
                         {item.content_type.toUpperCase()} · {item.display_duration_seconds}s
                         {!item.is_active && ' · Inactivo'}
                       </p>

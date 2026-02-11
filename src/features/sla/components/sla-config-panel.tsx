@@ -226,7 +226,7 @@ export function SLAConfigPanel({ organizationId }: Props) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-gray-500">Cargando configuraciones...</p>
+        <p className="text-gray-300">Cargando configuraciones...</p>
       </div>
     )
   }
@@ -236,10 +236,10 @@ export function SLAConfigPanel({ organizationId }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-white">
             Configuración de SLA
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-300 mt-1">
             Define tiempos de espera y alertas por servicio
           </p>
         </div>
@@ -250,7 +250,7 @@ export function SLAConfigPanel({ organizationId }: Props) {
 
       {/* Form */}
       {showForm && (
-        <Card className="bg-neu-bg shadow-neu">
+        <Card className="bg-white/[0.06]">
           <CardHeader>
             <CardTitle>
               {formData.id ? 'Editar SLA' : 'Nueva Configuración SLA'}
@@ -385,9 +385,9 @@ export function SLAConfigPanel({ organizationId }: Props) {
 
       {/* Configs list */}
       {configs.length === 0 ? (
-        <Card className="bg-neu-bg shadow-neu">
+        <Card className="bg-white/[0.06]">
           <CardContent className="py-12 text-center">
-            <p className="text-gray-500">
+            <p className="text-gray-300">
               No hay configuraciones de SLA. Crea una para comenzar.
             </p>
           </CardContent>
@@ -395,15 +395,15 @@ export function SLAConfigPanel({ organizationId }: Props) {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {configs.map((config) => (
-            <Card key={config.id} className="bg-neu-bg shadow-neu-sm">
+            <Card key={config.id} className="bg-white/[0.06]">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold text-gray-800">
+                    <h3 className="font-semibold text-white">
                       {config.service?.name || 'Todos los servicios'}
                     </h3>
                     {config.service && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-300">
                         Código: {config.service.code}
                       </p>
                     )}
@@ -416,19 +416,19 @@ export function SLAConfigPanel({ organizationId }: Props) {
                 <div className="space-y-2 text-sm">
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <p className="text-gray-500">Advertencia</p>
+                      <p className="text-gray-300">Advertencia</p>
                       <p className="font-medium text-yellow-600">
                         {config.warning_at_minutes} min
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Crítico</p>
+                      <p className="text-gray-300">Crítico</p>
                       <p className="font-medium text-orange-600">
                         {config.critical_at_minutes} min
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Máximo</p>
+                      <p className="text-gray-300">Máximo</p>
                       <p className="font-medium text-red-600">
                         {config.max_wait_minutes} min
                       </p>
@@ -436,8 +436,8 @@ export function SLAConfigPanel({ organizationId }: Props) {
                   </div>
 
                   {config.auto_escalate_priority && (
-                    <div className="pt-2 border-t border-gray-200">
-                      <p className="text-gray-600">
+                    <div className="pt-2 border-t border-white/[0.08]">
+                      <p className="text-gray-300">
                         Escala a prioridad{' '}
                         <span className="font-medium">
                           {config.escalate_to_priority === 1 && 'Preferencial'}
@@ -450,7 +450,7 @@ export function SLAConfigPanel({ organizationId }: Props) {
                   )}
                 </div>
 
-                <div className="flex gap-2 mt-4 pt-3 border-t border-gray-200">
+                <div className="flex gap-2 mt-4 pt-3 border-t border-white/[0.08]">
                   <Button
                     variant="secondary"
                     size="sm"

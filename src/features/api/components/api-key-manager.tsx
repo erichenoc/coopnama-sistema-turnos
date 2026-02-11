@@ -85,11 +85,11 @@ export function APIKeyManager() {
   return (
     <div className="space-y-6">
       {revealedKey && (
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm font-medium text-yellow-800 mb-2">
+        <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+          <p className="text-sm font-medium text-yellow-300 mb-2">
             Tu API key ha sido creada. Copiala ahora, no se mostrara de nuevo.
           </p>
-          <code className="block p-3 bg-white rounded border font-mono text-sm break-all">
+          <code className="block p-3 bg-white/[0.06] rounded border font-mono text-sm break-all">
             {revealedKey}
           </code>
           <div className="mt-2 flex gap-2">
@@ -115,7 +115,7 @@ export function APIKeyManager() {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+              <label className="block text-sm font-medium text-gray-200 mb-1">Nombre</label>
               <Input
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
@@ -123,7 +123,7 @@ export function APIKeyManager() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Permisos</label>
+              <label className="block text-sm font-medium text-gray-200 mb-2">Permisos</label>
               <div className="flex gap-3">
                 {['read', 'write'].map(scope => (
                   <label key={scope} className="flex items-center gap-2 cursor-pointer">
@@ -161,33 +161,33 @@ export function APIKeyManager() {
         </CardHeader>
         <CardContent>
           {keys.length === 0 ? (
-            <p className="text-center py-6 text-gray-400">No hay API keys</p>
+            <p className="text-center py-6 text-gray-300">No hay API keys</p>
           ) : (
             <div className="space-y-3">
               {keys.map((key) => (
                 <div
                   key={key.id}
                   className={`flex items-center justify-between p-4 rounded-lg ${
-                    key.is_active ? 'bg-gray-50' : 'bg-gray-50/50 opacity-60'
+                    key.is_active ? 'bg-white/[0.04]' : 'bg-white/[0.04]/50 opacity-60'
                   }`}
                 >
                   <div>
-                    <p className="font-medium text-gray-900">{key.name}</p>
-                    <p className="text-sm text-gray-500 font-mono">{key.key_prefix}...</p>
+                    <p className="font-medium text-white">{key.name}</p>
+                    <p className="text-sm text-gray-300 font-mono">{key.key_prefix}...</p>
                     <div className="flex gap-2 mt-1">
                       {key.scopes.map(scope => (
-                        <span key={scope} className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">
+                        <span key={scope} className="px-1.5 py-0.5 bg-[#009e59]/10 text-emerald-300 text-xs rounded">
                           {scope}
                         </span>
                       ))}
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-300">
                         {key.rate_limit_per_minute} req/min
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     {key.last_used_at && (
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-300">
                         Usado: {new Date(key.last_used_at).toLocaleDateString('es-DO')}
                       </span>
                     )}
@@ -215,20 +215,20 @@ export function APIKeyManager() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3 text-sm">
-            <p className="text-gray-600">Base URL: <code className="bg-gray-100 px-2 py-0.5 rounded">/api/v1</code></p>
+            <p className="text-gray-300">Base URL: <code className="bg-white/[0.06] px-2 py-0.5 rounded">/api/v1</code></p>
             <div className="space-y-2">
-              <p className="font-medium text-gray-800">Endpoints:</p>
-              <div className="bg-gray-50 p-3 rounded-lg font-mono text-xs space-y-1">
-                <p><span className="text-green-600">GET</span> /api/v1/tickets - Listar turnos</p>
-                <p><span className="text-blue-600">POST</span> /api/v1/tickets - Crear turno</p>
-                <p><span className="text-green-600">GET</span> /api/v1/queue?branch_id=X - Estado de cola</p>
-                <p><span className="text-green-600">GET</span> /api/v1/appointments - Listar citas</p>
-                <p><span className="text-blue-600">POST</span> /api/v1/appointments - Crear cita</p>
+              <p className="font-medium text-white">Endpoints:</p>
+              <div className="bg-white/[0.04] p-3 rounded-lg font-mono text-xs space-y-1">
+                <p><span className="text-emerald-600">GET</span> /api/v1/tickets - Listar turnos</p>
+                <p><span className="text-[#009e59]">POST</span> /api/v1/tickets - Crear turno</p>
+                <p><span className="text-emerald-600">GET</span> /api/v1/queue?branch_id=X - Estado de cola</p>
+                <p><span className="text-emerald-600">GET</span> /api/v1/appointments - Listar citas</p>
+                <p><span className="text-[#009e59]">POST</span> /api/v1/appointments - Crear cita</p>
               </div>
             </div>
             <div>
-              <p className="font-medium text-gray-800">Autenticacion:</p>
-              <code className="block bg-gray-900 text-green-400 p-3 rounded-lg text-xs mt-1">
+              <p className="font-medium text-white">Autenticacion:</p>
+              <code className="block bg-gray-900 text-emerald-400 p-3 rounded-lg text-xs mt-1">
                 Authorization: Bearer ck_tu_api_key_aqui
               </code>
             </div>

@@ -20,6 +20,31 @@ import {
   checkSLABreaches,
   resolveCompletedBreaches,
 } from '@/features/sla/services/sla-monitor'
+import { timingSafeEqual } from 'crypto'
+
+const CRON_SECRET = process.env.CRON_SECRET
+
+/**
+ * Verify cron secret using timing-safe comparison
+ */
+function verifyCronSecret(authHeader: string | null, expected: string | undefined): boolean {
+  if (!expected) return false // Secret not configured = reject all
+  if (!authHeader) return false
+
+  // Extract Bearer token
+  const match = authHeader.match(/^Bearer (.+)$/)
+  if (!match) return false
+
+  const provided = match[1]
+  try {
+    const a = Buffer.from(provided)
+    const b = Buffer.from(expected)
+    if (a.length !== b.length) return false
+    return timingSafeEqual(a, b)
+  } catch {
+    return false
+  }
+}
 
 // ============================================
 // TYPES
@@ -52,14 +77,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const startTime = Date.now()
 
   try {
-    // 1. Verificar autenticación (opcional: usar cron secret en producción)
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    // 1. Verificar autenticación (MANDATORY: usar cron secret)
+    // Validate cron secret is configured
+    if (!CRON_SECRET) {
       return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
+        { error: 'Cron job not configured' },
+        { status: 503 }
+      )
+    }
+
+    // Verify cron secret with timing-safe comparison
+    const authHeader = request.headers.get('authorization')
+    if (!verifyCronSecret(authHeader, CRON_SECRET)) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
       )
     }
 
@@ -74,14 +106,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (orgError) {
       console.error('Error fetching organizations:', orgError)
       return NextResponse.json(
-        { error: 'Error al obtener organizaciones' },
+        { error: 'Internal server error' },
         { status: 500 }
       )
     }
 
     if (!organizations || organizations.length === 0) {
       return NextResponse.json({
-        message: 'No hay organizaciones activas',
+        message: 'No active organizations',
         timestamp: new Date().toISOString(),
       })
     }
@@ -109,9 +141,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
         if (branchError) {
           console.error(`Error fetching branches for org ${org.id}:`, branchError)
-          summary.errors.push(
-            `Org ${org.name}: Error al obtener sucursales - ${branchError.message}`
-          )
+          summary.errors.push(`Error fetching branches`)
           continue
         }
 
@@ -146,9 +176,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
               `Error checking SLA for branch ${branch.id}:`,
               error
             )
-            summary.errors.push(
-              `Branch ${branch.name}: ${error instanceof Error ? error.message : 'Error desconocido'}`
-            )
+            summary.errors.push(`Error checking SLA`)
           }
         }
 
@@ -161,15 +189,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             `Error resolving breaches for org ${org.id}:`,
             error
           )
-          summary.errors.push(
-            `Org ${org.name}: Error al resolver violaciones - ${error instanceof Error ? error.message : 'Error desconocido'}`
-          )
+          summary.errors.push(`Error resolving breaches`)
         }
       } catch (error) {
         console.error(`Error processing org ${org.id}:`, error)
-        summary.errors.push(
-          `Org ${org.name}: ${error instanceof Error ? error.message : 'Error desconocido'}`
-        )
+        summary.errors.push(`Error processing organization`)
       }
     }
 
@@ -192,8 +216,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json(
       {
-        error: 'Error interno del servidor',
-        message: error instanceof Error ? error.message : 'Error desconocido',
+        error: 'Internal server error',
         timestamp: new Date().toISOString(),
       },
       { status: 500 }

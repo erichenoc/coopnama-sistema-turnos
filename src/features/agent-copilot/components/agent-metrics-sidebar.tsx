@@ -19,24 +19,24 @@ export function AgentMetricsSidebar({ agentId }: AgentMetricsSidebarProps) {
   }
 
   return (
-    <div className="flex items-center gap-4 px-4 py-2 bg-gray-50 border-b border-gray-200 text-xs text-gray-600">
+    <div className="flex items-center gap-4 px-4 py-2 bg-white/[0.06] border-b border-white/[0.08] text-xs text-gray-300">
       <div className="flex items-center gap-1">
-        <span className="font-medium text-gray-800">{metrics.todayServed}</span>
+        <span className="font-medium text-white">{metrics.todayServed}</span>
         <span>atendidos</span>
       </div>
-      <div className="w-px h-3 bg-gray-300" />
+      <div className="w-px h-3 bg-white/[0.08]" />
       <div className="flex items-center gap-1">
-        <span className="font-medium text-gray-800">
+        <span className="font-medium text-white">
           {formatTime(metrics.avgServiceTime)}
         </span>
         <span>prom</span>
       </div>
-      <div className="w-px h-3 bg-gray-300" />
+      <div className="w-px h-3 bg-white/[0.08]" />
       <div className="flex items-center gap-1">
         {metrics.avgRating !== null ? (
           <>
             <span className="text-yellow-500">&#9733;</span>
-            <span className="font-medium text-gray-800">{metrics.avgRating}</span>
+            <span className="font-medium text-white">{metrics.avgRating}</span>
           </>
         ) : (
           <span>Sin calif.</span>

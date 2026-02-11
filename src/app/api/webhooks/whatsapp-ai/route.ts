@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { chat } from '@/lib/ai/chatbot'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
+import { timingSafeEqual } from 'crypto'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const WEBHOOK_SECRET = process.env.WHATSAPP_WEBHOOK_SECRET
+
+/**
+ * Verify webhook secret using timing-safe comparison
+ */
+function verifySecret(provided: string | null, expected: string | undefined): boolean {
+  if (!expected) return false // Secret not configured = reject all
+  if (!provided) return false
+  try {
+    const a = Buffer.from(provided)
+    const b = Buffer.from(expected)
+    if (a.length !== b.length) return false
+    return timingSafeEqual(a, b)
+  } catch {
+    return false
+  }
+}
 
 /**
  * POST /api/webhooks/whatsapp-ai
@@ -11,10 +29,18 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
  * Expected payload: { from: string, message: string, organization_id: string }
  */
 export async function POST(req: NextRequest) {
-  // Verify webhook secret
+  // Validate webhook secret is configured
+  if (!WEBHOOK_SECRET) {
+    return NextResponse.json(
+      { error: 'Webhook not configured' },
+      { status: 503 }
+    )
+  }
+
+  // Verify webhook secret with timing-safe comparison
   const webhookSecret = req.headers.get('x-webhook-secret')
-  if (webhookSecret !== process.env.WHATSAPP_WEBHOOK_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!verifySecret(webhookSecret, WEBHOOK_SECRET)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   try {

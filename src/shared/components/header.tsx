@@ -36,8 +36,8 @@ export function Header({
     <header
       className={cn(
         'h-16 flex items-center justify-between px-4 lg:px-6',
-        'bg-neu-bg',
-        'shadow-[0_4px_12px_#b8b9be]',
+        'bg-slate-900/80 backdrop-blur-xl',
+        'border-b border-white/[0.06]',
         className
       )}
     >
@@ -50,13 +50,12 @@ export function Header({
             className={`
               lg:hidden
               p-2
-              bg-neu-bg
-              shadow-neu-sm
+              bg-white/[0.06] border border-white/[0.08]
               rounded-neu-sm
-              hover:shadow-neu-xs
-              active:shadow-neu-inset-xs
+              hover:bg-white/[0.10]
+              active:scale-95
               transition-all duration-150
-              text-gray-600
+              text-gray-300
             `}
             aria-label="Abrir menú"
           >
@@ -69,26 +68,26 @@ export function Header({
         {/* Title & Breadcrumbs */}
         <div>
           {breadcrumbs && breadcrumbs.length > 0 && (
-            <nav className="flex items-center gap-1 text-sm text-gray-500 mb-0.5">
+            <nav className="flex items-center gap-1 text-sm text-gray-400 mb-0.5">
               {breadcrumbs.map((crumb, index) => (
                 <span key={index} className="flex items-center">
                   {index > 0 && <span className="mx-1">/</span>}
                   {crumb.href ? (
-                    <a href={crumb.href} className="hover:text-coopnama-primary transition-colors">
+                    <a href={crumb.href} className="hover:text-[#009e59] transition-colors">
                       {crumb.label}
                     </a>
                   ) : (
-                    <span className="text-gray-700">{crumb.label}</span>
+                    <span className="text-gray-200">{crumb.label}</span>
                   )}
                 </span>
               ))}
             </nav>
           )}
           {title && (
-            <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
+            <h1 className="text-xl font-semibold text-white">{title}</h1>
           )}
           {subtitle && (
-            <p className="text-sm text-gray-500">{subtitle}</p>
+            <p className="text-sm text-gray-400">{subtitle}</p>
           )}
         </div>
       </div>
@@ -103,20 +102,19 @@ export function Header({
 
         {/* User Profile */}
         {userSlot || (user && (
-          <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
+          <div className="flex items-center gap-3 pl-3 border-l border-white/[0.08]">
             <div className="hidden sm:block text-right">
-              <p className="text-sm font-medium text-gray-800">{user.name}</p>
+              <p className="text-sm font-medium text-white">{user.name}</p>
               {user.role && (
-                <p className="text-xs text-gray-500">{user.role}</p>
+                <p className="text-xs text-gray-400">{user.role}</p>
               )}
             </div>
             <button
               className={`
-                bg-neu-bg
-                shadow-neu-sm
+                bg-white/[0.06] border border-white/[0.08]
                 rounded-full
                 p-0.5
-                hover:shadow-neu-xs
+                hover:bg-white/[0.10]
                 transition-all duration-150
               `}
             >
@@ -160,14 +158,15 @@ export function SearchHeader({
             className={`
               w-64 lg:w-96
               pl-10 pr-4 py-2
-              bg-neu-bg
-              shadow-neu-inset
+              bg-white/[0.05] border border-white/[0.10]
               rounded-full
-              text-gray-700
+              text-white
               placeholder:text-gray-400
               focus:outline-none
-              focus:shadow-[inset_4px_4px_8px_#b8b9be,inset_-4px_-4px_8px_#ffffff,0_0_0_2px_rgba(30,64,175,0.2)]
-              transition-shadow duration-150
+              focus:border-[#009e59]/50
+              focus:ring-2
+              focus:ring-[#009e59]/20
+              transition-all duration-150
             `}
           />
           <svg

@@ -171,8 +171,8 @@ export default function BranchesPage() {
     <>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Sucursales</h1>
-          <p className="text-gray-500 mt-1">Administra las sucursales de tu organizacion</p>
+          <h1 className="text-3xl font-bold text-white">Sucursales</h1>
+          <p className="text-gray-300 mt-1">Administra las sucursales de tu organizacion</p>
         </div>
         <Button variant="primary" onClick={() => handleOpenModal()}>
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,7 +186,7 @@ export default function BranchesPage() {
         <Card>
           <CardContent>
             <div className="text-center py-12">
-              <p className="text-gray-400">No hay sucursales creadas</p>
+              <p className="text-gray-300">No hay sucursales creadas</p>
             </div>
           </CardContent>
         </Card>
@@ -198,7 +198,7 @@ export default function BranchesPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle>{branch.name}</CardTitle>
-                    <p className="text-sm text-gray-500 mt-1">Codigo: {branch.code}</p>
+                    <p className="text-sm text-gray-300 mt-1">Codigo: {branch.code}</p>
                   </div>
                   <Badge variant={branch.is_active ? 'default' : 'outline'}>
                     {branch.is_active ? 'Activa' : 'Inactiva'}
@@ -208,36 +208,36 @@ export default function BranchesPage() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-300 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <div>
-                      <p className="text-sm text-gray-700">{branch.address || 'Sin direccion'}</p>
-                      <p className="text-xs text-gray-500">{branch.city || 'Sin ciudad'}</p>
+                      <p className="text-sm text-gray-200">{branch.address || 'Sin direccion'}</p>
+                      <p className="text-xs text-gray-300">{branch.city || 'Sin ciudad'}</p>
                     </div>
                   </div>
 
                   {branch.phone && (
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
-                      <p className="text-sm text-gray-700">{branch.phone}</p>
+                      <p className="text-sm text-gray-200">{branch.phone}</p>
                     </div>
                   )}
 
                   <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm text-gray-200">
                       {branch.opening_time} - {branch.closing_time}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-2">Dias laborales:</p>
+                    <p className="text-xs text-gray-300 mb-2">Dias laborales:</p>
                     <div className="flex gap-1">
                       {WEEKDAY_LABELS.map((label, index) => {
                         const dayNumber = index + 1
@@ -248,7 +248,7 @@ export default function BranchesPage() {
                             className={`
                               w-8 h-8 flex items-center justify-center rounded-full text-xs font-medium
                               ${isActive
-                                ? 'bg-coopnama-primary text-white'
+                                ? 'bg-[#009e59] text-white'
                                 : 'bg-gray-200 text-gray-400'
                               }
                             `}
@@ -260,8 +260,8 @@ export default function BranchesPage() {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-gray-200/50">
-                    <p className="text-sm text-gray-600">
+                  <div className="pt-2 border-t border-white/[0.08]">
+                    <p className="text-sm text-gray-300">
                       Capacidad: <span className="font-semibold">{branch.max_capacity_per_hour}</span> turnos/hora
                     </p>
                   </div>
@@ -286,7 +286,7 @@ export default function BranchesPage() {
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} size="lg">
         <form onSubmit={handleSubmit}>
           <ModalHeader>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-white">
               {editingBranch ? 'Editar Sucursal' : 'Nueva Sucursal'}
             </h2>
           </ModalHeader>
@@ -355,7 +355,7 @@ export default function BranchesPage() {
                 required
               />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Dias laborales
                 </label>
                 <div className="grid grid-cols-7 gap-2">
@@ -370,8 +370,8 @@ export default function BranchesPage() {
                         className={`
                           px-2 py-3 rounded-neu-sm text-sm font-medium transition-all
                           ${isActive
-                            ? 'bg-coopnama-primary text-white shadow-neu-sm'
-                            : 'bg-neu-bg text-gray-600 shadow-neu-inset'
+                            ? 'bg-[#009e59] text-white shadow-neu-sm'
+                            : 'bg-white/[0.06] text-gray-300 shadow-neu-inset'
                           }
                         `}
                       >

@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { timingSafeEqual } from 'crypto'
 
-const WEBHOOK_SECRET = process.env.N8N_WEBHOOK_SECRET || ''
+const WEBHOOK_SECRET = process.env.N8N_WEBHOOK_SECRET
+
+/**
+ * Verify webhook secret using timing-safe comparison
+ */
+function verifySecret(provided: string | undefined, expected: string | undefined): boolean {
+  if (!expected) return false // Secret not configured = reject all
+  if (!provided) return false
+  try {
+    const a = Buffer.from(provided)
+    const b = Buffer.from(expected)
+    if (a.length !== b.length) return false
+    return timingSafeEqual(a, b)
+  } catch {
+    return false
+  }
+}
 
 /**
  * POST /api/webhooks/whatsapp - Receive incoming WhatsApp messages from n8n
@@ -20,12 +37,20 @@ const WEBHOOK_SECRET = process.env.N8N_WEBHOOK_SECRET || ''
  * }
  */
 export async function POST(request: NextRequest) {
+  // Validate webhook secret is configured
+  if (!WEBHOOK_SECRET) {
+    return NextResponse.json(
+      { error: 'Webhook not configured' },
+      { status: 503 }
+    )
+  }
+
   try {
     const payload = await request.json()
 
-    // Validate webhook secret if configured
-    if (WEBHOOK_SECRET && payload.secret !== WEBHOOK_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Verify webhook secret with timing-safe comparison
+    if (!verifySecret(payload.secret, WEBHOOK_SECRET)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const { from, body, name } = payload

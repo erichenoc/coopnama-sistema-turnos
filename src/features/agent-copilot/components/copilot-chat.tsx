@@ -127,7 +127,7 @@ export function CopilotChat({ ticket, notes, callbacks }: CopilotChatProps) {
 
   if (!ticket || ticket.status !== 'serving') {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-400 py-8">
         Llame un turno para iniciar el copiloto
       </div>
     )
@@ -142,11 +142,11 @@ export function CopilotChat({ ticket, notes, callbacks }: CopilotChatProps) {
           .map((msg) => (
             <div
               key={msg.id}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-neu-sm shadow-neu-xs"
+              className="bg-[#009e59]/10 p-3 rounded-neu-sm shadow-neu-xs"
             >
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              <p className="text-sm text-gray-200 whitespace-pre-wrap">
                 {msg.content || (
-                  <span className="text-gray-400">Pensando...</span>
+                  <span className="text-gray-300">Pensando...</span>
                 )}
               </p>
             </div>
@@ -168,12 +168,12 @@ export function CopilotChat({ ticket, notes, callbacks }: CopilotChatProps) {
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Preguntar al copiloto..."
           disabled={isLoading}
-          className="flex-1 px-3 py-2 rounded-neu-sm shadow-neu-inset text-sm focus:outline-none focus:ring-2 focus:ring-coopnama-primary disabled:opacity-50"
+          className="flex-1 px-3 py-2 rounded-neu-sm shadow-neu-inset text-sm focus:outline-none focus:border-[#009e59]/50 focus:ring-2 focus:ring-[#009e59]/20 disabled:opacity-50 bg-white/[0.04] text-white placeholder:text-gray-400"
         />
         <button
           onClick={handleSend}
           disabled={isLoading || !input.trim()}
-          className="px-3 py-2 bg-coopnama-primary text-white rounded-neu-sm text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+          className="px-3 py-2 bg-gradient-to-r from-[#009e59] to-[#00c96f] text-white rounded-neu-sm text-sm font-medium hover:brightness-110 disabled:opacity-50 transition-opacity"
         >
           Enviar
         </button>

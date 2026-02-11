@@ -10,6 +10,7 @@ export function SignupForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
 
@@ -43,12 +44,34 @@ export function SignupForm() {
       const result = await signupAction(form)
       if (result?.error) {
         setError(result.error)
+      } else if (result?.success) {
+        setSuccess(true)
       }
     } catch {
       router.refresh()
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (success) {
+    return (
+      <div className="text-center space-y-4">
+        <div className="w-16 h-16 mx-auto rounded-full bg-[#009e59]/10 flex items-center justify-center">
+          <svg className="w-8 h-8 text-[#009e59]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-semibold text-white">Cuenta creada exitosamente</h3>
+        <p className="text-gray-400">
+          Tu cuenta ha sido creada y esta pendiente de aprobacion por un administrador.
+          Recibiras acceso una vez que tu cuenta sea activada.
+        </p>
+        <Link href="/login" className="inline-block mt-4 text-[#009e59] font-medium hover:underline">
+          Volver al inicio de sesion
+        </Link>
+      </div>
+    )
   }
 
   return (
@@ -103,9 +126,9 @@ export function SignupForm() {
           type="checkbox"
           checked={showPassword}
           onChange={(e) => setShowPassword(e.target.checked)}
-          className="w-4 h-4 rounded border-gray-300 text-coopnama-primary focus:ring-coopnama-primary"
+          className="w-4 h-4 rounded border-white/[0.10] text-[#009e59] focus:ring-[#009e59]/20"
         />
-        <span className="text-sm text-gray-600">Mostrar contrasenas</span>
+        <span className="text-sm text-gray-300">Mostrar contrasenas</span>
       </label>
 
       <label className="flex items-start gap-2 cursor-pointer">
@@ -113,9 +136,9 @@ export function SignupForm() {
           type="checkbox"
           checked={acceptedTerms}
           onChange={(e) => setAcceptedTerms(e.target.checked)}
-          className="w-4 h-4 mt-0.5 rounded border-gray-300 text-coopnama-primary focus:ring-coopnama-primary"
+          className="w-4 h-4 mt-0.5 rounded border-white/[0.10] text-[#009e59] focus:ring-[#009e59]/20"
         />
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-gray-300">
           Acepto los terminos y condiciones y la politica de privacidad
         </span>
       </label>
@@ -124,9 +147,9 @@ export function SignupForm() {
         Crear Cuenta
       </Button>
 
-      <p className="text-center text-gray-600">
+      <p className="text-center text-gray-300">
         Ya tienes una cuenta?{' '}
-        <Link href="/login" className="text-coopnama-primary font-medium hover:underline">
+        <Link href="/login" className="text-[#009e59] font-medium hover:underline">
           Inicia sesion
         </Link>
       </p>

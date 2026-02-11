@@ -11,14 +11,14 @@ interface ColorPickerProps {
 export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <label className="block text-sm font-medium text-gray-200 mb-2">{label}</label>
       <div className="flex items-center gap-3">
         <div className="relative">
           <input
             type="color"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-12 h-12 rounded-lg border-2 border-gray-200 cursor-pointer"
+            className="w-12 h-12 rounded-lg border-2 border-white/[0.08] cursor-pointer"
           />
         </div>
         <Input
@@ -28,7 +28,7 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
           className="flex-1 font-mono"
         />
         <div
-          className="w-12 h-12 rounded-lg border border-gray-200"
+          className="w-12 h-12 rounded-lg border border-white/[0.08]"
           style={{ backgroundColor: value }}
         />
       </div>

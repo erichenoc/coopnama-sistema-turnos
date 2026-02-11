@@ -108,23 +108,23 @@ export function AgentLeaderboard({ organizationId, branchId }: AgentLeaderboardP
             )
           } else {
             return (
-              <span key={i} className="text-gray-300">
+              <span key={i} className="text-gray-600">
                 ★
               </span>
             )
           }
         })}
-        <span className="ml-1 text-sm text-gray-600">{rating.toFixed(1)}</span>
+        <span className="ml-1 text-sm text-gray-300">{rating.toFixed(1)}</span>
       </div>
     )
   }
 
   return (
-    <Card className="bg-neu-bg shadow-neu">
+    <Card className="bg-white/[0.06]">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>Tabla de Posiciones</span>
-          <span className="text-sm font-normal text-gray-500">
+          <span className="text-sm font-normal text-gray-400">
             {lastUpdate.toLocaleDateString('es-DO', {
               weekday: 'long',
               year: 'numeric',
@@ -140,7 +140,7 @@ export function AgentLeaderboard({ organizationId, branchId }: AgentLeaderboardP
             <Spinner size="lg" label="Cargando leaderboard..." />
           </div>
         ) : agents.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-400">
             <p>No hay datos de agentes para hoy</p>
             <p className="text-sm mt-2">Los agentes aparecerán cuando completen turnos</p>
           </div>
@@ -148,23 +148,23 @@ export function AgentLeaderboard({ organizationId, branchId }: AgentLeaderboardP
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                <tr className="border-b border-white/[0.08]">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">
                     Posición
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">
                     Agente
                   </th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-200">
                     Turnos
                   </th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-200">
                     Tiempo Prom.
                   </th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-200">
                     Calificación
                   </th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-200">
                     Puntos
                   </th>
                 </tr>
@@ -173,13 +173,13 @@ export function AgentLeaderboard({ organizationId, branchId }: AgentLeaderboardP
                 {agents.map((agent) => (
                   <tr
                     key={agent.agent_id}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    className="border-b border-white/[0.06] hover:bg-white/[0.06] transition-colors"
                   >
                     {/* Rank */}
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{getMedal(agent.rank)}</span>
-                        <span className="text-lg font-bold text-gray-700">#{agent.rank}</span>
+                        <span className="text-lg font-bold text-gray-200">#{agent.rank}</span>
                       </div>
                     </td>
 
@@ -190,22 +190,22 @@ export function AgentLeaderboard({ organizationId, branchId }: AgentLeaderboardP
                           <img
                             src={agent.avatar_url}
                             alt={agent.agent_name}
-                            className="w-10 h-10 rounded-full object-cover shadow-neu-sm"
+                            className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-coopnama-primary to-coopnama-secondary flex items-center justify-center text-white font-bold shadow-neu-sm">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#009e59] to-[#00c96f] flex items-center justify-center text-white font-bold">
                             {agent.agent_name.charAt(0).toUpperCase()}
                           </div>
                         )}
                         <div>
-                          <p className="font-semibold text-gray-800">{agent.agent_name}</p>
+                          <p className="font-semibold text-white">{agent.agent_name}</p>
                           {agent.achievements.length > 0 && (
                             <div className="flex gap-1 mt-1">
                               {agent.achievements.slice(0, 3).map((achievement) => (
                                 <Badge
                                   key={achievement.id}
                                   variant="outline"
-                                  className="text-xs shadow-neu-sm"
+                                  className="text-xs"
                                   title={achievement.description || achievement.achievement_name}
                                 >
                                   {getAchievementEmoji(achievement.achievement_type)}
@@ -224,14 +224,14 @@ export function AgentLeaderboard({ organizationId, branchId }: AgentLeaderboardP
 
                     {/* Tickets Served */}
                     <td className="px-4 py-4 text-center">
-                      <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-neu-bg shadow-neu-inset text-lg font-bold text-coopnama-primary">
+                      <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/[0.06] text-lg font-bold text-[#009e59]">
                         {agent.tickets_served}
                       </span>
                     </td>
 
                     {/* Avg Service Time */}
                     <td className="px-4 py-4 text-center">
-                      <span className="font-mono text-sm text-gray-700">
+                      <span className="font-mono text-sm text-gray-200">
                         {formatTime(agent.avg_service_time)}
                       </span>
                     </td>
@@ -241,7 +241,7 @@ export function AgentLeaderboard({ organizationId, branchId }: AgentLeaderboardP
 
                     {/* Total Score */}
                     <td className="px-4 py-4 text-center">
-                      <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-coopnama-primary to-coopnama-secondary">
+                      <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#009e59] to-[#00c96f]">
                         {Math.round(agent.total_score)}
                       </span>
                     </td>

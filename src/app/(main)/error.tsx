@@ -14,8 +14,8 @@ export default function MainLayoutError({ error, reset }: ErrorProps) {
   }, [error])
 
   return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center p-4">
-      <div className="bg-neu-surface shadow-neu rounded-neu-lg p-8 max-w-md w-full text-center">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <div className="bg-white/[0.06] shadow-neu rounded-neu-lg p-8 max-w-md w-full text-center">
         {/* Error Icon */}
         <div className="w-16 h-16 mx-auto mb-4 bg-coopnama-danger/10 rounded-full flex items-center justify-center">
           <svg
@@ -34,17 +34,17 @@ export default function MainLayoutError({ error, reset }: ErrorProps) {
         </div>
 
         {/* Error Message */}
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+        <h2 className="text-2xl font-semibold text-white mb-2">
           Error en el panel
         </h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-300 mb-6">
           {error.message || 'Ha ocurrido un error al cargar el panel. Por favor, intenta nuevamente.'}
         </p>
 
         {/* Action Button */}
         <button
           onClick={reset}
-          className="bg-neu-surface shadow-neu hover:shadow-neu-inset active:shadow-neu-inset-md rounded-neu px-6 py-3 font-semibold text-coopnama-primary transition-all duration-150"
+          className="bg-white/[0.06] shadow-neu hover:shadow-neu-inset active:shadow-neu-inset-md rounded-neu px-6 py-3 font-semibold text-[#009e59] transition-all duration-150"
         >
           Reintentar
         </button>

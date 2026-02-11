@@ -32,20 +32,20 @@ export function RecurrenceSelector({ isRecurring, pattern, endDate, onChange }: 
           type="button"
           onClick={handleToggle}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            isRecurring ? 'bg-coopnama-primary' : 'bg-gray-300'
+            isRecurring ? 'bg-gradient-to-r from-[#009e59] to-[#00c96f]' : 'bg-white/[0.10]'
           }`}
         >
           <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
             isRecurring ? 'translate-x-6' : 'translate-x-1'
           }`} />
         </button>
-        <label className="text-sm font-medium text-gray-700">Cita recurrente</label>
+        <label className="text-sm font-medium text-gray-200">Cita recurrente</label>
       </div>
 
       {isRecurring && (
         <div className="pl-14 space-y-3">
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Frecuencia</label>
+            <label className="block text-sm text-gray-300 mb-1">Frecuencia</label>
             <div className="flex gap-2">
               {PATTERNS.map(p => (
                 <button
@@ -54,8 +54,8 @@ export function RecurrenceSelector({ isRecurring, pattern, endDate, onChange }: 
                   onClick={() => onChange({ is_recurring: true, recurrence_pattern: p.value, recurrence_end_date: endDate })}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                     pattern === p.value
-                      ? 'bg-coopnama-primary text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-gradient-to-r from-[#009e59] to-[#00c96f] text-white'
+                      : 'bg-white/[0.06] text-gray-300 hover:bg-white/[0.08]'
                   }`}
                 >
                   {p.label}
@@ -65,7 +65,7 @@ export function RecurrenceSelector({ isRecurring, pattern, endDate, onChange }: 
           </div>
 
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Repetir hasta (opcional)</label>
+            <label className="block text-sm text-gray-300 mb-1">Repetir hasta (opcional)</label>
             <Input
               type="date"
               value={endDate || ''}

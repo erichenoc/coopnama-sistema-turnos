@@ -54,25 +54,25 @@ export function FeedbackModal({ isOpen, onClose, ticketId, ticketNumber }: Feedb
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="md">
       <ModalHeader>
-        <h3 className="text-xl font-bold text-gray-800">Evaluar Servicio</h3>
-        <p className="text-sm text-gray-500 mt-1">Turno {ticketNumber}</p>
+        <h3 className="text-xl font-bold text-white">Evaluar Servicio</h3>
+        <p className="text-sm text-gray-300 mt-1">Turno {ticketNumber}</p>
       </ModalHeader>
       <ModalBody>
         {submitted ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="text-lg font-semibold text-gray-800">Gracias por su evaluacion</p>
-            <p className="text-sm text-gray-500 mt-1">Su opinion nos ayuda a mejorar</p>
+            <p className="text-lg font-semibold text-white">Gracias por su evaluacion</p>
+            <p className="text-sm text-gray-300 mt-1">Su opinion nos ayuda a mejorar</p>
           </div>
         ) : (
           <div className="space-y-6">
             {/* Star Rating */}
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-3">Como fue su experiencia?</p>
+              <p className="text-sm text-gray-300 mb-3">Como fue su experiencia?</p>
               <div className="flex items-center justify-center gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -96,13 +96,13 @@ export function FeedbackModal({ isOpen, onClose, ticketId, ticketNumber }: Feedb
                 ))}
               </div>
               {displayRating > 0 && (
-                <p className="text-sm text-gray-500 mt-2">{STAR_LABELS[displayRating - 1]}</p>
+                <p className="text-sm text-gray-300 mt-2">{STAR_LABELS[displayRating - 1]}</p>
               )}
             </div>
 
             {/* Comment */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-200 mb-1">
                 Comentario (opcional)
               </label>
               <textarea
@@ -111,9 +111,9 @@ export function FeedbackModal({ isOpen, onClose, ticketId, ticketNumber }: Feedb
                 placeholder="Cuentenos sobre su experiencia..."
                 rows={3}
                 maxLength={500}
-                className="w-full px-4 py-3 bg-neu-bg shadow-neu-inset-xs rounded-neu-sm text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30 resize-none"
+                className="w-full px-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-neu-sm text-gray-200 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30 resize-none"
               />
-              <p className="text-xs text-gray-400 mt-1 text-right">{comment.length}/500</p>
+              <p className="text-xs text-gray-300 mt-1 text-right">{comment.length}/500</p>
             </div>
           </div>
         )}

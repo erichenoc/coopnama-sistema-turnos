@@ -65,21 +65,21 @@ export function TransferRecommendation({
 
   if (!ticket || ticket.status !== 'serving') {
     return (
-      <div className="text-center text-gray-500 py-4 text-sm">
+      <div className="text-center text-gray-300 py-4 text-sm">
         Disponible al atender un turno
       </div>
     )
   }
 
   const confidenceColors = {
-    high: 'bg-green-100 text-green-700',
-    medium: 'bg-yellow-100 text-yellow-700',
-    low: 'bg-gray-100 text-gray-600',
+    high: 'bg-emerald-500/10 text-emerald-300',
+    medium: 'bg-yellow-500/10 text-yellow-300',
+    low: 'bg-white/[0.06] text-gray-300',
   }
 
   return (
     <div>
-      <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+      <h4 className="text-xs font-semibold text-gray-300 uppercase mb-2">
         Recomendacion de Transferencia
       </h4>
 
@@ -88,9 +88,9 @@ export function TransferRecommendation({
           <Spinner size="sm" />
         </div>
       ) : recommendation ? (
-        <div className="bg-indigo-50 border border-indigo-200 p-3 rounded-neu-sm">
+        <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-neu-sm">
           <div className="flex items-center justify-between mb-2">
-            <p className="font-medium text-indigo-800 text-sm">
+            <p className="font-medium text-emerald-300 text-sm">
               {recommendation.serviceName}
             </p>
             <span
@@ -106,7 +106,7 @@ export function TransferRecommendation({
               confianza
             </span>
           </div>
-          <p className="text-xs text-indigo-600 mb-3">{recommendation.reason}</p>
+          <p className="text-xs text-emerald-300 mb-3">{recommendation.reason}</p>
           <Button
             onClick={() =>
               callbacks.onTriggerTransfer(
@@ -121,7 +121,7 @@ export function TransferRecommendation({
           </Button>
         </div>
       ) : fetched ? (
-        <div className="text-center text-gray-400 py-4 text-sm">
+        <div className="text-center text-gray-300 py-4 text-sm">
           <p>No se sugiere transferencia para este caso</p>
           <Button
             onClick={fetchRecommendation}

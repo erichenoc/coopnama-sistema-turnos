@@ -16,7 +16,7 @@ import {
 import type { PieLabelRenderProps, PieLabel } from 'recharts'
 import { useOrg } from '@/shared/providers/org-provider'
 
-const COLORS = ['#1e40af', '#10b981', '#f59e0b', '#6b7280', '#ef4444']
+const COLORS = ['#10b981', '#009e59', '#f59e0b', '#6b7280', '#ef4444']
 
 type ReportTab = 'general' | 'agentes' | 'csat' | 'demanda'
 
@@ -201,8 +201,8 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Reportes y Analiticas</h1>
-          <p className="text-gray-500 mt-1">Visualiza el rendimiento del sistema de turnos</p>
+          <h1 className="text-3xl font-bold text-white">Reportes y Analiticas</h1>
+          <p className="text-gray-400 mt-1">Visualiza el rendimiento del sistema de turnos</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -224,7 +224,7 @@ export default function ReportsPage() {
           </Button>
 
           {/* Date Range Selector */}
-          <div className="flex gap-2 bg-neu-bg p-1 rounded-neu-sm shadow-neu-sm">
+          <div className="flex gap-2 bg-white/[0.06] border border-white/[0.08] p-1 rounded-lg">
             {[
               { label: 'Hoy', value: 'today' as DateRange },
               { label: '7 dias', value: '7days' as DateRange },
@@ -236,7 +236,7 @@ export default function ReportsPage() {
                 className={`px-4 py-2 rounded-neu-xs font-medium transition-all ${
                   dateRange === option.value
                     ? 'bg-coopnama-primary text-white shadow-neu-xs'
-                    : 'text-gray-600 hover:text-gray-800'
+                    : 'text-gray-600 hover:text-white'
                 }`}
               >
                 {option.label}
@@ -254,8 +254,8 @@ export default function ReportsPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-neu-sm font-medium transition-all whitespace-nowrap ${
               activeTab === tab.id
-                ? 'bg-neu-bg shadow-neu-inset text-coopnama-primary'
-                : 'bg-neu-bg shadow-neu text-gray-600 hover:text-coopnama-primary'
+                ? 'bg-white/[0.08] border border-coopnama-primary/30 text-emerald-400'
+                : 'bg-white/[0.06] border border-white/[0.08] text-gray-300 hover:text-emerald-400'
             }`}
           >
             {tab.label}
@@ -269,8 +269,8 @@ export default function ReportsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Total Turnos</p>
-                <p className="text-3xl font-bold text-gray-800">{totalTickets}</p>
+                <p className="text-sm text-gray-400 mb-1">Total Turnos</p>
+                <p className="text-3xl font-bold text-white">{totalTickets}</p>
                 <p className="text-xs text-gray-400 mt-1">{completedTickets.length} completados</p>
               </div>
               <div className="p-3 bg-coopnama-primary/10 rounded-full">
@@ -286,8 +286,8 @@ export default function ReportsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Tiempo Espera</p>
-                <p className="text-3xl font-bold text-gray-800">{(avgWaitTime / 60).toFixed(1)}</p>
+                <p className="text-sm text-gray-400 mb-1">Tiempo Espera</p>
+                <p className="text-3xl font-bold text-white">{(avgWaitTime / 60).toFixed(1)}</p>
                 <p className="text-xs text-gray-400 mt-1">minutos promedio</p>
               </div>
               <div className="p-3 bg-coopnama-secondary/10 rounded-full">
@@ -303,8 +303,8 @@ export default function ReportsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Tiempo Atencion</p>
-                <p className="text-3xl font-bold text-gray-800">{(avgServiceTime / 60).toFixed(1)}</p>
+                <p className="text-sm text-gray-400 mb-1">Tiempo Atencion</p>
+                <p className="text-3xl font-bold text-white">{(avgServiceTime / 60).toFixed(1)}</p>
                 <p className="text-xs text-gray-400 mt-1">minutos promedio</p>
               </div>
               <div className="p-3 bg-coopnama-accent/10 rounded-full">
@@ -320,8 +320,8 @@ export default function ReportsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Tasa Completacion</p>
-                <p className="text-3xl font-bold text-gray-800">{completionRate.toFixed(0)}%</p>
+                <p className="text-sm text-gray-400 mb-1">Tasa Completacion</p>
+                <p className="text-3xl font-bold text-white">{completionRate.toFixed(0)}%</p>
                 <p className="text-xs text-gray-400 mt-1">turnos completados</p>
               </div>
               <div className="p-3 bg-green-500/10 rounded-full">
@@ -346,7 +346,7 @@ export default function ReportsPage() {
                   <XAxis dataKey="hour" stroke="#6b7280" fontSize={12} />
                   <YAxis stroke="#6b7280" fontSize={12} />
                   <Tooltip contentStyle={{ backgroundColor: '#f9fafb', border: 'none', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                  <Bar dataKey="turnos" fill="#1e40af" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="turnos" fill="#10b981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -395,7 +395,7 @@ export default function ReportsPage() {
                       return value
                     }}
                   />
-                  <Line type="monotone" dataKey="turnos" stroke="#1e40af" strokeWidth={2} dot={{ fill: '#1e40af', r: 4 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="turnos" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -432,7 +432,7 @@ export default function ReportsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardContent className="pt-6 text-center">
-                  <p className="text-sm text-gray-500 mb-2">Score CSAT</p>
+                  <p className="text-sm text-gray-400 mb-2">Score CSAT</p>
                   <p className={`text-5xl font-black ${csatScore >= 80 ? 'text-green-500' : csatScore >= 60 ? 'text-amber-500' : 'text-red-500'}`}>
                     {csatScore.toFixed(0)}%
                   </p>
@@ -465,7 +465,7 @@ export default function ReportsPage() {
                     {sentimentData.map(s => (
                       <div key={s.name} className="flex items-center gap-1">
                         <span className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }} />
-                        <span className="text-xs text-gray-500">{s.name} ({s.value})</span>
+                        <span className="text-xs text-gray-400">{s.name} ({s.value})</span>
                       </div>
                     ))}
                   </div>

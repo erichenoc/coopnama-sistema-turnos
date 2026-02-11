@@ -39,15 +39,28 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     // eslint-disable-next-line no-undef
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      // Focus existing tab if found
-      for (const client of windowClients) {
-        if (client.url.includes(urlToOpen) && 'focus' in client) {
-          return client.focus()
+      // Validate URL is same-origin before opening
+      try {
+        // eslint-disable-next-line no-undef
+        const targetUrl = new URL(urlToOpen, self.location.origin)
+        // eslint-disable-next-line no-undef
+        if (targetUrl.origin !== self.location.origin) {
+          console.warn('Blocked cross-origin navigation:', urlToOpen)
+          return
         }
+
+        // Focus existing tab if found
+        for (const client of windowClients) {
+          if (client.url.includes(targetUrl.href) && 'focus' in client) {
+            return client.focus()
+          }
+        }
+        // Otherwise open new tab with validated URL
+        // eslint-disable-next-line no-undef
+        return clients.openWindow(targetUrl.href)
+      } catch (error) {
+        console.error('Invalid URL in notification:', urlToOpen, error)
       }
-      // Otherwise open new tab
-      // eslint-disable-next-line no-undef
-      return clients.openWindow(urlToOpen)
     })
   )
 })

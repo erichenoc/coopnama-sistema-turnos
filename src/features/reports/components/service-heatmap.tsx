@@ -17,12 +17,12 @@ const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 const HOURS = Array.from({ length: 11 }, (_, i) => i + 8) // 8am - 6pm
 
 function getIntensity(count: number, max: number): string {
-  if (count === 0 || max === 0) return 'bg-gray-50'
+  if (count === 0 || max === 0) return 'bg-white/[0.04]'
   const ratio = count / max
-  if (ratio >= 0.75) return 'bg-blue-600 text-white'
-  if (ratio >= 0.5) return 'bg-blue-400 text-white'
-  if (ratio >= 0.25) return 'bg-blue-200 text-blue-800'
-  return 'bg-blue-100 text-blue-700'
+  if (ratio >= 0.75) return 'bg-[#009e59] text-white'
+  if (ratio >= 0.5) return 'bg-emerald-400 text-white'
+  if (ratio >= 0.25) return 'bg-emerald-200 text-emerald-800'
+  return 'bg-emerald-100 text-emerald-700'
 }
 
 export function ServiceHeatmap({ data }: ServiceHeatmapProps) {
@@ -55,9 +55,9 @@ export function ServiceHeatmap({ data }: ServiceHeatmapProps) {
           <table className="w-full text-xs">
             <thead>
               <tr>
-                <th className="py-2 px-1 text-gray-500 font-medium text-left w-12"></th>
+                <th className="py-2 px-1 text-gray-400 font-medium text-left w-12"></th>
                 {HOURS.map(h => (
-                  <th key={h} className="py-2 px-1 text-gray-500 font-medium text-center">
+                  <th key={h} className="py-2 px-1 text-gray-400 font-medium text-center">
                     {h}:00
                   </th>
                 ))}
@@ -66,7 +66,7 @@ export function ServiceHeatmap({ data }: ServiceHeatmapProps) {
             <tbody>
               {[1, 2, 3, 4, 5, 6, 0].map((day) => (
                 <tr key={day}>
-                  <td className="py-1 px-1 font-medium text-gray-600">{DAY_LABELS[day]}</td>
+                  <td className="py-1 px-1 font-medium text-gray-300">{DAY_LABELS[day]}</td>
                   {HOURS.map(hour => {
                     const cell = getCell(day, hour)
                     const count = cell?.ticket_count || 0
@@ -89,15 +89,15 @@ export function ServiceHeatmap({ data }: ServiceHeatmapProps) {
 
         {/* Legend */}
         <div className="flex items-center gap-4 mt-4 justify-center">
-          <span className="text-xs text-gray-500">Menor</span>
+          <span className="text-xs text-gray-300">Menor</span>
           <div className="flex gap-1">
-            <div className="w-6 h-4 rounded bg-gray-50 border border-gray-200"></div>
-            <div className="w-6 h-4 rounded bg-blue-100"></div>
-            <div className="w-6 h-4 rounded bg-blue-200"></div>
-            <div className="w-6 h-4 rounded bg-blue-400"></div>
-            <div className="w-6 h-4 rounded bg-blue-600"></div>
+            <div className="w-6 h-4 rounded bg-white/[0.04] border border-white/[0.08]"></div>
+            <div className="w-6 h-4 rounded bg-emerald-100"></div>
+            <div className="w-6 h-4 rounded bg-emerald-200"></div>
+            <div className="w-6 h-4 rounded bg-emerald-400"></div>
+            <div className="w-6 h-4 rounded bg-[#009e59]"></div>
           </div>
-          <span className="text-xs text-gray-500">Mayor</span>
+          <span className="text-xs text-gray-300">Mayor</span>
         </div>
       </CardContent>
     </Card>

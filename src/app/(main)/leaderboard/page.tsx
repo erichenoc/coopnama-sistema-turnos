@@ -9,8 +9,8 @@ export default function LeaderboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Tabla de Posiciones</h1>
-        <p className="text-gray-500">Rendimiento de agentes en tiempo real</p>
+        <h1 className="text-2xl font-bold text-white">Tabla de Posiciones</h1>
+        <p className="text-gray-400">Rendimiento de agentes en tiempo real</p>
       </div>
       <AgentLeaderboard
         organizationId={organizationId}

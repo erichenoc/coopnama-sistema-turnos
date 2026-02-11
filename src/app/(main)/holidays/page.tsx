@@ -195,7 +195,7 @@ export default function HolidaysPage() {
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
           />
         </div>
-        <div className="text-sm text-gray-600 sm:ml-4">
+        <div className="text-sm text-gray-300 sm:ml-4">
           Total: <span className="font-semibold">{holidays.length}</span> feriados
         </div>
       </div>
@@ -204,10 +204,10 @@ export default function HolidaysPage() {
         <Card>
           <CardContent>
             <div className="text-center py-12">
-              <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-gray-400">No hay feriados configurados para {selectedYear}</p>
+              <p className="text-gray-500">No hay feriados configurados para {selectedYear}</p>
             </div>
           </CardContent>
         </Card>
@@ -228,21 +228,21 @@ export default function HolidaysPage() {
                       return (
                         <div
                           key={holiday.id}
-                          className="flex items-center justify-between p-4 rounded-neu shadow-neu hover:shadow-neu-lg transition-shadow"
+                          className="flex items-center justify-between p-4 rounded-lg bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.08] transition-all"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-neu-sm shadow-neu-inset flex flex-col items-center justify-center">
-                              <span className="text-2xl font-bold text-gray-700">{dayNumber}</span>
-                              <span className="text-xs text-gray-500 uppercase">{MONTH_NAMES[monthNumber].slice(0, 3)}</span>
+                            <div className="w-14 h-14 rounded-lg bg-white/[0.06] border border-white/[0.08] flex flex-col items-center justify-center">
+                              <span className="text-2xl font-bold text-gray-200">{dayNumber}</span>
+                              <span className="text-xs text-gray-400 uppercase">{MONTH_NAMES[monthNumber].slice(0, 3)}</span>
                             </div>
                             <div>
-                              <h3 className="font-semibold text-gray-800">{holiday.name}</h3>
+                              <h3 className="font-semibold text-white">{holiday.name}</h3>
                               <div className="flex gap-2 mt-1">
                                 <Badge variant="outline" size="sm">
                                   {getBranchName(holiday.branch_id)}
                                 </Badge>
                                 {holiday.is_recurring && (
-                                  <Badge variant="default" size="sm" className="bg-purple-100 text-purple-700">
+                                  <Badge variant="default" size="sm" className="bg-purple-500/10 text-purple-300 border-purple-500/20">
                                     Recurrente
                                   </Badge>
                                 )}
@@ -271,7 +271,7 @@ export default function HolidaysPage() {
       <Modal isOpen={isModalOpen} onClose={closeModal} size="md">
         <form onSubmit={handleSubmit}>
           <ModalHeader>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-white">
               {editingHoliday ? 'Editar Feriado' : 'Nuevo Feriado'}
             </h2>
           </ModalHeader>

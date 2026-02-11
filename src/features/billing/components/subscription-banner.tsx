@@ -75,14 +75,14 @@ export function SubscriptionBanner() {
   return (
     <div className={`mb-6 p-4 rounded-lg flex items-center justify-between ${
       isPastDue
-        ? 'bg-red-50 border border-red-200'
+        ? 'bg-red-500/10 border border-red-500/20'
         : sub.cancelAtPeriodEnd
-          ? 'bg-yellow-50 border border-yellow-200'
-          : 'bg-blue-50 border border-blue-200'
+          ? 'bg-yellow-500/10 border border-yellow-500/20'
+          : 'bg-[#009e59]/10 border border-[#009e59]/20'
     }`}>
       <div>
         <p className={`text-sm font-medium ${
-          isPastDue ? 'text-red-800' : sub.cancelAtPeriodEnd ? 'text-yellow-800' : 'text-blue-800'
+          isPastDue ? 'text-red-300' : sub.cancelAtPeriodEnd ? 'text-yellow-300' : 'text-emerald-300'
         }`}>
           {isPastDue
             ? 'Pago vencido - Por favor actualiza tu metodo de pago'

@@ -45,7 +45,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#e6e7ee',
+  themeColor: '#009e59',
 }
 
 export default function RootLayout({
@@ -59,7 +59,7 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-sans antialiased bg-neu-bg text-gray-700 min-h-screen">
+      <body className="font-sans antialiased bg-slate-950 text-gray-100 min-h-screen">
         <Providers>
           {children}
         </Providers>

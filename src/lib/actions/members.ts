@@ -25,6 +25,23 @@ export async function createMemberAction(
 ): Promise<{ data?: Member; error?: string }> {
   const supabase = await createClient()
 
+  // Verify authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'No autorizado' }
+  }
+
+  // Verify user belongs to the organization
+  const { data: profile } = await supabase
+    .from('users')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile || profile.organization_id !== input.organization_id) {
+    return { error: 'No autorizado: organizacion no coincide' }
+  }
+
   const { data, error } = await supabase
     .from('members')
     .insert({
@@ -57,6 +74,34 @@ export async function updateMemberAction(
 ): Promise<{ data?: Member; error?: string }> {
   const supabase = await createClient()
 
+  // Verify authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'No autorizado' }
+  }
+
+  // Get member to verify organization
+  const { data: member } = await supabase
+    .from('members')
+    .select('organization_id')
+    .eq('id', memberId)
+    .single()
+
+  if (!member) {
+    return { error: 'Miembro no encontrado' }
+  }
+
+  // Verify user belongs to the organization
+  const { data: profile } = await supabase
+    .from('users')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile || profile.organization_id !== member.organization_id) {
+    return { error: 'No autorizado: organizacion no coincide' }
+  }
+
   const { data, error } = await supabase
     .from('members')
     .update(updates)
@@ -72,6 +117,34 @@ export async function updateMemberAction(
 
 export async function deleteMemberAction(memberId: string): Promise<{ error?: string }> {
   const supabase = await createClient()
+
+  // Verify authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'No autorizado' }
+  }
+
+  // Get member to verify organization
+  const { data: member } = await supabase
+    .from('members')
+    .select('organization_id')
+    .eq('id', memberId)
+    .single()
+
+  if (!member) {
+    return { error: 'Miembro no encontrado' }
+  }
+
+  // Verify user belongs to the organization
+  const { data: profile } = await supabase
+    .from('users')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile || profile.organization_id !== member.organization_id) {
+    return { error: 'No autorizado: organizacion no coincide' }
+  }
 
   const { error } = await supabase
     .from('members')

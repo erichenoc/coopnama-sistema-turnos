@@ -43,7 +43,7 @@ export function QuickActionsBar({
   }
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 border-t border-gray-200 bg-gray-50">
+    <div className="flex items-center gap-2 px-4 py-2 border-t border-white/[0.08] bg-white/[0.06]">
       <Button
         variant="secondary"
         onClick={handleCopyToNotes}
@@ -68,7 +68,7 @@ export function QuickActionsBar({
       <Button
         variant="secondary"
         onClick={handleEscalate}
-        className="text-xs px-3 py-1.5 text-orange-600 hover:text-orange-700"
+        className="text-xs px-3 py-1.5 text-orange-400 hover:text-orange-300"
       >
         Escalar prioridad
       </Button>

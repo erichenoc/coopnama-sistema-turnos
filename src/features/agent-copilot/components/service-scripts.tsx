@@ -77,36 +77,36 @@ export function ServiceScripts({ ticket, context }: ServiceScriptsProps) {
   }
 
   const renderEntry = (entry: KnowledgeEntry) => (
-    <div key={entry.id} className="bg-gray-50 rounded-neu-sm shadow-neu-xs overflow-hidden">
+    <div key={entry.id} className="bg-white/[0.06] rounded-neu-sm shadow-neu-xs overflow-hidden">
       <button
         onClick={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
-        className="w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors"
+        className="w-full text-left px-3 py-2 hover:bg-white/[0.08] transition-colors"
       >
         <div className="flex justify-between items-center">
           <div>
             <div className="flex items-center gap-2">
               {entry.entry_type === 'procedure' && (
-                <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+                <span className="text-xs bg-[#009e59]/10 text-emerald-300 px-1.5 py-0.5 rounded">
                   Procedimiento
                 </span>
               )}
               {entry.entry_type === 'faq' && (
-                <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
+                <span className="text-xs bg-emerald-500/10 text-emerald-300 px-1.5 py-0.5 rounded">
                   FAQ
                 </span>
               )}
-              <p className="font-medium text-gray-800 text-sm">{entry.title}</p>
+              <p className="font-medium text-white text-sm">{entry.title}</p>
             </div>
-            <p className="text-xs text-gray-500">{entry.category}</p>
+            <p className="text-xs text-gray-300">{entry.category}</p>
           </div>
-          <span className="text-gray-400 text-xs">
+          <span className="text-gray-300 text-xs">
             {expandedId === entry.id ? '▼' : '▶'}
           </span>
         </div>
       </button>
       {expandedId === entry.id && (
-        <div className="px-3 py-2 bg-white border-t border-gray-200">
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{entry.content}</p>
+        <div className="px-3 py-2 bg-slate-900/95 border-t border-white/[0.08]">
+          <p className="text-sm text-gray-200 whitespace-pre-wrap">{entry.content}</p>
         </div>
       )}
     </div>
@@ -128,7 +128,7 @@ export function ServiceScripts({ ticket, context }: ServiceScriptsProps) {
       {/* Auto-loaded procedures for current service */}
       {ticket?.status === 'serving' && (
         <div>
-          <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+          <h4 className="text-xs font-semibold text-gray-300 uppercase mb-2">
             Guias para {ticket.service?.name || 'este servicio'}
           </h4>
           {isLoadingProcedures ? (
@@ -136,7 +136,7 @@ export function ServiceScripts({ ticket, context }: ServiceScriptsProps) {
               <Spinner size="sm" />
             </div>
           ) : sortedProcedures.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4">
+            <p className="text-sm text-gray-300 text-center py-4">
               No hay guias para este servicio
             </p>
           ) : (
@@ -147,7 +147,7 @@ export function ServiceScripts({ ticket, context }: ServiceScriptsProps) {
 
       {/* Manual search */}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+        <h4 className="text-xs font-semibold text-gray-300 uppercase mb-2">
           Buscar en Base de Conocimiento
         </h4>
         <div className="flex gap-2 mb-3">
@@ -157,7 +157,7 @@ export function ServiceScripts({ ticket, context }: ServiceScriptsProps) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="flex-1 px-3 py-2 rounded-neu-sm shadow-neu-inset text-sm focus:outline-none focus:ring-2 focus:ring-coopnama-primary"
+            className="flex-1 px-3 py-2 rounded-neu-sm shadow-neu-inset text-sm focus:outline-none focus:border-[#009e59]/50 focus:ring-2 focus:ring-[#009e59]/20 bg-white/[0.04] text-white placeholder:text-gray-400"
           />
           <Button
             onClick={handleSearch}
@@ -172,7 +172,7 @@ export function ServiceScripts({ ticket, context }: ServiceScriptsProps) {
           <div className="space-y-2">{searchResults.map(renderEntry)}</div>
         )}
         {searchTerm && !isLoadingSearch && searchResults.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-4">
+          <p className="text-sm text-gray-300 text-center py-4">
             No se encontraron resultados
           </p>
         )}

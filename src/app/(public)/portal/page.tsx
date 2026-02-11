@@ -71,14 +71,14 @@ export default function PortalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neu-bg">
+    <div className="min-h-screen bg-slate-950">
       <header className="bg-coopnama-primary text-white py-6 px-8 shadow-lg">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image src={LOGO_URL} alt="COOPNAMA" width={40} height={40} className="rounded-lg object-contain" priority />
             <div>
               <span className="font-bold text-xl">Portal del Cliente</span>
-              <p className="text-blue-200 text-sm">COOPNAMA</p>
+              <p className="text-emerald-200 text-sm">COOPNAMA</p>
             </div>
           </div>
           {member && (
@@ -90,11 +90,11 @@ export default function PortalPage() {
       <main className="max-w-2xl mx-auto px-6 py-10">
         {!member ? (
           <div className="max-w-sm mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 text-center mb-2">Acceder</h1>
-            <p className="text-gray-500 text-center mb-8">Ingrese su cedula para ver su historial</p>
+            <h1 className="text-2xl font-bold text-white text-center mb-2">Acceder</h1>
+            <p className="text-gray-400 text-center mb-8">Ingrese su cedula para ver su historial</p>
 
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-center mb-6">
+              <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center mb-6">
                 {error}
               </div>
             )}
@@ -128,8 +128,8 @@ export default function PortalPage() {
                     </span>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-800">{member.full_name}</h2>
-                    <p className="text-gray-500">Cedula: {member.cedula}</p>
+                    <h2 className="text-xl font-bold text-white">{member.full_name}</h2>
+                    <p className="text-gray-400">Cedula: {member.cedula}</p>
                     {member.member_number && (
                       <p className="text-sm text-coopnama-primary">Socio #{member.member_number}</p>
                     )}
@@ -140,28 +140,28 @@ export default function PortalPage() {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4">
-              <Card className="shadow-neu-sm">
+              <Card className="shadow-neu">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-800">{tickets.length}</p>
-                  <p className="text-xs text-gray-500">Total Visitas</p>
+                  <p className="text-2xl font-bold text-white">{tickets.length}</p>
+                  <p className="text-xs text-gray-400">Total Visitas</p>
                 </CardContent>
               </Card>
-              <Card className="shadow-neu-sm">
+              <Card className="shadow-neu">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-2xl font-bold text-green-400">
                     {tickets.filter(t => t.status === 'completed').length}
                   </p>
-                  <p className="text-xs text-gray-500">Completadas</p>
+                  <p className="text-xs text-gray-400">Completadas</p>
                 </CardContent>
               </Card>
-              <Card className="shadow-neu-sm">
+              <Card className="shadow-neu">
                 <CardContent className="p-4 text-center">
                   <p className="text-2xl font-bold text-yellow-500">
                     {tickets.filter(t => t.rating).length > 0
                       ? (tickets.reduce((sum, t) => sum + (t.rating || 0), 0) / tickets.filter(t => t.rating).length).toFixed(1)
                       : '—'}
                   </p>
-                  <p className="text-xs text-gray-500">Rating Prom.</p>
+                  <p className="text-xs text-gray-400">Rating Prom.</p>
                 </CardContent>
               </Card>
             </div>
@@ -177,11 +177,11 @@ export default function PortalPage() {
                 ) : (
                   <div className="space-y-2">
                     {tickets.map(ticket => (
-                      <div key={ticket.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-neu-sm">
+                      <div key={ticket.id} className="flex items-center gap-3 p-3 bg-white/[0.04] rounded-lg">
                         <span className="font-mono font-bold text-coopnama-primary">{ticket.ticket_number}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-800 truncate">{ticket.service?.name || 'N/A'}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-sm text-white truncate">{ticket.service?.name || 'N/A'}</p>
+                          <p className="text-xs text-gray-400">
                             {new Date(ticket.created_at).toLocaleDateString('es-DO', {
                               year: 'numeric', month: 'short', day: 'numeric'
                             })}

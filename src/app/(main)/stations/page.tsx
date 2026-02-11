@@ -36,9 +36,9 @@ const STATION_TYPE_OPTIONS: SelectOption[] = [
 ]
 
 const STATION_TYPE_COLORS: Record<StationType, string> = {
-  general: 'text-blue-600 bg-blue-100',
-  priority: 'text-amber-600 bg-amber-100',
-  specialized: 'text-purple-600 bg-purple-100',
+  general: 'text-emerald-400 bg-emerald-100',
+  priority: 'text-amber-400 bg-amber-100',
+  specialized: 'text-purple-400 bg-purple-100',
 }
 
 export default function StationsPage() {
@@ -179,7 +179,7 @@ export default function StationsPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setTypeFilter('all')}
-            className={`px-4 py-2 rounded-neu-sm transition-all ${typeFilter === 'all' ? 'shadow-neu-inset text-coopnama-primary' : 'shadow-neu'}`}
+            className={`px-4 py-2 rounded-neu-sm transition-all ${typeFilter === 'all' ? 'shadow-neu-inset text-emerald-400' : 'shadow-neu text-gray-300'}`}
           >
             Todas
           </button>
@@ -187,7 +187,7 @@ export default function StationsPage() {
             <button
               key={type.value}
               onClick={() => setTypeFilter(type.value as StationType)}
-              className={`px-4 py-2 rounded-neu-sm transition-all ${typeFilter === type.value ? 'shadow-neu-inset text-coopnama-primary' : 'shadow-neu'}`}
+              className={`px-4 py-2 rounded-neu-sm transition-all ${typeFilter === type.value ? 'shadow-neu-inset text-emerald-400' : 'shadow-neu text-gray-300'}`}
             >
               {type.label}
             </button>
@@ -201,8 +201,8 @@ export default function StationsPage() {
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-neu flex items-center justify-center bg-neu-bg shadow-neu">
-                    <span className="text-3xl font-bold text-coopnama-primary">
+                  <div className="w-16 h-16 rounded-neu flex items-center justify-center bg-white/[0.06] shadow-neu">
+                    <span className="text-3xl font-bold text-emerald-400">
                       {station.station_number}
                     </span>
                   </div>

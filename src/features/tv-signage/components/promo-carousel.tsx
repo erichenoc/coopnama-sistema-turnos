@@ -3,6 +3,20 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+/**
+ * Sanitiza HTML para prevenir XSS
+ * Elimina: <script>, event handlers (onclick, etc), javascript:, <iframe>, <object>, <embed>
+ */
+function sanitizeHTML(html: string): string {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/<iframe\b[^>]*>/gi, '')
+    .replace(/<object\b[^>]*>/gi, '')
+    .replace(/<embed\b[^>]*>/gi, '')
+}
+
 interface SignageItem {
   id: string
   content_type: 'image' | 'text' | 'video' | 'html'
@@ -105,7 +119,7 @@ export function PromoCarousel({ organizationId, branchId, isIdle }: Props) {
             <h2 className="text-5xl font-bold text-white mb-6">{currentItem.title}</h2>
           )}
           {currentItem.content_text && (
-            <p className="text-2xl text-blue-200 leading-relaxed whitespace-pre-wrap">
+            <p className="text-2xl text-emerald-300 leading-relaxed whitespace-pre-wrap">
               {currentItem.content_text}
             </p>
           )}
@@ -125,7 +139,7 @@ export function PromoCarousel({ organizationId, branchId, isIdle }: Props) {
       {currentItem.content_type === 'html' && currentItem.content_text && (
         <div
           className="w-full h-full flex items-center justify-center"
-          dangerouslySetInnerHTML={{ __html: currentItem.content_text }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHTML(currentItem.content_text) }}
         />
       )}
 

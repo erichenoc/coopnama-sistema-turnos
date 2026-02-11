@@ -21,20 +21,20 @@ export function SLAAlertBanner({ ticket, context }: SLAAlertBannerProps) {
 
   const phaseConfig = {
     warning: {
-      bg: 'bg-yellow-50 border-yellow-300',
-      text: 'text-yellow-800',
+      bg: 'bg-amber-500/10 border-amber-500/20',
+      text: 'text-amber-300',
       icon: '⚠️',
       label: 'Atencion',
     },
     critical: {
-      bg: 'bg-orange-50 border-orange-400',
-      text: 'text-orange-800',
+      bg: 'bg-orange-500/10 border-orange-500/20',
+      text: 'text-orange-300',
       icon: '🔥',
       label: 'Critico',
     },
     breached: {
-      bg: 'bg-red-50 border-red-400',
-      text: 'text-red-800',
+      bg: 'bg-red-500/10 border-red-500/20',
+      text: 'text-red-300',
       icon: '🚨',
       label: 'SLA excedido',
     },

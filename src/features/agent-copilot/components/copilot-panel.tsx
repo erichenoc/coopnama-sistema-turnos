@@ -40,8 +40,8 @@ function TabButton({
       onClick={onClick}
       className={`px-3 py-1.5 rounded-neu-sm text-xs font-medium transition-colors ${
         active
-          ? 'bg-coopnama-primary text-white shadow-neu-sm'
-          : 'text-gray-600 hover:text-coopnama-primary'
+          ? 'bg-gradient-to-r from-[#009e59] to-[#00c96f] text-white shadow-neu-sm'
+          : 'text-gray-300 hover:text-[#009e59]'
       }`}
     >
       {children}
@@ -62,18 +62,18 @@ export function CopilotPanel({ ticket, notes, callbacks, context }: CopilotPanel
     )
 
   return (
-    <Card className="bg-neu-bg shadow-neu-sm rounded-neu-sm">
+    <Card className="bg-white/[0.06] shadow-neu-sm rounded-neu-sm">
       <CardHeader className="pb-0">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold text-gray-800">
+          <CardTitle className="text-lg font-semibold text-white">
             Copiloto IA
           </CardTitle>
           <button
             onClick={toggleNewAgentMode}
             className={`text-xs px-2 py-1 rounded transition-colors ${
               newAgentMode
-                ? 'bg-blue-100 text-blue-700'
-                : 'text-gray-400 hover:text-gray-600'
+                ? 'bg-[#009e59]/10 text-emerald-300'
+                : 'text-gray-300 hover:text-gray-200'
             }`}
             title={newAgentMode ? 'Desactivar modo guiado' : 'Activar modo guiado'}
           >
@@ -90,7 +90,7 @@ export function CopilotPanel({ ticket, notes, callbacks, context }: CopilotPanel
         <AgentMetricsSidebar agentId={context.agentId} />
 
         {/* Tab Buttons */}
-        <div className="flex gap-1 mb-3 border-b border-gray-200 pb-2 mt-2 overflow-x-auto">
+        <div className="flex gap-1 mb-3 border-b border-white/[0.08] pb-2 mt-2 overflow-x-auto">
           {TABS.map((tab) => (
             <TabButton
               key={tab.key}

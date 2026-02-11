@@ -137,38 +137,38 @@ export default function MembersPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">Nombre</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">Cedula</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">Telefono</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">No. Socio</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">Prioridad</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">Visitas</th>
-                    <th className="text-right py-3 px-4 font-medium text-gray-600">Acciones</th>
+                  <tr className="border-b border-white/[0.08]">
+                    <th className="text-left py-3 px-4 font-medium text-gray-300">Nombre</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-300">Cedula</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-300">Telefono</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-300">No. Socio</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-300">Prioridad</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-300">Visitas</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-300">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {members.map((member) => (
-                    <tr key={member.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="py-3 px-4 font-medium text-gray-800">{member.full_name}</td>
-                      <td className="py-3 px-4 text-gray-600 font-mono">{member.cedula || '-'}</td>
-                      <td className="py-3 px-4 text-gray-600">{member.phone || '-'}</td>
-                      <td className="py-3 px-4 text-gray-600 font-mono">{member.member_number || '-'}</td>
+                    <tr key={member.id} className="border-b border-white/[0.06] hover:bg-white/[0.06] transition-colors">
+                      <td className="py-3 px-4 font-medium text-white">{member.full_name}</td>
+                      <td className="py-3 px-4 text-gray-300 font-mono">{member.cedula || '-'}</td>
+                      <td className="py-3 px-4 text-gray-300">{member.phone || '-'}</td>
+                      <td className="py-3 px-4 text-gray-300 font-mono">{member.member_number || '-'}</td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          member.priority_level === 0 ? 'bg-gray-100 text-gray-600' :
-                          member.priority_level === 1 ? 'bg-blue-100 text-blue-700' :
-                          member.priority_level === 2 ? 'bg-amber-100 text-amber-700' :
-                          'bg-red-100 text-red-700'
+                          member.priority_level === 0 ? 'bg-white/[0.06] text-gray-300' :
+                          member.priority_level === 1 ? 'bg-emerald-500/10 text-emerald-300' :
+                          member.priority_level === 2 ? 'bg-amber-500/10 text-amber-300' :
+                          'bg-red-500/10 text-red-300'
                         }`}>
                           {PRIORITY_LABELS[priorityName(member.priority_level)]}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-gray-600">{member.total_visits}</td>
+                      <td className="py-3 px-4 text-gray-300">{member.total_visits}</td>
                       <td className="py-3 px-4 text-right">
                         <button
                           onClick={() => { setEditingMember(member); setShowModal(true) }}
-                          className="p-1.5 text-gray-400 hover:text-coopnama-primary rounded transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-emerald-400 rounded transition-colors"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -176,7 +176,7 @@ export default function MembersPage() {
                         </button>
                         <button
                           onClick={() => handleDelete(member.id)}
-                          className="p-1.5 text-gray-400 hover:text-coopnama-danger rounded transition-colors ml-1"
+                          className="p-1.5 text-gray-400 hover:text-red-400 rounded transition-colors ml-1"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -192,8 +192,8 @@ export default function MembersPage() {
 
           {/* Pagination */}
           {total > 20 && (
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-500">Pagina {page} de {Math.ceil(total / 20)}</p>
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.08]">
+              <p className="text-sm text-gray-400">Pagina {page} de {Math.ceil(total / 20)}</p>
               <div className="flex gap-2">
                 <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Anterior</Button>
                 <Button variant="ghost" size="sm" disabled={page >= Math.ceil(total / 20)} onClick={() => setPage(p => p + 1)}>Siguiente</Button>
@@ -207,7 +207,7 @@ export default function MembersPage() {
       <Modal isOpen={showModal} onClose={() => { setShowModal(false); setEditingMember(null) }} size="lg">
         <form onSubmit={handleSave}>
           <ModalHeader>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-white">
               {editingMember ? 'Editar Miembro' : 'Nuevo Miembro'}
             </h2>
           </ModalHeader>

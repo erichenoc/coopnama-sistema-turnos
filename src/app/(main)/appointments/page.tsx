@@ -60,11 +60,11 @@ const STATUS_LABELS: Record<AppointmentStatus, string> = {
 
 const STATUS_STYLES: Record<AppointmentStatus, string> = {
   pending: 'bg-amber-100 text-amber-700 border border-amber-300',
-  confirmed: 'bg-blue-100 text-blue-700 border border-blue-300',
-  checked_in: 'bg-indigo-100 text-indigo-700 border border-indigo-300',
+  confirmed: 'bg-emerald-100 text-emerald-700 border border-emerald-300',
+  checked_in: 'bg-emerald-100 text-emerald-700 border border-emerald-300',
   completed: 'bg-green-100 text-green-700 border border-green-300',
   cancelled: 'bg-red-100 text-red-700 border border-red-300',
-  no_show: 'bg-gray-100 text-gray-600 border border-gray-300',
+  no_show: 'bg-white/[0.06] text-gray-300 border border-gray-300',
 }
 
 const STATUS_OPTIONS: AppointmentStatus[] = ['pending', 'confirmed', 'checked_in', 'completed', 'cancelled', 'no_show']
@@ -228,7 +228,7 @@ export default function AppointmentsPage() {
           <button
             onClick={() => setStatusFilter('all')}
             className={`px-4 py-2 rounded-neu-sm transition-all text-sm ${
-              statusFilter === 'all' ? 'shadow-neu-inset text-coopnama-primary font-semibold' : 'shadow-neu'
+              statusFilter === 'all' ? 'bg-white/[0.08] border border-coopnama-primary/30 text-coopnama-primary font-semibold' : 'bg-white/[0.06] border border-white/[0.08]'
             }`}
           >
             Todas
@@ -238,7 +238,7 @@ export default function AppointmentsPage() {
               key={status}
               onClick={() => setStatusFilter(status)}
               className={`px-4 py-2 rounded-neu-sm transition-all text-sm ${
-                statusFilter === status ? 'shadow-neu-inset text-coopnama-primary font-semibold' : 'shadow-neu'
+                statusFilter === status ? 'bg-white/[0.08] border border-coopnama-primary/30 text-coopnama-primary font-semibold' : 'bg-white/[0.06] border border-white/[0.08]'
               }`}
             >
               {STATUS_LABELS[status]}
@@ -255,7 +255,7 @@ export default function AppointmentsPage() {
         </CardHeader>
         <CardContent>
           {filteredAppointments.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-gray-400">
               <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -266,21 +266,21 @@ export default function AppointmentsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Fecha y Hora</th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Cliente</th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Servicio</th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Código</th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Estado</th>
-                    <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Acciones</th>
+                  <tr className="border-b border-white/[0.08]">
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-200">Fecha y Hora</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-200">Cliente</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-200">Servicio</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-200">Código</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-200">Estado</th>
+                    <th className="text-right py-3 px-4 text-sm font-semibold text-gray-200">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAppointments.map((appointment) => (
-                    <tr key={appointment.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <tr key={appointment.id} className="border-b border-white/[0.06] hover:bg-white/[0.06] transition-colors">
                       <td className="py-3 px-4">
                         <div className="text-sm">
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-white">
                             {new Date(appointment.appointment_date).toLocaleDateString('es-DO', {
                               weekday: 'short',
                               year: 'numeric',
@@ -288,35 +288,35 @@ export default function AppointmentsPage() {
                               day: 'numeric',
                             })}
                           </div>
-                          <div className="text-gray-600">
+                          <div className="text-gray-300">
                             {appointment.appointment_time} ({appointment.duration_minutes} min)
                           </div>
                         </div>
                       </td>
                       <td className="py-3 px-4">
                         <div className="text-sm">
-                          <div className="font-medium text-gray-900">{appointment.customer_name}</div>
+                          <div className="font-medium text-white">{appointment.customer_name}</div>
                           {appointment.customer_phone && (
-                            <div className="text-gray-600">{appointment.customer_phone}</div>
+                            <div className="text-gray-300">{appointment.customer_phone}</div>
                           )}
                           {appointment.customer_cedula && (
-                            <div className="text-xs text-gray-500">Cédula: {appointment.customer_cedula}</div>
+                            <div className="text-xs text-gray-400">Cédula: {appointment.customer_cedula}</div>
                           )}
                         </div>
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-8 h-8 rounded-neu flex items-center justify-center text-white font-bold text-xs shadow-neu"
+                            className="w-8 h-8 rounded-neu flex items-center justify-center text-white font-bold text-xs bg-white/[0.06] border border-white/[0.08]"
                             style={{ backgroundColor: appointment.service.color }}
                           >
                             {appointment.service.code}
                           </div>
-                          <span className="text-sm text-gray-900">{appointment.service.name}</span>
+                          <span className="text-sm text-white">{appointment.service.name}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">
+                        <code className="text-xs bg-white/[0.06] px-2 py-1 rounded font-mono">
                           {appointment.confirmation_code}
                         </code>
                       </td>
@@ -326,7 +326,7 @@ export default function AppointmentsPage() {
                             {STATUS_LABELS[appointment.status]}
                           </Badge>
                           {(appointment.is_recurring || appointment.parent_appointment_id) && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-indigo-50 text-indigo-600 border border-indigo-200" title={appointment.recurrence_pattern ? RECURRENCE_LABELS[appointment.recurrence_pattern] : 'Recurrente'}>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-600 border border-emerald-200" title={appointment.recurrence_pattern ? RECURRENCE_LABELS[appointment.recurrence_pattern] : 'Recurrente'}>
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                               {appointment.recurrence_pattern ? RECURRENCE_LABELS[appointment.recurrence_pattern] : 'Rec.'}
                             </span>
@@ -382,30 +382,30 @@ export default function AppointmentsPage() {
       <Modal isOpen={isCancelModalOpen} onClose={closeCancelModal} size="md">
         <form onSubmit={handleCancel}>
           <ModalHeader>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-white">
               Cancelar Cita
             </h2>
           </ModalHeader>
           <ModalBody>
             {selectedAppointment && (
               <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-neu-sm">
-                  <p className="text-sm text-gray-600 mb-1">Cliente</p>
-                  <p className="font-semibold text-gray-900">{selectedAppointment.customer_name}</p>
-                  <p className="text-sm text-gray-600 mt-2 mb-1">Fecha y Hora</p>
-                  <p className="font-medium text-gray-900">
+                <div className="bg-white/[0.04] p-4 rounded-neu-sm">
+                  <p className="text-sm text-gray-300 mb-1">Cliente</p>
+                  <p className="font-semibold text-white">{selectedAppointment.customer_name}</p>
+                  <p className="text-sm text-gray-300 mt-2 mb-1">Fecha y Hora</p>
+                  <p className="font-medium text-white">
                     {new Date(selectedAppointment.appointment_date).toLocaleDateString('es-DO')} a las{' '}
                     {selectedAppointment.appointment_time}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
                     Razón de cancelación (opcional)
                   </label>
                   <textarea
                     value={cancellationReason}
                     onChange={(e) => setCancellationReason(e.target.value)}
-                    className="w-full px-4 py-3 rounded-neu-sm shadow-neu-inset bg-neu-bg border-none focus:outline-none focus:ring-2 focus:ring-coopnama-primary/20 transition-all"
+                    className="w-full px-4 py-3 rounded-neu-sm bg-white/[0.06] border border-white/[0.08]-inset bg-neu-bg border-none focus:outline-none focus:ring-2 focus:ring-coopnama-primary/20 transition-all"
                     rows={3}
                     placeholder="Ej: Cliente solicitó reprogramar, emergencia personal, etc."
                   />

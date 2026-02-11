@@ -40,18 +40,18 @@ const CONDITION_TYPE_LABELS: Record<string, string> = {
 }
 
 const CONDITION_TYPE_COLORS: Record<string, string> = {
-  age: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-  disability: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-  pregnancy: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-  vip: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-  member_type: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-  time_of_day: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
-  service: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-  custom: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
+  age: 'bg-[#009e59]/10 text-emerald-300 border-[#009e59]/20',
+  disability: 'bg-[#009e59]/10 text-emerald-300 border-[#009e59]/20',
+  pregnancy: 'bg-[#009e59]/10 text-emerald-300 border-[#009e59]/20',
+  vip: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
+  member_type: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
+  time_of_day: 'bg-orange-500/10 text-orange-300 border-orange-500/20',
+  service: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
+  custom: 'bg-white/[0.06] text-gray-300 border-white/[0.08]'
 }
 
 const BOOST_BORDER_COLORS: Record<number, string> = {
-  1: 'border-l-4 border-l-blue-500',
+  1: 'border-l-4 border-l-[#009e59]',
   2: 'border-l-4 border-l-purple-500',
   3: 'border-l-4 border-l-red-500'
 }
@@ -210,7 +210,7 @@ export function PriorityRulesManager({ organizationId }: Props) {
       </div>
 
       {showForm && (
-        <Card className="bg-neu-bg shadow-neu rounded-neu-sm">
+        <Card className="bg-white/[0.06]">
           <CardHeader>
             <CardTitle>{editingRule ? 'Editar Regla' : 'Nueva Regla'}</CardTitle>
           </CardHeader>
@@ -236,7 +236,7 @@ export function PriorityRulesManager({ organizationId }: Props) {
             <div>
               <label className="block text-sm font-medium mb-1">Tipo de condición</label>
               <select
-                className="w-full px-3 py-2 rounded-md border bg-white dark:bg-gray-800"
+                className="w-full px-3 py-2 rounded-md border bg-white/[0.06] border-white/[0.08] text-white"
                 value={formData.condition_type}
                 onChange={(e) => setFormData({ ...formData, condition_type: e.target.value as PriorityRule['condition_type'], condition_value: {} })}
               >
@@ -250,7 +250,7 @@ export function PriorityRulesManager({ organizationId }: Props) {
               <div>
                 <label className="block text-sm font-medium mb-1">Tipo de miembro</label>
                 <select
-                  className="w-full px-3 py-2 rounded-md border bg-white dark:bg-gray-800"
+                  className="w-full px-3 py-2 rounded-md border bg-white/[0.06] border-white/[0.08] text-white"
                   value={(formData.condition_value.member_type as string) || 'vip'}
                   onChange={(e) => updateConditionValue('member_type', e.target.value)}
                 >
@@ -286,7 +286,7 @@ export function PriorityRulesManager({ organizationId }: Props) {
               <div>
                 <label className="block text-sm font-medium mb-1">Servicio</label>
                 <select
-                  className="w-full px-3 py-2 rounded-md border bg-white dark:bg-gray-800"
+                  className="w-full px-3 py-2 rounded-md border bg-white/[0.06] border-white/[0.08] text-white"
                   value={(formData.condition_value.service_id as string) || ''}
                   onChange={(e) => updateConditionValue('service_id', e.target.value)}
                 >
@@ -301,7 +301,7 @@ export function PriorityRulesManager({ organizationId }: Props) {
             <div>
               <label className="block text-sm font-medium mb-1">Nivel de prioridad</label>
               <select
-                className="w-full px-3 py-2 rounded-md border bg-white dark:bg-gray-800"
+                className="w-full px-3 py-2 rounded-md border bg-white/[0.06] border-white/[0.08] text-white"
                 value={formData.priority_boost}
                 onChange={(e) => setFormData({ ...formData, priority_boost: parseInt(e.target.value) })}
               >
@@ -332,7 +332,7 @@ export function PriorityRulesManager({ organizationId }: Props) {
 
       <div className="grid gap-4">
         {rules.map(rule => (
-          <Card key={rule.id} className={`bg-neu-bg shadow-neu-sm rounded-neu-sm ${BOOST_BORDER_COLORS[rule.priority_boost]}`}>
+          <Card key={rule.id} className={`bg-white/[0.06] ${BOOST_BORDER_COLORS[rule.priority_boost]}`}>
             <CardContent className="p-4">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
@@ -341,17 +341,17 @@ export function PriorityRulesManager({ organizationId }: Props) {
                     <Badge className={`${CONDITION_TYPE_COLORS[rule.condition_type]} text-xs`}>
                       {CONDITION_TYPE_LABELS[rule.condition_type]}
                     </Badge>
-                    <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold">
+                    <Badge className="bg-gradient-to-r from-[#009e59] to-purple-500 text-white font-bold">
                       +{rule.priority_boost}
                     </Badge>
                     {rule.is_active && (
-                      <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-xs">
+                      <Badge className="bg-emerald-500/10 text-emerald-300 border-emerald-500/20 text-xs">
                         Activa
                       </Badge>
                     )}
                   </div>
                   {rule.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{rule.description}</p>
+                    <p className="text-sm text-gray-300">{rule.description}</p>
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -368,7 +368,7 @@ export function PriorityRulesManager({ organizationId }: Props) {
         ))}
 
         {rules.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-400">
             No hay reglas configuradas. Agrega una nueva regla para comenzar.
           </div>
         )}

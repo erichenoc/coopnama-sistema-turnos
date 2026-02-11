@@ -22,9 +22,9 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     ref
   ) => {
     const variantStyles = {
-      raised: 'shadow-neu bg-neu-bg',
-      inset: 'shadow-neu-inset bg-neu-bg',
-      flat: 'bg-neu-bg border border-gray-200/50',
+      raised: 'bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] shadow-glass',
+      inset: 'bg-black/[0.15] border border-white/[0.04] shadow-neu-inset',
+      flat: 'bg-white/[0.04] border border-white/[0.06]',
     }
 
     const sizeStyles = {
@@ -39,7 +39,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         className={cn(
           variantStyles[variant],
           sizeStyles[size],
-          hoverable && 'transition-all duration-200 hover:shadow-neu-sm cursor-pointer',
+          hoverable && 'transition-all duration-200 hover:bg-white/[0.08] hover:border-white/[0.12] cursor-pointer',
           className
         )}
         {...props}
@@ -76,7 +76,7 @@ const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ className, children, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-xl font-semibold text-gray-700', className)}
+      className={cn('text-xl font-semibold text-white', className)}
       {...props}
     >
       {children}
@@ -93,7 +93,7 @@ const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
   ({ className, children, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn('text-sm text-gray-500', className)}
+      className={cn('text-sm text-gray-400', className)}
       {...props}
     >
       {children}
@@ -123,7 +123,7 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center pt-4 mt-4 border-t border-gray-200/50', className)}
+      className={cn('flex items-center pt-4 mt-4 border-t border-white/[0.08]', className)}
       {...props}
     >
       {children}

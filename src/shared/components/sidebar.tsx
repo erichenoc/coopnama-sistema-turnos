@@ -49,8 +49,8 @@ export function Sidebar({
     <aside
       className={cn(
         'h-screen flex flex-col',
-        'bg-neu-bg',
-        'shadow-[4px_0_12px_#b8b9be]',
+        'bg-slate-900/90 backdrop-blur-xl',
+        'border-r border-white/[0.06]',
         'transition-all duration-300 ease-out',
         collapsed ? 'w-20' : 'w-64',
         className
@@ -59,7 +59,7 @@ export function Sidebar({
       {/* Logo Section */}
       <div
         className={cn(
-          'h-16 flex items-center border-b border-gray-200/50',
+          'h-16 flex items-center border-b border-white/[0.06]',
           collapsed ? 'justify-center px-2' : 'px-4'
         )}
       >
@@ -68,8 +68,8 @@ export function Sidebar({
             <Image src={LOGO_URL} alt="COOPNAMA" width={48} height={48} className="rounded-lg object-contain" priority />
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="font-bold text-gray-800">COOPNAMA</span>
-                <span className="text-xs text-gray-500">Sistema de Turnos</span>
+                <span className="font-bold text-white">COOPNAMA</span>
+                <span className="text-xs text-gray-300">Sistema de Turnos</span>
               </div>
             )}
           </div>
@@ -89,8 +89,8 @@ export function Sidebar({
                     className={cn(
                       'w-full flex items-center gap-3 px-3 py-2 rounded-neu-sm',
                       'transition-all duration-150',
-                      'hover:shadow-neu-sm',
-                      isParentActive(item) && 'bg-coopnama-primary/10 text-coopnama-primary',
+                      'text-gray-300 hover:bg-white/[0.06] hover:text-white',
+                      isParentActive(item) && 'bg-[#009e59]/15 text-emerald-300',
                       collapsed && 'justify-center'
                     )}
                   >
@@ -113,7 +113,7 @@ export function Sidebar({
                     )}
                   </button>
                   {!collapsed && expandedItems.includes(item.label) && (
-                    <ul className="mt-1 ml-4 pl-4 border-l border-gray-200 space-y-1">
+                    <ul className="mt-1 ml-4 pl-4 border-l border-white/[0.08] space-y-1">
                       {item.children.map((child) => (
                         <li key={child.href}>
                           <Link
@@ -122,8 +122,8 @@ export function Sidebar({
                               'flex items-center gap-2 px-3 py-2 rounded-neu-sm text-sm',
                               'transition-all duration-150',
                               isActive(child.href)
-                                ? 'shadow-neu-inset-sm bg-coopnama-primary text-white'
-                                : 'hover:shadow-neu-xs text-gray-600 hover:text-gray-800'
+                                ? 'bg-[#009e59]/15 text-emerald-300 border border-[#009e59]/25'
+                                : 'hover:bg-white/[0.06] text-gray-300 hover:text-white'
                             )}
                           >
                             <span>{child.icon}</span>
@@ -142,8 +142,8 @@ export function Sidebar({
                     'flex items-center gap-3 px-3 py-2 rounded-neu-sm',
                     'transition-all duration-150',
                     isActive(item.href)
-                      ? 'shadow-neu-inset bg-coopnama-primary text-white'
-                      : 'hover:shadow-neu-sm text-gray-600 hover:text-gray-800',
+                      ? 'bg-[#009e59]/15 text-emerald-300 border border-[#009e59]/25'
+                      : 'hover:bg-white/[0.06] text-gray-300 hover:text-white',
                     collapsed && 'justify-center'
                   )}
                   title={collapsed ? item.label : undefined}
@@ -172,10 +172,10 @@ export function Sidebar({
           onClick={() => onCollapsedChange(!collapsed)}
           className={cn(
             'mx-3 mb-2 p-2 rounded-neu-sm',
-            'bg-neu-bg shadow-neu-sm',
-            'hover:shadow-neu-xs active:shadow-neu-inset-xs',
+            'bg-white/[0.06] border border-white/[0.08]',
+            'hover:bg-white/[0.10] active:scale-95',
             'transition-all duration-150',
-            'text-gray-500 hover:text-gray-700',
+            'text-gray-300 hover:text-white',
             collapsed ? 'self-center' : 'self-end'
           )}
           aria-label={collapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
@@ -193,7 +193,7 @@ export function Sidebar({
 
       {/* Footer */}
       {footer && (
-        <div className={cn('border-t border-gray-200/50 p-4', collapsed && 'px-2')}>
+        <div className={cn('border-t border-white/[0.06] p-4', collapsed && 'px-2')}>
           {footer}
         </div>
       )}

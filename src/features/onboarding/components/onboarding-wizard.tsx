@@ -221,9 +221,9 @@ export function OnboardingWizard({ organizationId, onComplete }: OnboardingWizar
                   className={`
                     w-12 h-12 rounded-full flex items-center justify-center
                     transition-all duration-200
-                    ${isActive ? 'bg-coopnama-primary text-white shadow-neu' : ''}
-                    ${isCompleted ? 'bg-coopnama-secondary text-white' : ''}
-                    ${!isActive && !isCompleted ? 'bg-neu-bg shadow-neu-inset text-gray-400' : ''}
+                    ${isActive ? 'bg-gradient-to-r from-[#009e59] to-[#00c96f] text-white shadow-lg' : ''}
+                    ${isCompleted ? 'bg-emerald-600 text-white' : ''}
+                    ${!isActive && !isCompleted ? 'bg-white/[0.06] text-gray-300' : ''}
                   `}
                 >
                   {isCompleted ? (
@@ -235,9 +235,9 @@ export function OnboardingWizard({ organizationId, onComplete }: OnboardingWizar
                 <span
                   className={`
                     text-xs font-medium text-center
-                    ${isActive ? 'text-coopnama-primary' : ''}
-                    ${isCompleted ? 'text-coopnama-secondary' : ''}
-                    ${!isActive && !isCompleted ? 'text-gray-400' : ''}
+                    ${isActive ? 'text-[#009e59]' : ''}
+                    ${isCompleted ? 'text-emerald-600' : ''}
+                    ${!isActive && !isCompleted ? 'text-gray-300' : ''}
                   `}
                 >
                   {step.label}
@@ -248,7 +248,7 @@ export function OnboardingWizard({ organizationId, onComplete }: OnboardingWizar
                 <div
                   className={`
                     h-0.5 flex-1 mx-2 transition-colors duration-200
-                    ${isCompleted ? 'bg-coopnama-secondary' : 'bg-gray-300'}
+                    ${isCompleted ? 'bg-emerald-600' : 'bg-white/[0.10]'}
                   `}
                 />
               )}
@@ -281,7 +281,7 @@ export function OnboardingWizard({ organizationId, onComplete }: OnboardingWizar
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Tipo de Organización
                 </label>
                 <div className="grid grid-cols-2 gap-4">
@@ -294,10 +294,10 @@ export function OnboardingWizard({ organizationId, onComplete }: OnboardingWizar
                       type="button"
                       onClick={() => setData({ ...data, orgType: option.value })}
                       className={`
-                        p-4 rounded-neu-sm text-center transition-all
+                        p-4 rounded-lg text-center transition-all
                         ${data.orgType === option.value
-                          ? 'shadow-neu-inset text-coopnama-primary font-semibold'
-                          : 'shadow-neu hover:shadow-neu-sm text-gray-600'
+                          ? 'bg-emerald-500/10 border-2 border-[#009e59] text-[#009e59] font-semibold'
+                          : 'bg-white/[0.06] hover:bg-white/[0.08] text-gray-300 border border-white/[0.08]'
                         }
                       `}
                     >
@@ -357,20 +357,20 @@ export function OnboardingWizard({ organizationId, onComplete }: OnboardingWizar
                       type="button"
                       onClick={() => toggleService(service)}
                       className={`
-                        p-4 rounded-neu-sm text-left transition-all
+                        p-4 rounded-lg text-left transition-all
                         ${isSelected
-                          ? 'shadow-neu-inset bg-coopnama-primary/5 border-2 border-coopnama-primary'
-                          : 'shadow-neu hover:shadow-neu-sm'
+                          ? 'bg-white/[0.06] border-2 border-[#009e59]'
+                          : 'bg-white/[0.06] hover:bg-white/[0.08] border border-white/[0.08]'
                         }
                       `}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="font-medium text-gray-700">{service.name}</p>
-                          <p className="text-xs text-gray-500 mt-1">{service.category}</p>
+                          <p className="font-medium text-gray-200">{service.name}</p>
+                          <p className="text-xs text-gray-400 mt-1">{service.category}</p>
                         </div>
                         {isSelected && (
-                          <CheckCircle2 className="w-5 h-5 text-coopnama-primary flex-shrink-0" />
+                          <CheckCircle2 className="w-5 h-5 text-[#009e59] flex-shrink-0" />
                         )}
                       </div>
                     </button>
@@ -402,13 +402,13 @@ export function OnboardingWizard({ organizationId, onComplete }: OnboardingWizar
                 onChange={(e) => setData({ ...data, stationCount: parseInt(e.target.value) || 1 })}
               />
 
-              <div className="bg-neu-bg shadow-neu-inset rounded-neu-sm p-4">
-                <p className="text-sm text-gray-600">
+              <div className="bg-white/[0.06] border border-white/[0.08] rounded-lg p-4">
+                <p className="text-sm text-gray-300">
                   Se crearán <span className="font-semibold text-coopnama-primary">{data.stationCount}</span> estaciones:
                 </p>
                 <ul className="mt-2 space-y-1">
                   {Array.from({ length: Math.min(data.stationCount, 5) }, (_, i) => (
-                    <li key={i} className="text-sm text-gray-500">
+                    <li key={i} className="text-sm text-gray-400">
                       Ventanilla {i + 1} (VEN-{(i + 1).toString().padStart(2, '0')})
                     </li>
                   ))}
@@ -435,32 +435,32 @@ export function OnboardingWizard({ organizationId, onComplete }: OnboardingWizar
           {currentStep === 5 && (
             <>
               <div className="space-y-4">
-                <div className="bg-coopnama-primary/5 rounded-neu-sm p-6 text-center">
-                  <CheckCircle2 className="w-16 h-16 mx-auto text-coopnama-secondary mb-4" />
-                  <h3 className="text-2xl font-semibold text-gray-700 mb-2">
+                <div className="bg-[#009e59]/5 rounded-lg p-6 text-center">
+                  <CheckCircle2 className="w-16 h-16 mx-auto text-emerald-600 mb-4" />
+                  <h3 className="text-2xl font-semibold text-gray-200 mb-2">
                     Configuración Completa
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-300">
                     Su sistema está listo para comenzar a operar
                   </p>
                 </div>
 
-                <div className="bg-neu-bg shadow-neu-inset rounded-neu-sm p-4 space-y-3">
+                <div className="bg-white/[0.06] border border-white/[0.08] rounded-lg p-4 space-y-3">
                   <div>
-                    <p className="text-xs text-gray-500">Organización</p>
-                    <p className="font-medium text-gray-700">{data.orgName}</p>
+                    <p className="text-xs text-gray-400">Organización</p>
+                    <p className="font-medium text-gray-200">{data.orgName}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Sucursal</p>
-                    <p className="font-medium text-gray-700">{data.branchName}</p>
+                    <p className="text-xs text-gray-400">Sucursal</p>
+                    <p className="font-medium text-gray-200">{data.branchName}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Servicios</p>
-                    <p className="font-medium text-gray-700">{data.selectedServices.length} configurados</p>
+                    <p className="text-xs text-gray-400">Servicios</p>
+                    <p className="font-medium text-gray-200">{data.selectedServices.length} configurados</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Estaciones</p>
-                    <p className="font-medium text-gray-700">{data.stationCount} activas</p>
+                    <p className="text-xs text-gray-400">Estaciones</p>
+                    <p className="font-medium text-gray-200">{data.stationCount} activas</p>
                   </div>
                 </div>
               </div>

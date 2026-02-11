@@ -13,6 +13,23 @@ export async function updateBrandingAction(
   try {
     const supabase = await createClient()
 
+    // Verify authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return { error: 'No autorizado' }
+    }
+
+    // Verify user belongs to the organization
+    const { data: profile } = await supabase
+      .from('users')
+      .select('organization_id')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.organization_id !== organizationId) {
+      return { error: 'No autorizado: organizacion no coincide' }
+    }
+
     const { error } = await supabase
       .from('organizations')
       .update(data)
@@ -32,6 +49,24 @@ export async function uploadLogoAction(
 ) {
   try {
     const supabase = await createClient()
+
+    // Verify authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return { error: 'No autorizado' }
+    }
+
+    // Verify user belongs to the organization
+    const { data: profile } = await supabase
+      .from('users')
+      .select('organization_id')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.organization_id !== organizationId) {
+      return { error: 'No autorizado: organizacion no coincide' }
+    }
+
     const file = formData.get('logo') as File
 
     if (!file || file.size === 0) {

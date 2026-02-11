@@ -36,9 +36,9 @@ export default function ForgotPasswordPage() {
     >
       {success ? (
         <div className="space-y-6 text-center">
-          <div className="p-4 bg-green-50 border border-green-200 rounded-neu-sm">
+          <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
             <svg
-              className="w-12 h-12 text-green-600 mx-auto mb-2"
+              className="w-12 h-12 text-green-400 mx-auto mb-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -50,16 +50,16 @@ export default function ForgotPasswordPage() {
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p className="text-sm text-green-800 font-medium">
+            <p className="text-sm text-white font-medium">
               Revisa tu correo electronico
             </p>
-            <p className="text-sm text-green-600 mt-1">
+            <p className="text-sm text-gray-300 mt-1">
               Te hemos enviado un enlace para restablecer tu contrasena.
             </p>
           </div>
           <Link
             href="/login"
-            className="inline-block text-coopnama-primary font-medium hover:underline"
+            className="inline-block text-[#009e59] font-medium hover:underline"
           >
             Volver al inicio de sesion
           </Link>
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-neu-sm">
+            <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-lg">
               <p className="text-sm text-coopnama-danger">{error}</p>
             </div>
           )}
@@ -90,8 +90,8 @@ export default function ForgotPasswordPage() {
             Enviar Enlace
           </Button>
 
-          <p className="text-center text-gray-600">
-            <Link href="/login" className="text-coopnama-primary font-medium hover:underline">
+          <p className="text-center text-gray-300">
+            <Link href="/login" className="text-[#009e59] font-medium hover:underline">
               Volver al inicio de sesion
             </Link>
           </p>

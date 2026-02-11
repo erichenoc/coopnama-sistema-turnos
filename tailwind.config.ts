@@ -8,36 +8,49 @@ const config: Config = {
   theme: {
     extend: {
       // ============================================
-      // NEUMORPHISM DESIGN SYSTEM - COOPNAMA TURNOS
+      // GRADIENT MESH DARK DESIGN SYSTEM - COOPNAMA TURNOS
       // ============================================
 
       colors: {
-        // Neumorphism base colors
+        // Glass-morphism base colors (dark theme)
         'neu': {
-          bg: '#e6e7ee',         // Background base (gris azulado)
-          dark: '#b8b9be',       // Sombra oscura
-          light: '#ffffff',      // Sombra clara
-          surface: '#e6e7ee',    // Superficie de elementos
+          bg: '#0f172a',         // slate-950 - Background base
+          dark: 'rgba(0,0,0,0.3)', // Sombra oscura
+          light: 'rgba(255,255,255,0.06)', // Borde sutil claro
+          surface: '#1e293b',    // slate-800 - Superficie de elementos
         },
-        // Dark mode Neumorphism
+        // Dark mode (same as base now)
         'neu-dark': {
-          bg: '#2d2d2d',
-          dark: '#1a1a1a',
-          light: '#404040',
-          surface: '#2d2d2d',
+          bg: '#0f172a',
+          dark: 'rgba(0,0,0,0.4)',
+          light: 'rgba(255,255,255,0.08)',
+          surface: '#1e293b',
         },
-        // COOPNAMA Brand Colors (CSS vars for dynamic theming)
+        // COOPNAMA Brand Colors
         'coopnama': {
           primary: 'var(--coopnama-primary)',
           secondary: 'var(--coopnama-secondary)',
           accent: 'var(--coopnama-accent)',
           danger: 'var(--coopnama-danger)',
           warning: '#f97316',
+          green: {
+            DEFAULT: '#009e59',
+            50: '#ecfdf5',
+            100: '#d1fae5',
+            200: '#a7f3d0',
+            300: '#6ee7b7',
+            400: '#34d399',
+            500: '#009e59',
+            600: '#008a4e',
+            700: '#047857',
+            800: '#065f46',
+            900: '#064e3b',
+          },
         },
         // Ticket Status Colors
         'status': {
           waiting: '#3b82f6',    // Azul - En espera
-          called: '#f59e0b',     // Ámbar - Llamado
+          called: '#f59e0b',     // Ambar - Llamado
           serving: '#10b981',    // Verde - Atendiendo
           completed: '#6b7280',  // Gris - Completado
           cancelled: '#ef4444', // Rojo - Cancelado
@@ -53,41 +66,58 @@ const config: Config = {
       },
 
       // ============================================
-      // NEUMORPHISM SHADOWS
+      // GLASS-MORPHISM SHADOWS
       // ============================================
       boxShadow: {
-        // === RAISED (Elevado) ===
-        'neu-xs': '3px 3px 6px #b8b9be, -3px -3px 6px #ffffff',
-        'neu-sm': '4px 4px 8px #b8b9be, -4px -4px 8px #ffffff',
-        'neu': '6px 6px 12px #b8b9be, -6px -6px 12px #ffffff',
-        'neu-md': '8px 8px 16px #b8b9be, -8px -8px 16px #ffffff',
-        'neu-lg': '12px 12px 24px #b8b9be, -12px -12px 24px #ffffff',
-        'neu-xl': '20px 20px 40px #b8b9be, -20px -20px 40px #ffffff',
+        // === GLASS (Raised) ===
+        'neu-xs': '0 1px 4px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.04)',
+        'neu-sm': '0 2px 6px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.05)',
+        'neu': '0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06)',
+        'neu-md': '0 4px 12px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)',
+        'neu-lg': '0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
+        'neu-xl': '0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)',
 
-        // === INSET (Hundido/Presionado) ===
-        'neu-inset-xs': 'inset 2px 2px 4px #b8b9be, inset -2px -2px 4px #ffffff',
-        'neu-inset-sm': 'inset 3px 3px 6px #b8b9be, inset -3px -3px 6px #ffffff',
-        'neu-inset': 'inset 4px 4px 8px #b8b9be, inset -4px -4px 8px #ffffff',
-        'neu-inset-md': 'inset 6px 6px 12px #b8b9be, inset -6px -6px 12px #ffffff',
-        'neu-inset-lg': 'inset 8px 8px 16px #b8b9be, inset -8px -8px 16px #ffffff',
+        // === INSET (Pressed) ===
+        'neu-inset-xs': 'inset 0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03)',
+        'neu-inset-sm': 'inset 0 2px 4px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04)',
+        'neu-inset': 'inset 0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04)',
+        'neu-inset-md': 'inset 0 3px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04)',
+        'neu-inset-lg': 'inset 0 4px 12px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04)',
 
-        // === DARK MODE SHADOWS ===
-        'neu-dark-xs': '3px 3px 6px #1a1a1a, -3px -3px 6px #404040',
-        'neu-dark-sm': '4px 4px 8px #1a1a1a, -4px -4px 8px #404040',
-        'neu-dark': '6px 6px 12px #1a1a1a, -6px -6px 12px #404040',
-        'neu-dark-md': '8px 8px 16px #1a1a1a, -8px -8px 16px #404040',
-        'neu-dark-lg': '12px 12px 24px #1a1a1a, -12px -12px 24px #404040',
+        // === DARK MODE SHADOWS (same as base now) ===
+        'neu-dark-xs': '0 1px 4px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04)',
+        'neu-dark-sm': '0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05)',
+        'neu-dark': '0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
+        'neu-dark-md': '0 4px 12px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06)',
+        'neu-dark-lg': '0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)',
 
-        'neu-dark-inset': 'inset 4px 4px 8px #1a1a1a, inset -4px -4px 8px #404040',
-        'neu-dark-inset-md': 'inset 6px 6px 12px #1a1a1a, inset -6px -6px 12px #404040',
+        'neu-dark-inset': 'inset 0 2px 6px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04)',
+        'neu-dark-inset-md': 'inset 0 3px 8px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04)',
 
         // === SPECIAL EFFECTS ===
-        'neu-flat': '0 4px 12px #b8b9be',  // Solo sombra inferior
-        'neu-glow': '0 0 20px rgba(30, 64, 175, 0.3)', // Glow COOPNAMA
+        'neu-flat': '0 4px 12px rgba(0,0,0,0.3)',
+        'neu-glow': '0 0 20px rgba(0, 158, 89, 0.4)',
+        'neu-glow-green': '0 0 30px rgba(0, 158, 89, 0.3), 0 0 60px rgba(0, 158, 89, 0.1)',
+        'neu-glow-blue': '0 0 20px rgba(30, 64, 175, 0.4)',
+        'glass': '0 0 0 1px rgba(255,255,255,0.08), 0 2px 8px rgba(0,0,0,0.3)',
+        'glass-lg': '0 0 0 1px rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.4)',
+        'glass-green': '0 0 0 1px rgba(0, 158, 89, 0.2), 0 2px 8px rgba(0,0,0,0.3)',
       },
 
       // ============================================
-      // BORDER RADIUS (Neumorphism usa bordes suaves)
+      // BACKGROUND IMAGE (Gradients)
+      // ============================================
+      backgroundImage: {
+        'gradient-green': 'linear-gradient(135deg, #009e59 0%, #00c96f 100%)',
+        'gradient-green-dark': 'linear-gradient(135deg, #008a4e 0%, #009e59 100%)',
+        'gradient-green-subtle': 'linear-gradient(135deg, rgba(0,158,89,0.15) 0%, rgba(0,201,111,0.05) 100%)',
+        'gradient-brand': 'linear-gradient(135deg, #009e59 0%, #1e40af 100%)',
+        'gradient-brand-reverse': 'linear-gradient(135deg, #1e40af 0%, #009e59 100%)',
+        'gradient-mesh': 'radial-gradient(at 30% 20%, rgba(0,158,89,0.12) 0%, transparent 50%), radial-gradient(at 70% 80%, rgba(30,64,175,0.10) 0%, transparent 50%)',
+      },
+
+      // ============================================
+      // BORDER RADIUS
       // ============================================
       borderRadius: {
         'neu': '16px',
@@ -113,19 +143,22 @@ const config: Config = {
         'neu-press': 'neuPress 0.15s ease-out forwards',
         'neu-release': 'neuRelease 0.15s ease-out forwards',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'pulse-green': 'pulseGreen 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'fade-in': 'fadeIn 0.3s ease-out forwards',
         'slide-up': 'slideUp 0.3s ease-out forwards',
         'slide-down': 'slideDown 0.3s ease-out forwards',
         'ticket-call': 'ticketCall 0.5s ease-out',
+        'mesh-float': 'meshFloat 20s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
       },
       keyframes: {
         neuPress: {
-          '0%': { boxShadow: '6px 6px 12px #b8b9be, -6px -6px 12px #ffffff' },
-          '100%': { boxShadow: 'inset 4px 4px 8px #b8b9be, inset -4px -4px 8px #ffffff' },
+          '0%': { boxShadow: '0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06)' },
+          '100%': { boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04)', transform: 'scale(0.98)' },
         },
         neuRelease: {
-          '0%': { boxShadow: 'inset 4px 4px 8px #b8b9be, inset -4px -4px 8px #ffffff' },
-          '100%': { boxShadow: '6px 6px 12px #b8b9be, -6px -6px 12px #ffffff' },
+          '0%': { boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04)', transform: 'scale(0.98)' },
+          '100%': { boxShadow: '0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06)', transform: 'scale(1)' },
         },
         fadeIn: {
           '0%': { opacity: '0' },
@@ -141,13 +174,26 @@ const config: Config = {
         },
         ticketCall: {
           '0%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.1)', boxShadow: '0 0 30px rgba(245, 158, 11, 0.5)' },
+          '50%': { transform: 'scale(1.05)', boxShadow: '0 0 30px rgba(0, 158, 89, 0.4)' },
           '100%': { transform: 'scale(1)' },
+        },
+        meshFloat: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '33%': { transform: 'translate(30px, -20px) scale(1.05)' },
+          '66%': { transform: 'translate(-20px, 15px) scale(0.95)' },
+        },
+        pulseGreen: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
         },
       },
 
       // ============================================
-      // SPACING (Para layouts consistentes)
+      // SPACING
       // ============================================
       spacing: {
         '18': '4.5rem',

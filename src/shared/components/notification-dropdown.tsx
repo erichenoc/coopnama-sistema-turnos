@@ -142,9 +142,9 @@ export function NotificationDropdown() {
         onClick={() => setOpen(!open)}
         className={`
           relative p-2
-          bg-neu-bg shadow-neu-sm rounded-full
-          hover:shadow-neu-xs active:shadow-neu-inset-xs
-          transition-all duration-150 text-gray-600
+          bg-white/[0.06] border border-white/[0.08] rounded-full
+          hover:bg-white/[0.10] active:scale-95
+          transition-all duration-150 text-gray-300
         `}
         aria-label="Notificaciones"
       >
@@ -166,14 +166,14 @@ export function NotificationDropdown() {
 
       {/* Dropdown Panel */}
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 bg-slate-900/95 backdrop-blur-xl rounded-lg shadow-glass-lg border border-white/[0.10] z-50 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
-            <h3 className="font-semibold text-gray-800 text-sm">Notificaciones</h3>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-white/[0.04]">
+            <h3 className="font-semibold text-white text-sm">Notificaciones</h3>
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-xs text-coopnama-primary hover:underline"
+                className="text-xs text-[#009e59] hover:underline"
               >
                 Marcar como leidas
               </button>
@@ -194,17 +194,17 @@ export function NotificationDropdown() {
               notifications.map((notif) => (
                 <div
                   key={notif.id}
-                  className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                    !notif.read ? 'bg-coopnama-primary/5' : ''
+                  className={`px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.04] transition-colors ${
+                    !notif.read ? 'bg-[#009e59]/5' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-lg mt-0.5">{STATUS_ICONS[notif.type]}</span>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm ${!notif.read ? 'font-semibold text-gray-800' : 'text-gray-700'}`}>
+                      <p className={`text-sm ${!notif.read ? 'font-semibold text-white' : 'text-gray-200'}`}>
                         {notif.title}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">{notif.body}</p>
+                      <p className="text-xs text-gray-400 truncate">{notif.body}</p>
                     </div>
                     <span className="text-xs text-gray-400 whitespace-nowrap">{notif.time}</span>
                   </div>
@@ -215,8 +215,8 @@ export function NotificationDropdown() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 text-center">
-              <span className="text-xs text-gray-500">
+            <div className="px-4 py-2 border-t border-white/[0.06] bg-white/[0.04] text-center">
+              <span className="text-xs text-gray-400">
                 Mostrando actividad de hoy
               </span>
             </div>

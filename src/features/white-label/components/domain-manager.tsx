@@ -75,7 +75,7 @@ export function DomainManager() {
           <CardTitle>Dominios Personalizados</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-300 mb-4">
             Configura un dominio personalizado para que tus clientes accedan al sistema con tu propia marca.
           </p>
 
@@ -96,24 +96,24 @@ export function DomainManager() {
           </div>
 
           {domains.length === 0 ? (
-            <p className="text-center py-6 text-gray-400">No hay dominios configurados</p>
+            <p className="text-center py-6 text-gray-300">No hay dominios configurados</p>
           ) : (
             <div className="space-y-3">
               {domains.map((domain) => (
                 <div
                   key={domain.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-4 bg-white/[0.04] rounded-lg"
                 >
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-sm font-medium">{domain.domain}</span>
                     <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                      domain.is_verified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                      domain.is_verified ? 'bg-green-500/10 text-green-300' : 'bg-yellow-500/10 text-yellow-300'
                     }`}>
                       {domain.is_verified ? 'Verificado' : 'Pendiente'}
                     </span>
                     {domain.is_verified && (
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                        domain.ssl_status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                        domain.ssl_status === 'active' ? 'bg-green-500/10 text-green-300' : 'bg-white/[0.06] text-gray-300'
                       }`}>
                         SSL: {domain.ssl_status}
                       </span>
@@ -137,7 +137,7 @@ export function DomainManager() {
           <CardTitle>Configuracion DNS</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-300 mb-4">
             Para verificar tu dominio, agrega el siguiente registro CNAME en tu proveedor DNS:
           </p>
           <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm">
@@ -145,7 +145,7 @@ export function DomainManager() {
             <p>Nombre: turnos (o tu subdominio)</p>
             <p>Valor: cname.vercel-dns.com</p>
           </div>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs text-gray-300 mt-2">
             La verificacion puede tardar hasta 24 horas despues de configurar el DNS.
           </p>
         </CardContent>

@@ -1,14 +1,45 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { notifyMultiChannel, buildTicketNotificationText } from '@/lib/notifications/service'
+import { timingSafeEqual } from 'crypto'
 
-const CRON_SECRET = process.env.CRON_SECRET || ''
+const CRON_SECRET = process.env.CRON_SECRET
+
+/**
+ * Verify cron secret using timing-safe comparison
+ */
+function verifyCronSecret(authHeader: string | null, expected: string | undefined): boolean {
+  if (!expected) return false // Secret not configured = reject all
+  if (!authHeader) return false
+
+  // Extract Bearer token
+  const match = authHeader.match(/^Bearer (.+)$/)
+  if (!match) return false
+
+  const provided = match[1]
+  try {
+    const a = Buffer.from(provided)
+    const b = Buffer.from(expected)
+    if (a.length !== b.length) return false
+    return timingSafeEqual(a, b)
+  } catch {
+    return false
+  }
+}
 
 export async function GET(request: Request) {
-  // Verify cron secret (Vercel Cron sends this header)
+  // Validate cron secret is configured
+  if (!CRON_SECRET) {
+    return NextResponse.json(
+      { error: 'Cron job not configured' },
+      { status: 503 }
+    )
+  }
+
+  // Verify cron secret with timing-safe comparison
   const authHeader = request.headers.get('authorization')
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!verifyCronSecret(authHeader, CRON_SECRET)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   const supabase = createClient(

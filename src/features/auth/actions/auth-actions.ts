@@ -3,10 +3,44 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 
 export interface AuthResult {
   error?: string
   success?: boolean
+}
+
+// In-memory rate limiter for auth actions
+const loginAttempts = new Map<string, { count: number; resetAt: number }>()
+const MAX_LOGIN_ATTEMPTS = 5
+const RATE_LIMIT_WINDOW_MS = 60_000 // 1 minute
+
+function checkLoginRateLimit(identifier: string): { allowed: boolean; remaining: number } {
+  const now = Date.now()
+  const record = loginAttempts.get(identifier)
+
+  if (!record || now > record.resetAt) {
+    loginAttempts.set(identifier, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    return { allowed: true, remaining: MAX_LOGIN_ATTEMPTS - 1 }
+  }
+
+  if (record.count >= MAX_LOGIN_ATTEMPTS) {
+    return { allowed: false, remaining: 0 }
+  }
+
+  record.count++
+  return { allowed: true, remaining: MAX_LOGIN_ATTEMPTS - record.count }
+}
+
+// Cleanup old entries periodically (every 5 minutes)
+if (typeof globalThis !== 'undefined') {
+  const cleanupInterval = 5 * 60_000
+  setInterval(() => {
+    const now = Date.now()
+    for (const [key, val] of loginAttempts) {
+      if (now > val.resetAt) loginAttempts.delete(key)
+    }
+  }, cleanupInterval).unref?.()
 }
 
 export async function loginAction(formData: FormData): Promise<AuthResult> {
@@ -17,6 +51,16 @@ export async function loginAction(formData: FormData): Promise<AuthResult> {
 
   if (!email || !password) {
     return { error: 'Email y contrasena son requeridos' }
+  }
+
+  // Rate limit by IP + email combo
+  const headersList = await headers()
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const rateLimitKey = `${ip}:${email.toLowerCase()}`
+  const { allowed } = checkLoginRateLimit(rateLimitKey)
+
+  if (!allowed) {
+    return { error: 'Demasiados intentos. Espera un minuto antes de intentar de nuevo.' }
   }
 
   const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -40,11 +84,21 @@ export async function signupAction(formData: FormData): Promise<AuthResult> {
     return { error: 'Todos los campos son requeridos' }
   }
 
-  if (password.length < 6) {
-    return { error: 'La contrasena debe tener al menos 6 caracteres' }
+  // Validate password strength
+  if (password.length < 8) {
+    return { error: 'La contrasena debe tener al menos 8 caracteres' }
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { error: 'La contrasena debe incluir al menos una letra mayuscula' }
+  }
+  if (!/[a-z]/.test(password)) {
+    return { error: 'La contrasena debe incluir al menos una letra minuscula' }
+  }
+  if (!/[0-9]/.test(password)) {
+    return { error: 'La contrasena debe incluir al menos un numero' }
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -56,8 +110,40 @@ export async function signupAction(formData: FormData): Promise<AuthResult> {
     return { error: error.message }
   }
 
+  // Get the new user's ID
+  const userId = data.user?.id
+  if (!userId) {
+    return { error: 'Error al crear usuario. Intenta de nuevo.' }
+  }
+
+  // Fetch the default organization (first org)
+  const { data: orgData, error: orgError } = await supabase
+    .from('organizations')
+    .select('id')
+    .limit(1)
+    .single()
+
+  if (orgError || !orgData) {
+    return { error: 'Error de configuracion. Contacta al administrador.' }
+  }
+
+  // Insert into users table with inactive status (pending admin approval)
+  const { error: userInsertError } = await supabase
+    .from('users')
+    .insert({
+      id: userId,
+      organization_id: orgData.id,
+      full_name: fullName,
+      role: 'agent',
+      is_active: false,
+    })
+
+  if (userInsertError) {
+    return { error: 'Error al crear perfil de usuario. Intenta de nuevo.' }
+  }
+
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  return { success: true }
 }
 
 export async function logoutAction(): Promise<void> {
@@ -90,8 +176,15 @@ export async function forgotPasswordAction(formData: FormData): Promise<AuthResu
     return { error: 'El correo electronico es requerido' }
   }
 
+  // Use origin from request headers for reliable URL detection across all environments
+  const headersList = await headers()
+  const origin = headersList.get('origin')
+    || process.env.NEXT_PUBLIC_SITE_URL
+    || process.env.NEXT_PUBLIC_APP_URL
+    || 'http://localhost:3000'
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password`,
+    redirectTo: `${origin}/auth/callback?type=recovery`,
   })
 
   if (error) {
@@ -114,8 +207,18 @@ export async function resetPasswordAction(formData: FormData): Promise<AuthResul
     return { error: 'Las contrasenas no coinciden' }
   }
 
-  if (password.length < 6) {
-    return { error: 'La contrasena debe tener al menos 6 caracteres' }
+  // Validate password strength
+  if (password.length < 8) {
+    return { error: 'La contrasena debe tener al menos 8 caracteres' }
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { error: 'La contrasena debe incluir al menos una letra mayuscula' }
+  }
+  if (!/[a-z]/.test(password)) {
+    return { error: 'La contrasena debe incluir al menos una letra minuscula' }
+  }
+  if (!/[0-9]/.test(password)) {
+    return { error: 'La contrasena debe incluir al menos un numero' }
   }
 
   const { error } = await supabase.auth.updateUser({ password })

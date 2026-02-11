@@ -3,39 +3,42 @@
 @tailwind utilities;
 
 /* ============================================
-   NEUMORPHISM DESIGN SYSTEM - COOPNAMA TURNOS
+   GRADIENT MESH DARK DESIGN SYSTEM - COOPNAMA TURNOS
    ============================================ */
 
-/* CSS Variables for Neumorphism */
+/* CSS Variables */
 :root {
-  /* Neumorphism Light Mode */
-  --neu-bg: #e6e7ee;
-  --neu-surface: #e6e7ee;
-  --neu-shadow-dark: #b8b9be;
-  --neu-shadow-light: #ffffff;
+  /* Gradient Mesh Dark Mode */
+  --neu-bg: #0f172a;
+  --neu-surface: rgba(255, 255, 255, 0.06);
+  --neu-shadow-dark: rgba(0, 0, 0, 0.3);
+  --neu-shadow-light: rgba(255, 255, 255, 0.06);
 
-  /* Text Colors */
-  --neu-text-primary: #374151;
-  --neu-text-secondary: #6b7280;
-  --neu-text-muted: #9ca3af;
+  /* Text Colors - ENHANCED CONTRAST */
+  --neu-text-primary: #f8fafc;
+  --neu-text-secondary: #cbd5e1;
+  --neu-text-muted: #94a3b8;
 
-  /* COOPNAMA Brand */
-  --coopnama-primary: #1e40af;
-  --coopnama-secondary: #10b981;
+  /* COOPNAMA Brand - Green Primary */
+  --coopnama-primary: #009e59;
+  --coopnama-secondary: #34d399;
   --coopnama-accent: #f59e0b;
   --coopnama-danger: #ef4444;
+  --coopnama-green: #009e59;
+  --coopnama-green-light: #00c96f;
 
   /* Ticket Status */
   --status-waiting: #3b82f6;
   --status-called: #f59e0b;
-  --status-serving: #10b981;
-  --status-completed: #6b7280;
+  --status-serving: #009e59;
+  --status-completed: #94a3b8;
   --status-cancelled: #ef4444;
 
-  /* Shadows */
-  --shadow-neu: 6px 6px 12px var(--neu-shadow-dark), -6px -6px 12px var(--neu-shadow-light);
-  --shadow-neu-sm: 4px 4px 8px var(--neu-shadow-dark), -4px -4px 8px var(--neu-shadow-light);
-  --shadow-neu-inset: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light);
+  /* Glass Shadows */
+  --shadow-glass: 0 0 0 1px rgba(255,255,255,0.08), 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-glass-sm: 0 0 0 1px rgba(255,255,255,0.06), 0 1px 4px rgba(0,0,0,0.2);
+  --shadow-glass-inset: inset 0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-glass-green: 0 0 0 1px rgba(0,158,89,0.2), 0 2px 8px rgba(0,0,0,0.3);
 
   /* Transitions */
   --transition-fast: 150ms ease-out;
@@ -46,18 +49,6 @@
   --radius-neu: 16px;
   --radius-neu-sm: 12px;
   --radius-neu-lg: 24px;
-}
-
-/* Dark Mode Variables */
-.dark {
-  --neu-bg: #2d2d2d;
-  --neu-surface: #2d2d2d;
-  --neu-shadow-dark: #1a1a1a;
-  --neu-shadow-light: #404040;
-
-  --neu-text-primary: #f3f4f6;
-  --neu-text-secondary: #d1d5db;
-  --neu-text-muted: #9ca3af;
 }
 
 /* ============================================
@@ -77,67 +68,79 @@ body {
 }
 
 /* ============================================
-   NEUMORPHISM UTILITY CLASSES
+   GLASS-MORPHISM UTILITY CLASSES
    ============================================ */
 
-/* Raised Effect */
+/* Raised Glass Card */
 .neu-raised {
-  background-color: var(--neu-surface);
-  box-shadow: var(--shadow-neu);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-neu);
+  box-shadow: var(--shadow-glass);
 }
 
 .neu-raised-sm {
-  background-color: var(--neu-surface);
-  box-shadow: var(--shadow-neu-sm);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-neu-sm);
+  box-shadow: var(--shadow-glass-sm);
 }
 
 /* Inset/Pressed Effect */
 .neu-inset {
-  background-color: var(--neu-surface);
-  box-shadow: var(--shadow-neu-inset);
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-neu);
+  box-shadow: var(--shadow-glass-inset);
 }
 
 /* Interactive Button */
 .neu-button {
-  background-color: var(--neu-surface);
-  box-shadow: var(--shadow-neu);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-neu);
-  transition: box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-glass);
+  transition: all var(--transition-fast);
 }
 
 .neu-button:hover {
-  box-shadow: var(--shadow-neu-sm);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .neu-button:active {
-  box-shadow: var(--shadow-neu-inset);
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-glass-inset);
 }
 
-/* Focus States (Accesibilidad) */
+/* Focus States - Green accent */
 .neu-focus:focus {
   outline: none;
-  box-shadow: var(--shadow-neu-inset), 0 0 0 3px rgba(30, 64, 175, 0.3);
+  border-color: rgba(0, 158, 89, 0.5);
+  box-shadow: 0 0 0 3px rgba(0, 158, 89, 0.2);
 }
 
 .neu-focus:focus-visible {
   outline: none;
-  box-shadow: var(--shadow-neu-inset), 0 0 0 3px rgba(30, 64, 175, 0.5);
+  border-color: rgba(0, 158, 89, 0.6);
+  box-shadow: 0 0 0 3px rgba(0, 158, 89, 0.3);
 }
 
 /* ============================================
-   INPUT STYLES (Neumorphism)
+   INPUT STYLES (Glass-morphism)
    ============================================ */
 
 .neu-input {
-  background-color: var(--neu-surface);
-  box-shadow: var(--shadow-neu-inset);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-neu-sm);
-  border: none;
   color: var(--neu-text-primary);
-  transition: box-shadow var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .neu-input::placeholder {
@@ -146,9 +149,9 @@ body {
 
 .neu-input:focus {
   outline: none;
-  box-shadow: inset 6px 6px 12px var(--neu-shadow-dark),
-              inset -6px -6px 12px var(--neu-shadow-light),
-              0 0 0 3px rgba(30, 64, 175, 0.2);
+  border-color: rgba(0, 158, 89, 0.5);
+  box-shadow: 0 0 0 3px rgba(0, 158, 89, 0.15);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 /* ============================================
@@ -156,15 +159,88 @@ body {
    ============================================ */
 
 .neu-card {
-  background-color: var(--neu-surface);
-  box-shadow: var(--shadow-neu);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-neu-lg);
+  box-shadow: var(--shadow-glass);
 }
 
 .neu-card-sm {
-  background-color: var(--neu-surface);
-  box-shadow: var(--shadow-neu-sm);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-neu);
+  box-shadow: var(--shadow-glass-sm);
+}
+
+/* ============================================
+   MESH GRADIENT BACKGROUNDS - GREEN ACCENT
+   ============================================ */
+
+.mesh-gradient-bg {
+  position: relative;
+  background-color: #0f172a;
+  overflow: hidden;
+}
+
+.mesh-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+  pointer-events: none;
+  animation: meshFloat 20s ease-in-out infinite;
+}
+
+.mesh-blob-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #009e59 0%, transparent 70%);
+  top: -200px;
+  right: -100px;
+  animation-delay: 0s;
+}
+
+.mesh-blob-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #1e40af 0%, transparent 70%);
+  bottom: -150px;
+  left: -100px;
+  animation-delay: -7s;
+}
+
+.mesh-blob-3 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #00c96f 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -14s;
+}
+
+/* ============================================
+   GREEN ACCENT UTILITIES
+   ============================================ */
+
+.green-gradient-text {
+  background: linear-gradient(135deg, #009e59 0%, #00c96f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.green-glow {
+  box-shadow: 0 0 20px rgba(0, 158, 89, 0.3), 0 0 40px rgba(0, 158, 89, 0.1);
+}
+
+.green-border-glow {
+  border-color: rgba(0, 158, 89, 0.3);
+  box-shadow: 0 0 15px rgba(0, 158, 89, 0.15);
 }
 
 /* ============================================
@@ -196,10 +272,10 @@ body {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: var(--shadow-neu);
+    box-shadow: var(--shadow-glass);
   }
   50% {
-    box-shadow: var(--shadow-neu), 0 0 20px rgba(245, 158, 11, 0.3);
+    box-shadow: var(--shadow-glass), 0 0 20px rgba(0, 158, 89, 0.3);
   }
 }
 
@@ -238,7 +314,7 @@ body {
    ============================================ */
 
 .tv-display {
-  background: linear-gradient(135deg, var(--neu-bg) 0%, #dde1e7 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   min-height: 100vh;
 }
 
@@ -246,7 +322,7 @@ body {
   font-size: clamp(4rem, 15vw, 12rem);
   font-weight: 800;
   font-family: 'JetBrains Mono', monospace;
-  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 0 30px rgba(0, 158, 89, 0.3);
 }
 
 /* ============================================
@@ -267,7 +343,7 @@ body {
 }
 
 /* ============================================
-   SCROLLBAR STYLES
+   SCROLLBAR STYLES (Dark Theme)
    ============================================ */
 
 ::-webkit-scrollbar {
@@ -276,17 +352,17 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--neu-bg);
+  background: rgba(15, 23, 42, 0.5);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--neu-shadow-dark);
+  background: rgba(0, 158, 89, 0.20);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: rgba(0, 158, 89, 0.35);
 }
 
 /* ============================================
@@ -303,10 +379,26 @@ body {
 
 /* Print Styles for Tickets */
 @media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
   .neu-card,
   .neu-raised,
   .neu-button {
     box-shadow: none !important;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e5e7eb !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    color: #000000 !important;
+  }
+
+  .mesh-blob,
+  .mesh-blob-1,
+  .mesh-blob-2,
+  .mesh-blob-3 {
+    display: none !important;
   }
 }

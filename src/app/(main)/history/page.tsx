@@ -34,7 +34,7 @@ interface TicketRecord {
   agent: { id: string; full_name: string } | null
 }
 
-type DateRange = 'today' | '7days' | '30days' | 'all'
+type DateRange = 'today' | '7days' | '30days' | 'custom' | 'all'
 type StatusFilter = 'all' | 'completed' | 'cancelled' | 'no_show'
 
 export default function HistoryPage() {
@@ -42,6 +42,8 @@ export default function HistoryPage() {
   const [tickets, setTickets] = useState<TicketRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [dateRange, setDateRange] = useState<DateRange>('today')
+  const [customFrom, setCustomFrom] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
+  const [customTo, setCustomTo] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedTicket, setExpandedTicket] = useState<string | null>(null)
@@ -54,6 +56,7 @@ export default function HistoryPage() {
 
     const now = new Date()
     let startDate: Date | null = null
+    let endDate: Date | null = null
 
     switch (dateRange) {
       case 'today':
@@ -64,6 +67,10 @@ export default function HistoryPage() {
         break
       case '30days':
         startDate = subDays(startOfDay(now), 29)
+        break
+      case 'custom':
+        startDate = startOfDay(new Date(customFrom + 'T00:00:00'))
+        endDate = new Date(customTo + 'T23:59:59.999')
         break
       case 'all':
         startDate = null
@@ -82,6 +89,10 @@ export default function HistoryPage() {
       query = query.gte('created_at', startDate.toISOString())
     }
 
+    if (endDate) {
+      query = query.lte('created_at', endDate.toISOString())
+    }
+
     if (statusFilter !== 'all') {
       query = query.eq('status', statusFilter)
     }
@@ -98,7 +109,7 @@ export default function HistoryPage() {
       setTickets((data || []) as TicketRecord[])
     }
     setLoading(false)
-  }, [dateRange, statusFilter, serviceFilter])
+  }, [dateRange, statusFilter, serviceFilter, customFrom, customTo])
 
   // Fetch services for filter
   useEffect(() => {
@@ -155,8 +166,8 @@ export default function HistoryPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Historial de Atenciones</h1>
-          <p className="text-gray-500">Registro completo de todos los turnos procesados</p>
+          <h1 className="text-2xl font-bold text-white">Historial de Atenciones</h1>
+          <p className="text-gray-400">Registro completo de todos los turnos procesados</p>
         </div>
         <Button variant="ghost" onClick={fetchTickets}>
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,17 +179,17 @@ export default function HistoryPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 bg-green-50 rounded-neu-sm shadow-neu-xs text-center">
-          <p className="text-3xl font-bold text-green-600">{completed}</p>
-          <p className="text-sm text-gray-600">Completados</p>
+        <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-center">
+          <p className="text-3xl font-bold text-green-300">{completed}</p>
+          <p className="text-sm text-gray-300">Completados</p>
         </div>
-        <div className="p-4 bg-red-50 rounded-neu-sm shadow-neu-xs text-center">
-          <p className="text-3xl font-bold text-red-500">{cancelled}</p>
-          <p className="text-sm text-gray-600">Cancelados</p>
+        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-center">
+          <p className="text-3xl font-bold text-red-300">{cancelled}</p>
+          <p className="text-sm text-gray-300">Cancelados</p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-neu-sm shadow-neu-xs text-center">
-          <p className="text-3xl font-bold text-gray-500">{noShow}</p>
-          <p className="text-sm text-gray-600">No se presentaron</p>
+        <div className="p-4 bg-white/[0.04] border border-white/[0.06] rounded-lg text-center">
+          <p className="text-3xl font-bold text-gray-400">{noShow}</p>
+          <p className="text-sm text-gray-300">No se presentaron</p>
         </div>
       </div>
 
@@ -188,12 +199,13 @@ export default function HistoryPage() {
           <div className="flex flex-wrap gap-4 items-end">
             {/* Date Range */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Periodo</label>
-              <div className="flex gap-1 bg-neu-bg p-1 rounded-neu-xs shadow-neu-xs">
+              <label className="block text-xs font-medium text-gray-400 mb-1">Periodo</label>
+              <div className="flex gap-1 bg-white/[0.06] p-1 rounded-lg border border-white/[0.08]">
                 {[
                   { label: 'Hoy', value: 'today' as DateRange },
                   { label: '7 dias', value: '7days' as DateRange },
                   { label: '30 dias', value: '30days' as DateRange },
+                  { label: 'Rango', value: 'custom' as DateRange },
                   { label: 'Todo', value: 'all' as DateRange },
                 ].map(option => (
                   <button
@@ -202,7 +214,7 @@ export default function HistoryPage() {
                     className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
                       dateRange === option.value
                         ? 'bg-coopnama-primary text-white shadow-sm'
-                        : 'text-gray-600 hover:text-gray-800'
+                        : 'text-gray-300 hover:text-white'
                     }`}
                   >
                     {option.label}
@@ -211,13 +223,40 @@ export default function HistoryPage() {
               </div>
             </div>
 
+            {/* Custom Date Range */}
+            {dateRange === 'custom' && (
+              <div className="flex gap-3 items-end">
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Desde</label>
+                  <input
+                    type="date"
+                    value={customFrom}
+                    onChange={(e) => setCustomFrom(e.target.value)}
+                    max={customTo}
+                    className="px-3 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Hasta</label>
+                  <input
+                    type="date"
+                    value={customTo}
+                    onChange={(e) => setCustomTo(e.target.value)}
+                    min={customFrom}
+                    max={format(new Date(), 'yyyy-MM-dd')}
+                    className="px-3 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Status Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Estado</label>
+              <label className="block text-xs font-medium text-gray-400 mb-1">Estado</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-                className="px-3 py-2 bg-neu-bg shadow-neu-xs rounded-neu-xs text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                className="px-3 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
               >
                 <option value="all">Todos</option>
                 <option value="completed">Completados</option>
@@ -228,11 +267,11 @@ export default function HistoryPage() {
 
             {/* Service Filter */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Servicio</label>
+              <label className="block text-xs font-medium text-gray-400 mb-1">Servicio</label>
               <select
                 value={serviceFilter}
                 onChange={(e) => setServiceFilter(e.target.value)}
-                className="px-3 py-2 bg-neu-bg shadow-neu-xs rounded-neu-xs text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                className="px-3 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
               >
                 <option value="all">Todos</option>
                 {services.map(s => (
@@ -243,13 +282,13 @@ export default function HistoryPage() {
 
             {/* Search */}
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-xs font-medium text-gray-500 mb-1">Buscar</label>
+              <label className="block text-xs font-medium text-gray-400 mb-1">Buscar</label>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Nombre, cedula o numero de turno..."
-                className="w-full px-3 py-2 bg-neu-bg shadow-neu-inset-xs rounded-neu-xs text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                className="w-full px-3 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
               />
             </div>
           </div>
@@ -283,7 +322,7 @@ export default function HistoryPage() {
                   {/* Ticket Row */}
                   <button
                     onClick={() => setExpandedTicket(expandedTicket === ticket.id ? null : ticket.id)}
-                    className="w-full flex items-center gap-4 p-4 bg-neu-bg shadow-neu-xs rounded-neu-sm hover:shadow-neu-sm transition-shadow text-left"
+                    className="w-full flex items-center gap-4 p-4 bg-white/[0.06] border border-white/[0.08] rounded-lg hover:bg-white/[0.08] transition-shadow text-left"
                   >
                     {/* Ticket Number */}
                     <span className="font-mono font-bold text-lg text-coopnama-primary min-w-[70px]">
@@ -292,7 +331,7 @@ export default function HistoryPage() {
 
                     {/* Client Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-800 truncate">
+                      <p className="font-medium text-white truncate">
                         {ticket.customer_name || 'Sin nombre'}
                       </p>
                       <p className="text-xs text-gray-400">
@@ -303,17 +342,17 @@ export default function HistoryPage() {
 
                     {/* Agent */}
                     <div className="hidden sm:block text-right min-w-[120px]">
-                      <p className="text-sm text-gray-600 truncate">{ticket.agent?.full_name || '-'}</p>
+                      <p className="text-sm text-gray-300 truncate">{ticket.agent?.full_name || '-'}</p>
                       <p className="text-xs text-gray-400">Agente</p>
                     </div>
 
                     {/* Times */}
                     <div className="hidden md:block text-right min-w-[80px]">
-                      <p className="text-sm text-gray-600">{formatDuration(ticket.wait_time_seconds)}</p>
+                      <p className="text-sm text-gray-300">{formatDuration(ticket.wait_time_seconds)}</p>
                       <p className="text-xs text-gray-400">Espera</p>
                     </div>
                     <div className="hidden md:block text-right min-w-[80px]">
-                      <p className="text-sm text-gray-600">{formatDuration(ticket.service_time_seconds)}</p>
+                      <p className="text-sm text-gray-300">{formatDuration(ticket.service_time_seconds)}</p>
                       <p className="text-xs text-gray-400">Atencion</p>
                     </div>
 
@@ -336,7 +375,7 @@ export default function HistoryPage() {
 
                   {/* Expanded Details */}
                   {expandedTicket === ticket.id && (
-                    <div className="mx-4 mb-2 p-4 bg-white border border-gray-100 rounded-b-lg shadow-inner">
+                    <div className="mx-4 mb-2 p-4 bg-slate-900/95 border border-white/[0.08] rounded-b-lg shadow-inner">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
                           <p className="text-gray-400 text-xs mb-1">Cliente</p>
@@ -390,15 +429,15 @@ export default function HistoryPage() {
                         </div>
                       </div>
                       {ticket.notes && (
-                        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                        <div className="mt-4 p-3 bg-white/[0.04] rounded-lg">
                           <p className="text-gray-400 text-xs mb-1">Notas</p>
-                          <p className="text-sm text-gray-700">{ticket.notes}</p>
+                          <p className="text-sm text-gray-200">{ticket.notes}</p>
                         </div>
                       )}
                       {ticket.feedback_comment && (
-                        <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                        <div className="mt-2 p-3 bg-emerald-500/10 rounded-lg">
                           <p className="text-gray-400 text-xs mb-1">Comentario del cliente</p>
-                          <p className="text-sm text-gray-700">{ticket.feedback_comment}</p>
+                          <p className="text-sm text-gray-200">{ticket.feedback_comment}</p>
                         </div>
                       )}
                     </div>

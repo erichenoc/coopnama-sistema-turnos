@@ -37,7 +37,7 @@ export default function ResetPasswordPage() {
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-neu-sm">
+          <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-lg">
             <p className="text-sm text-coopnama-danger">{error}</p>
           </div>
         )}
@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-[38px] text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute right-4 top-[38px] text-gray-300 hover:text-gray-200 transition-colors"
           >
             {showPassword ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-4 top-[38px] text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute right-4 top-[38px] text-gray-300 hover:text-gray-200 transition-colors"
           >
             {showConfirmPassword ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -71,7 +71,7 @@ export function LoginForm() {
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-4 top-[38px] text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute right-4 top-[38px] text-gray-400 hover:text-gray-300 transition-colors"
         >
           {showPassword ? (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,10 +88,10 @@ export function LoginForm() {
 
       <div className="flex items-center justify-between">
         <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-coopnama-primary focus:ring-coopnama-primary" />
-          <span className="text-sm text-gray-600">Recordarme</span>
+          <input type="checkbox" className="w-4 h-4 rounded border-white/[0.10] text-[#009e59] focus:ring-[#009e59]/20" />
+          <span className="text-sm text-gray-300">Recordarme</span>
         </label>
-        <Link href="/forgot-password" className="text-sm text-coopnama-primary hover:underline">
+        <Link href="/forgot-password" className="text-sm text-[#009e59] hover:underline">
           Olvidaste tu contrasena?
         </Link>
       </div>
@@ -100,9 +100,9 @@ export function LoginForm() {
         Iniciar Sesion
       </Button>
 
-      <p className="text-center text-gray-600">
+      <p className="text-center text-gray-300">
         No tienes una cuenta?{' '}
-        <Link href="/signup" className="text-coopnama-primary font-medium hover:underline">
+        <Link href="/signup" className="text-[#009e59] font-medium hover:underline">
           Registrate
         </Link>
       </p>

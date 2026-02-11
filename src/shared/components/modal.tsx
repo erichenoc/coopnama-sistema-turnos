@@ -70,7 +70,7 @@ export function Modal({
     >
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm animate-fade-in"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
         onClick={handleOverlayClick}
         aria-hidden="true"
       />
@@ -80,8 +80,8 @@ export function Modal({
         className={cn(
           'relative w-full',
           sizeClasses[size],
-          'bg-neu-bg',
-          'shadow-neu-lg',
+          'bg-slate-900/95 backdrop-blur-xl border border-white/[0.10]',
+          'shadow-glass-lg',
           'rounded-neu-lg',
           'animate-scale-in',
           className
@@ -94,19 +94,18 @@ export function Modal({
               absolute top-4 right-4
               w-8 h-8
               flex items-center justify-center
-              bg-neu-bg
-              shadow-neu-sm
+              bg-white/[0.06] border border-white/[0.08]
               rounded-full
-              text-gray-500
-              hover:text-gray-700
-              hover:shadow-neu-xs
-              active:shadow-neu-inset-xs
+              text-gray-300
+              hover:text-white
+              hover:bg-white/[0.10]
+              active:scale-95
               transition-all duration-150
               focus:outline-none
               focus:ring-2
-              focus:ring-coopnama-primary
+              focus:ring-[#009e59]
               focus:ring-offset-2
-              focus:ring-offset-neu-bg
+              focus:ring-offset-slate-900
             `}
             aria-label="Cerrar"
           >
@@ -149,7 +148,7 @@ export function ModalBody({ children, className }: ModalSectionProps) {
 
 export function ModalFooter({ children, className }: ModalSectionProps) {
   return (
-    <div className={cn('px-6 py-4 flex justify-end gap-3 border-t border-gray-200/50', className)}>
+    <div className={cn('px-6 py-4 flex justify-end gap-3 border-t border-white/[0.08]', className)}>
       {children}
     </div>
   )
@@ -182,16 +181,16 @@ export function ConfirmDialog({
   const variantColors = {
     danger: 'bg-coopnama-danger text-white hover:bg-red-600',
     warning: 'bg-coopnama-accent text-white hover:bg-amber-600',
-    info: 'bg-coopnama-primary text-white hover:bg-blue-800',
+    info: 'bg-gradient-to-r from-[#009e59] to-[#00c96f] text-white hover:brightness-110',
   }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm" showCloseButton={false}>
       <ModalHeader>
-        <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+        <h2 className="text-xl font-semibold text-white">{title}</h2>
       </ModalHeader>
       <ModalBody>
-        <p className="text-gray-600">{message}</p>
+        <p className="text-gray-300">{message}</p>
       </ModalBody>
       <ModalFooter>
         <button
@@ -199,12 +198,11 @@ export function ConfirmDialog({
           disabled={isLoading}
           className={`
             px-4 py-2
-            bg-neu-bg
-            shadow-neu-sm
+            bg-white/[0.06] border border-white/[0.08]
             rounded-neu-sm
-            text-gray-600
-            hover:shadow-neu-xs
-            active:shadow-neu-inset-xs
+            text-gray-300
+            hover:bg-white/[0.10]
+            active:scale-[0.98]
             transition-all duration-150
             disabled:opacity-50
           `}

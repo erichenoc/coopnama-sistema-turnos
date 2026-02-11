@@ -41,6 +41,17 @@ export async function callNextTicketAction(
 ): Promise<{ data?: Ticket; error?: string }> {
   const supabase = await createClient()
 
+  // Verify authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'No autorizado' }
+  }
+
+  // Verify agentId matches authenticated user
+  if (agentId !== user.id) {
+    return { error: 'No autorizado: agente no coincide' }
+  }
+
   const { data, error } = await supabase.rpc('call_next_ticket', {
     p_station_id: stationId,
     p_agent_id: agentId,
@@ -64,6 +75,17 @@ export async function startServingAction(
 ): Promise<{ data?: Ticket; error?: string }> {
   const supabase = await createClient()
 
+  // Verify authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'No autorizado' }
+  }
+
+  // Verify agentId matches authenticated user
+  if (agentId !== user.id) {
+    return { error: 'No autorizado: agente no coincide' }
+  }
+
   const { data, error } = await supabase.rpc('start_serving_ticket', {
     p_ticket_id: ticketId,
     p_agent_id: agentId,
@@ -81,6 +103,17 @@ export async function completeTicketAction(
   notes?: string
 ): Promise<{ data?: Ticket; error?: string }> {
   const supabase = await createClient()
+
+  // Verify authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'No autorizado' }
+  }
+
+  // Verify agentId matches authenticated user
+  if (agentId !== user.id) {
+    return { error: 'No autorizado: agente no coincide' }
+  }
 
   const { data, error } = await supabase.rpc('complete_ticket', {
     p_ticket_id: ticketId,
@@ -106,6 +139,12 @@ export async function cancelTicketAction(
 ): Promise<{ error?: string }> {
   const supabase = await createClient()
 
+  // Verify authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'No autorizado' }
+  }
+
   const { error } = await supabase
     .from('tickets')
     .update({
@@ -127,6 +166,17 @@ export async function markNoShowAction(
   agentId: string
 ): Promise<{ data?: Ticket; error?: string }> {
   const supabase = await createClient()
+
+  // Verify authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'No autorizado' }
+  }
+
+  // Verify agentId matches authenticated user
+  if (agentId !== user.id) {
+    return { error: 'No autorizado: agente no coincide' }
+  }
 
   const { data, error } = await supabase.rpc('mark_ticket_no_show', {
     p_ticket_id: ticketId,

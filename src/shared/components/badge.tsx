@@ -60,23 +60,23 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
       serving: 'bg-status-serving/10 text-status-serving border border-status-serving/30',
       completed: 'bg-status-completed/10 text-status-completed border border-status-completed/30',
       cancelled: 'bg-status-cancelled/10 text-status-cancelled border border-status-cancelled/30',
-      no_show: 'bg-red-600/10 text-red-600 border border-red-600/30',
-      on_hold: 'bg-yellow-600/10 text-yellow-600 border border-yellow-600/30',
-      transferred: 'bg-purple-600/10 text-purple-600 border border-purple-600/30',
+      no_show: 'bg-red-600/10 text-red-400 border border-red-600/30',
+      on_hold: 'bg-yellow-600/10 text-yellow-400 border border-yellow-600/30',
+      transferred: 'bg-purple-600/10 text-purple-400 border border-purple-600/30',
     }
 
     // Priority colors
     const priorityStyles: Record<Priority, string> = {
-      normal: 'bg-gray-500/10 text-gray-600 border border-gray-400/30',
-      preferential: 'bg-blue-500/10 text-blue-600 border border-blue-400/30',
-      vip: 'bg-amber-500/10 text-amber-600 border border-amber-400/30',
-      urgent: 'bg-red-500/10 text-red-600 border border-red-400/30',
+      normal: 'bg-gray-500/10 text-gray-400 border border-gray-400/30',
+      preferential: 'bg-emerald-500/10 text-emerald-400 border border-emerald-400/30',
+      vip: 'bg-amber-500/10 text-amber-400 border border-amber-400/30',
+      urgent: 'bg-red-500/10 text-red-400 border border-red-400/30',
     }
 
     // Default variant styles
     const variantStyles = {
-      default: 'bg-gray-100 text-gray-600',
-      outline: 'bg-transparent border border-gray-300 text-gray-600',
+      default: 'bg-white/[0.08] text-gray-300',
+      outline: 'bg-transparent border border-white/[0.15] text-gray-300',
       status: status ? statusStyles[status] : '',
       priority: priority ? priorityStyles[priority] : '',
     }

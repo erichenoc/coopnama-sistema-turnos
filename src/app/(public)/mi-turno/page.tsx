@@ -259,7 +259,7 @@ export default function MiTurnoPage() {
     : ''
 
   return (
-    <div className="min-h-screen bg-neu-bg">
+    <div className="min-h-screen bg-slate-950">
       {/* Header */}
       <header className="bg-coopnama-primary text-white py-6 px-8 shadow-lg">
         <div className="max-w-lg mx-auto flex items-center justify-between">
@@ -267,15 +267,15 @@ export default function MiTurnoPage() {
             <Image src={LOGO_URL} alt="COOPNAMA" width={40} height={40} className="rounded-lg object-contain" priority />
             <span className="font-bold text-xl">COOPNAMA</span>
           </div>
-          <Link href="/" className="text-blue-200 hover:text-white text-sm transition-colors">
+          <Link href="/" className="text-emerald-200 hover:text-white text-sm transition-colors">
             Inicio
           </Link>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-800 text-center mb-2">Consultar Mi Turno</h1>
-        <p className="text-gray-500 text-center mb-8">Ingrese su numero de turno para ver el estado</p>
+        <h1 className="text-2xl font-bold text-white text-center mb-2">Consultar Mi Turno</h1>
+        <p className="text-gray-400 text-center mb-8">Ingrese su numero de turno para ver el estado</p>
 
         {/* Search Form */}
         <div className="flex gap-3 mb-8">
@@ -293,7 +293,7 @@ export default function MiTurnoPage() {
 
         {/* Error */}
         {error && (
-          <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-neu text-center mb-6">
+          <div className="p-4 bg-coopnama-danger/10 border border-coopnama-danger/20 rounded-lg text-center mb-6">
             <p className="text-coopnama-danger">{error}</p>
           </div>
         )}
@@ -303,22 +303,22 @@ export default function MiTurnoPage() {
           <div className="space-y-6">
             {/* Called Status - Large Pulsing Alert */}
             {ticket.status === 'called' && (
-              <div className="bg-status-called/20 border-2 border-status-called shadow-neu-lg rounded-neu-lg p-8 text-center animate-pulse">
+              <div className="bg-status-called/20 border-2 border-status-called shadow-neu rounded-lg p-8 text-center animate-pulse">
                 <Bell className="w-16 h-16 mx-auto mb-4 text-status-called" />
                 <p className="text-3xl font-black text-status-called mb-2">¡ES SU TURNO!</p>
                 {ticket.station && (
-                  <p className="text-xl text-gray-700">Diríjase a <span className="font-bold">{ticket.station.name}</span></p>
+                  <p className="text-xl text-gray-200">Diríjase a <span className="font-bold">{ticket.station.name}</span></p>
                 )}
               </div>
             )}
 
             {/* Main Ticket Card */}
-            <Card className="shadow-neu-lg">
+            <Card className="shadow-neu">
               <CardHeader className={`text-center ${
                 ticket.status === 'called' ? 'bg-status-called/20' :
                 ticket.status === 'serving' ? 'bg-status-serving/20' :
                 ticket.status === 'waiting' ? 'bg-status-waiting/20' :
-                'bg-gray-100'
+                'bg-white/[0.04]'
               }`}>
                 <span className="font-mono font-black text-5xl text-coopnama-primary block mb-3">
                   {ticket.ticket_number}
@@ -327,7 +327,7 @@ export default function MiTurnoPage() {
               </CardHeader>
 
               <CardContent className="space-y-6">
-                <p className="text-center text-gray-600 text-lg">{getStatusMessage(ticket.status)}</p>
+                <p className="text-center text-gray-300 text-lg">{getStatusMessage(ticket.status)}</p>
 
                 {/* Progress Steps */}
                 <div className="flex items-center justify-between px-4">
@@ -340,7 +340,7 @@ export default function MiTurnoPage() {
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                             isActive
                               ? 'bg-coopnama-primary border-coopnama-primary text-white'
-                              : 'bg-gray-200 border-gray-300 text-gray-400'
+                              : 'bg-white/[0.04] border-white/[0.08] text-gray-400'
                           }`}>
                             {index + 1}
                           </div>
@@ -349,7 +349,7 @@ export default function MiTurnoPage() {
                           </p>
                         </div>
                         {index < STEPS.length - 1 && (
-                          <div className={`w-8 h-1 mx-1 mb-6 ${isActive ? 'bg-coopnama-primary' : 'bg-gray-300'}`} />
+                          <div className={`w-8 h-1 mx-1 mb-6 ${isActive ? 'bg-coopnama-primary' : 'bg-white/[0.08]'}`} />
                         )}
                       </div>
                     )
@@ -360,24 +360,24 @@ export default function MiTurnoPage() {
                 {ticket.status === 'waiting' && (
                   <div className="grid grid-cols-3 gap-3">
                     {position !== null && (
-                      <div className="p-4 bg-coopnama-primary/5 rounded-neu text-center shadow-neu-inset">
+                      <div className="p-4 bg-coopnama-primary/5 rounded-lg text-center border border-white/[0.08]">
                         <TrendingUp className="w-5 h-5 mx-auto mb-1 text-coopnama-primary" />
-                        <p className="text-xs text-gray-500">Posicion</p>
+                        <p className="text-xs text-gray-400">Posicion</p>
                         <p className="text-2xl font-bold text-coopnama-primary">{position}</p>
                       </div>
                     )}
                     {estimatedWait !== null && (
-                      <div className="p-4 bg-coopnama-secondary/5 rounded-neu text-center shadow-neu-inset">
+                      <div className="p-4 bg-coopnama-secondary/5 rounded-lg text-center border border-white/[0.08]">
                         <Clock className="w-5 h-5 mx-auto mb-1 text-coopnama-secondary" />
-                        <p className="text-xs text-gray-500">Espera Est.</p>
+                        <p className="text-xs text-gray-400">Espera Est.</p>
                         <p className="text-2xl font-bold text-coopnama-secondary">~{estimatedWait}m</p>
                       </div>
                     )}
                     {activeAgents !== null && (
-                      <div className="p-4 bg-blue-50 rounded-neu text-center shadow-neu-inset">
-                        <Users className="w-5 h-5 mx-auto mb-1 text-blue-500" />
-                        <p className="text-xs text-gray-500">Agentes</p>
-                        <p className="text-2xl font-bold text-blue-500">{activeAgents}</p>
+                      <div className="p-4 bg-emerald-500/5 rounded-lg text-center border border-white/[0.08]">
+                        <Users className="w-5 h-5 mx-auto mb-1 text-emerald-400" />
+                        <p className="text-xs text-gray-400">Agentes</p>
+                        <p className="text-2xl font-bold text-emerald-400">{activeAgents}</p>
                       </div>
                     )}
                   </div>
@@ -385,21 +385,21 @@ export default function MiTurnoPage() {
 
                 {/* Station Info */}
                 {(ticket.status === 'serving') && ticket.station && (
-                  <div className="text-center p-4 bg-status-serving/10 rounded-neu shadow-neu-inset">
-                    <p className="text-sm text-gray-500">Siendo atendido en</p>
+                  <div className="text-center p-4 bg-status-serving/10 rounded-lg border border-white/[0.08]">
+                    <p className="text-sm text-gray-400">Siendo atendido en</p>
                     <p className="text-2xl font-bold text-status-serving">{ticket.station.name}</p>
                   </div>
                 )}
 
                 {/* Details */}
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/[0.08]">
                   <div>
                     <p className="text-sm text-gray-400">Servicio</p>
-                    <p className="font-medium text-gray-700">{ticket.service?.name || '-'}</p>
+                    <p className="font-medium text-gray-200">{ticket.service?.name || '-'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Creado</p>
-                    <p className="font-medium text-gray-700">
+                    <p className="font-medium text-gray-200">
                       {new Date(ticket.created_at).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>

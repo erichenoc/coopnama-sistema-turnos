@@ -58,16 +58,16 @@ export function SimilarCases({ ticket, organizationId }: SimilarCasesProps) {
 
   return (
     <div>
-      <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+      <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">
         Casos Similares Resueltos
       </h4>
       <div className="space-y-2">
         {cases.map((c) => (
-          <div key={c.ticketNumber} className="bg-gray-50 p-2 rounded-neu-sm shadow-neu-xs">
+          <div key={c.ticketNumber} className="bg-white/[0.06] p-2 rounded-neu-sm shadow-neu-xs">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-xs font-medium text-gray-800">{c.serviceName}</p>
-                <p className="text-xs text-gray-500">{c.date}</p>
+                <p className="text-xs font-medium text-white">{c.serviceName}</p>
+                <p className="text-xs text-gray-400">{c.date}</p>
               </div>
               <div className="text-right">
                 {c.rating && (
@@ -81,7 +81,7 @@ export function SimilarCases({ ticket, organizationId }: SimilarCasesProps) {
               </div>
             </div>
             {c.resolution && (
-              <p className="text-xs text-gray-600 mt-1 italic truncate">
+              <p className="text-xs text-gray-300 mt-1 italic truncate">
                 {c.resolution}
               </p>
             )}

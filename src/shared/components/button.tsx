@@ -29,42 +29,48 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = `
       inline-flex items-center justify-center gap-2
       font-medium rounded-neu
-      bg-neu-bg
+      border border-white/[0.08]
       transition-all duration-150 ease-out
-      focus:outline-none focus-visible:ring-2 focus-visible:ring-coopnama-primary focus-visible:ring-offset-2
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-[#009e59] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950
       disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none
     `
 
     const variantStyles = {
       primary: `
-        shadow-neu
-        hover:shadow-neu-sm
-        active:shadow-neu-inset
-        text-coopnama-primary
+        bg-gradient-to-r from-[#009e59] to-[#00c96f]
+        text-white
+        border-[#009e59]
+        shadow-md
+        hover:shadow-[0_0_20px_rgba(0,158,89,0.3)] hover:brightness-110
+        active:scale-[0.98]
       `,
       secondary: `
-        shadow-neu
-        hover:shadow-neu-sm
-        active:shadow-neu-inset
-        text-gray-600
+        bg-white/[0.06]
+        text-gray-200
+        hover:bg-white/[0.10]
+        active:scale-[0.98]
       `,
       ghost: `
         shadow-none
-        hover:shadow-neu-sm
-        active:shadow-neu-inset
-        text-gray-600
+        border-transparent
+        text-gray-300
+        hover:bg-white/[0.06]
+        hover:text-gray-200
+        active:scale-[0.98]
       `,
       danger: `
-        shadow-neu
-        hover:shadow-neu-sm
-        active:shadow-neu-inset
-        text-coopnama-danger
+        bg-red-500/10
+        text-red-400
+        border-red-500/20
+        hover:bg-red-500/20
+        active:scale-[0.98]
       `,
       success: `
-        shadow-neu
-        hover:shadow-neu-sm
-        active:shadow-neu-inset
-        text-coopnama-secondary
+        bg-emerald-500/10
+        text-emerald-400
+        border-emerald-500/20
+        hover:bg-emerald-500/20
+        active:scale-[0.98]
       `,
     }
 

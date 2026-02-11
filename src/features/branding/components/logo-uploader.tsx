@@ -48,11 +48,11 @@ export function LogoUploader({ currentLogoUrl, organizationId, onUploaded }: Log
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700">Logo de la Organizacion</label>
+      <label className="block text-sm font-medium text-gray-200">Logo de la Organizacion</label>
 
       {/* Preview */}
       <div className="flex items-center gap-6">
-        <div className="w-24 h-24 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300">
+        <div className="w-24 h-24 bg-white/[0.06] rounded-xl flex items-center justify-center overflow-hidden border-2 border-dashed border-white/[0.10]">
           {preview ? (
             <img src={preview} alt="Logo" className="w-full h-full object-contain" />
           ) : (
@@ -68,9 +68,9 @@ export function LogoUploader({ currentLogoUrl, organizationId, onUploaded }: Log
             type="file"
             accept="image/png,image/jpeg,image/svg+xml,image/webp"
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-coopnama-primary/10 file:text-coopnama-primary hover:file:bg-coopnama-primary/20 cursor-pointer"
+            className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#009e59]/10 file:text-[#009e59] hover:file:bg-[#009e59]/20 cursor-pointer"
           />
-          <p className="text-xs text-gray-400">PNG, JPG, SVG o WebP. Max 2MB.</p>
+          <p className="text-xs text-gray-300">PNG, JPG, SVG o WebP. Max 2MB.</p>
         </div>
       </div>
 

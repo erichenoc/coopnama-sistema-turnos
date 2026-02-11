@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@/shared/types/domain'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
@@ -10,13 +11,8 @@ import type { User as SupabaseUser } from '@supabase/supabase-js'
  * Organization Context Provider
  *
  * Provides organization, branch, and agent context throughout the app.
- * Falls back to demo IDs when no user is authenticated.
+ * Redirects to /login when no user is authenticated (no demo fallbacks).
  */
-
-// Demo fallback IDs
-const DEMO_ORG_ID = '00000000-0000-0000-0000-000000000001'
-const DEMO_BRANCH_ID = '00000000-0000-0000-0000-000000000001'
-const DEMO_AGENT_ID = '00000000-0000-0000-0000-000000000001'
 
 interface Branch {
   id: string
@@ -39,9 +35,10 @@ interface OrgContextValue {
 const OrgContext = createContext<OrgContextValue | undefined>(undefined)
 
 export function OrgProvider({ children }: { children: React.ReactNode }) {
-  const [organizationId, setOrganizationId] = useState<string>(DEMO_ORG_ID)
-  const [branchId, setBranchId] = useState<string>(DEMO_BRANCH_ID)
-  const [agentId, setAgentId] = useState<string | null>(DEMO_AGENT_ID)
+  const router = useRouter()
+  const [organizationId, setOrganizationId] = useState<string>('')
+  const [branchId, setBranchId] = useState<string>('')
+  const [agentId, setAgentId] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
@@ -56,13 +53,11 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
         const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
 
         if (authError || !authUser) {
-          // No authenticated user - use demo IDs
-          setOrganizationId(DEMO_ORG_ID)
-          setBranchId(DEMO_BRANCH_ID)
-          setAgentId(DEMO_AGENT_ID)
+          // No authenticated user - redirect to login
           setUser(null)
           setSupabaseUser(null)
           setLoading(false)
+          router.replace('/login')
           return
         }
 
@@ -77,12 +72,9 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
 
         if (profileError || !userProfile) {
           console.error('Error fetching user profile:', profileError)
-          // Fall back to demo IDs if profile not found
-          setOrganizationId(DEMO_ORG_ID)
-          setBranchId(DEMO_BRANCH_ID)
-          setAgentId(DEMO_AGENT_ID)
           setUser(null)
           setLoading(false)
+          router.replace('/login')
           return
         }
 
@@ -125,27 +117,24 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
           } else if (savedBranch && branchList.some((b) => b.id === savedBranch)) {
             setBranchId(savedBranch)
           } else {
-            setBranchId(userProfile.branch_id || DEMO_BRANCH_ID)
+            setBranchId(userProfile.branch_id || (branchList[0]?.id ?? ''))
           }
         } else {
-          setBranchId(userProfile.branch_id || DEMO_BRANCH_ID)
+          setBranchId(userProfile.branch_id || '')
         }
 
         setLoading(false)
       } catch (error) {
         console.error('Error in OrgProvider:', error)
-        // Fall back to demo IDs on error
-        setOrganizationId(DEMO_ORG_ID)
-        setBranchId(DEMO_BRANCH_ID)
-        setAgentId(DEMO_AGENT_ID)
         setUser(null)
         setSupabaseUser(null)
         setLoading(false)
+        router.replace('/login')
       }
     }
 
     fetchUserContext()
-  }, [])
+  }, [router])
 
   const switchBranch = (newBranchId: string) => {
     setBranchId(newBranchId)

@@ -39,7 +39,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-sm font-medium text-gray-600 mb-2"
+            className="block text-sm font-medium text-gray-300 mb-2"
           >
             {label}
           </label>
@@ -53,21 +53,24 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className={cn(
               `
               w-full
-              bg-neu-bg
-              shadow-neu-inset
+              bg-white/[0.05]
+              border border-white/[0.10]
               rounded-neu-sm
               px-4 py-3
               pr-10
-              text-gray-700
+              text-white
               appearance-none
               cursor-pointer
               transition-all duration-150 ease-out
               focus:outline-none
-              focus:shadow-[inset_6px_6px_12px_#b8b9be,inset_-6px_-6px_12px_#ffffff,0_0_0_3px_rgba(30,64,175,0.2)]
+              focus:border-[#009e59]/50
+              focus:ring-2
+              focus:ring-[#009e59]/20
+              focus:bg-white/[0.07]
               disabled:opacity-50
               disabled:cursor-not-allowed
               `,
-              error && 'shadow-[inset_4px_4px_8px_#b8b9be,inset_-4px_-4px_8px_#ffffff,0_0_0_2px_rgba(239,68,68,0.4)]',
+              error && 'border-red-500/50 ring-2 ring-red-500/20',
               className
             )}
             {...props}
@@ -111,7 +114,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         )}
 
         {hint && !error && (
-          <p className="mt-1.5 text-sm text-gray-500">{hint}</p>
+          <p className="mt-1.5 text-sm text-gray-400">{hint}</p>
         )}
       </div>
     )

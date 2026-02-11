@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, type InputHTMLAttributes } from 'react'
+import { forwardRef, useState, useEffect, type InputHTMLAttributes } from 'react'
 import { cn } from '@/shared/utils/cn'
 
 export interface ToggleProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
@@ -13,27 +13,40 @@ const sizeConfig = {
   sm: {
     track: 'w-8 h-4',
     thumb: 'w-3 h-3',
-    translate: 'translate-x-4',
+    translatePx: 16,
     labelText: 'text-sm',
   },
   md: {
     track: 'w-11 h-6',
     thumb: 'w-5 h-5',
-    translate: 'translate-x-5',
+    translatePx: 20,
     labelText: 'text-base',
   },
   lg: {
     track: 'w-14 h-7',
     thumb: 'w-6 h-6',
-    translate: 'translate-x-7',
+    translatePx: 28,
     labelText: 'text-lg',
   },
 }
 
 const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
-  ({ className, label, description, size = 'md', disabled, id, ...props }, ref) => {
+  ({ className, label, description, size = 'md', disabled, checked, defaultChecked, id, onChange, ...props }, ref) => {
     const toggleId = id || props.name
     const config = sizeConfig[size]
+
+    // Track checked state for thumb animation
+    const [isChecked, setIsChecked] = useState(checked ?? defaultChecked ?? false)
+
+    // Sync with controlled prop
+    useEffect(() => {
+      if (checked !== undefined) setIsChecked(checked)
+    }, [checked])
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (checked === undefined) setIsChecked(e.target.checked)
+      onChange?.(e)
+    }
 
     return (
       <label
@@ -50,6 +63,9 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             type="checkbox"
             id={toggleId}
             disabled={disabled}
+            checked={checked}
+            defaultChecked={defaultChecked}
+            onChange={handleChange}
             className="sr-only peer"
             {...props}
           />
@@ -58,16 +74,16 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             className={cn(
               config.track,
               `
-              bg-neu-bg
-              shadow-neu-inset
+              bg-white/[0.08]
+              border border-white/[0.10]
               rounded-full
               transition-all duration-200 ease-out
-              peer-checked:bg-coopnama-primary
+              peer-checked:bg-[#009e59]
               peer-checked:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]
               peer-focus-visible:ring-2
-              peer-focus-visible:ring-coopnama-primary
+              peer-focus-visible:ring-[#009e59]
               peer-focus-visible:ring-offset-2
-              peer-focus-visible:ring-offset-neu-bg
+              peer-focus-visible:ring-offset-slate-950
               `
             )}
           />
@@ -75,28 +91,21 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
           <div
             className={cn(
               config.thumb,
-              `
-              absolute
-              left-0.5
-              bg-white
-              rounded-full
-              shadow-neu-sm
-              transition-transform duration-200 ease-out
-              peer-checked:${config.translate}
-              `
+              'absolute left-0.5 bg-white rounded-full shadow-md transition-transform duration-200 ease-out'
             )}
+            style={{ transform: isChecked ? `translateX(${config.translatePx}px)` : 'translateX(0)' }}
           />
         </div>
 
         {(label || description) && (
           <div className="flex flex-col">
             {label && (
-              <span className={cn('font-medium text-gray-700', config.labelText)}>
+              <span className={cn('font-medium text-gray-300', config.labelText)}>
                 {label}
               </span>
             )}
             {description && (
-              <span className="text-sm text-gray-500">{description}</span>
+              <span className="text-sm text-gray-400">{description}</span>
             )}
           </div>
         )}

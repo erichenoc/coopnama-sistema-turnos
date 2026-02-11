@@ -62,7 +62,7 @@ export function PostServiceSummary({
 
   if (!ticket || ticket.status !== 'serving') {
     return (
-      <div className="text-center text-gray-500 py-4 text-sm">
+      <div className="text-center text-gray-300 py-4 text-sm">
         Disponible al atender un turno
       </div>
     )
@@ -70,13 +70,13 @@ export function PostServiceSummary({
 
   return (
     <div>
-      <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+      <h4 className="text-xs font-semibold text-gray-300 uppercase mb-2">
         Resumen Post-Servicio
       </h4>
 
       {!generated ? (
         <div className="text-center py-4">
-          <p className="text-sm text-gray-500 mb-3">
+          <p className="text-sm text-gray-300 mb-3">
             Genera un resumen automatico de esta atencion
           </p>
           <Button onClick={generateSummary} variant="primary" disabled={loading}>
@@ -89,7 +89,7 @@ export function PostServiceSummary({
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
             rows={4}
-            className="w-full px-3 py-2 rounded-neu-sm shadow-neu-inset text-sm focus:outline-none focus:ring-2 focus:ring-coopnama-primary mb-3"
+            className="w-full px-3 py-2 rounded-neu-sm shadow-neu-inset text-sm focus:outline-none focus:border-[#009e59]/50 focus:ring-2 focus:ring-[#009e59]/20 mb-3 bg-white/[0.04] text-white placeholder:text-gray-400"
           />
           <div className="flex gap-2">
             <Button

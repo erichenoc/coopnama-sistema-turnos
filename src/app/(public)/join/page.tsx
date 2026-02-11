@@ -181,7 +181,7 @@ export default function JoinQueuePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neu-bg flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     )
@@ -189,17 +189,17 @@ export default function JoinQueuePage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-neu-bg flex items-center justify-center px-6">
-        <Card className="max-w-md w-full shadow-neu-lg">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-6">
+        <Card className="max-w-md w-full shadow-neu">
           <CardContent className="py-12 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">¡Turno Creado!</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">¡Turno Creado!</h2>
             <p className="text-5xl font-mono font-black text-coopnama-primary my-4">{success}</p>
-            <p className="text-gray-500">Redirigiendo a seguimiento...</p>
+            <p className="text-gray-400">Redirigiendo a seguimiento...</p>
           </CardContent>
         </Card>
       </div>
@@ -207,7 +207,7 @@ export default function JoinQueuePage() {
   }
 
   return (
-    <div className="min-h-screen bg-neu-bg">
+    <div className="min-h-screen bg-slate-950">
       {/* Header */}
       <header className="bg-coopnama-primary text-white py-6 px-8 shadow-lg">
         <div className="max-w-lg mx-auto flex items-center gap-3">
@@ -222,17 +222,17 @@ export default function JoinQueuePage() {
           )}
           <div>
             <p className="font-bold text-lg">{branch?.organization.name || 'COOPNAMA'}</p>
-            <p className="text-blue-200 text-sm">{branch?.name || 'Sucursal'}</p>
+            <p className="text-emerald-200 text-sm">{branch?.name || 'Sucursal'}</p>
           </div>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-800 text-center mb-2">Tomar Turno</h1>
-        <p className="text-gray-500 text-center mb-8">Seleccione el servicio que necesita</p>
+        <h1 className="text-2xl font-bold text-white text-center mb-2">Tomar Turno</h1>
+        <p className="text-gray-400 text-center mb-8">Seleccione el servicio que necesita</p>
 
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-center mb-6">
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center mb-6">
             {error}
           </div>
         )}
@@ -248,7 +248,7 @@ export default function JoinQueuePage() {
 
           {/* Service Selection */}
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-3">Seleccione un servicio</p>
+            <p className="text-sm font-medium text-gray-200 mb-3">Seleccione un servicio</p>
             <div className="space-y-2">
               {services.map((service) => {
                 const info = queueInfo[service.id]
@@ -256,24 +256,24 @@ export default function JoinQueuePage() {
                   <button
                     key={service.id}
                     onClick={() => setSelectedServiceId(service.id)}
-                    className={`w-full text-left p-4 rounded-neu-sm transition-all ${
+                    className={`w-full text-left p-4 rounded-lg transition-all ${
                       selectedServiceId === service.id
-                        ? 'bg-coopnama-primary/10 border-2 border-coopnama-primary shadow-neu-sm'
-                        : 'bg-white shadow-neu-xs hover:shadow-neu-sm border-2 border-transparent'
+                        ? 'bg-coopnama-primary/10 border-2 border-coopnama-primary shadow-neu'
+                        : 'bg-white/[0.06] shadow-neu hover:bg-white/[0.08] border-2 border-transparent'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-800">{service.name}</p>
+                        <p className="font-medium text-white">{service.name}</p>
                         {service.description && (
-                          <p className="text-xs text-gray-500 mt-1">{service.description}</p>
+                          <p className="text-xs text-gray-400 mt-1">{service.description}</p>
                         )}
                       </div>
                       <span className="text-xs text-gray-400 font-mono">{service.code}</span>
                     </div>
                     {info && (
-                      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-white/[0.06]">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
                           <Users className="w-3.5 h-3.5" />
                           <span>
                             {info.waitingCount === 0
@@ -282,7 +282,7 @@ export default function JoinQueuePage() {
                           </span>
                         </div>
                         {info.waitingCount > 0 && (
-                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <div className="flex items-center gap-1.5 text-xs text-gray-400">
                             <Clock className="w-3.5 h-3.5" />
                             <span>~{info.estimatedMinutes} min</span>
                           </div>

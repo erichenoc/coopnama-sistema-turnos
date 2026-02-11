@@ -1,7 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_ROUTES = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/tv', '/kiosk', '/mi-turno', '/booking']
+const PUBLIC_ROUTES = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/tv', '/kiosk', '/mi-turno', '/booking', '/auth/callback']
+
+// API routes that are intentionally public (have their own auth/secret validation)
+const PUBLIC_API_PREFIXES = [
+  '/api/public/',      // Public endpoints (kiosk ticket creation, etc.)
+  '/api/webhooks/',    // Webhooks (validate their own secrets)
+  '/api/cron/',        // Cron jobs (validate their own secrets)
+]
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -40,18 +47,26 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isPublicRoute = PUBLIC_ROUTES.some(route =>
-    request.nextUrl.pathname === route
-  ) || request.nextUrl.pathname.startsWith('/api/')
+  const pathname = request.nextUrl.pathname
+
+  // Check if route is public
+  const isPublicPage = PUBLIC_ROUTES.some(route => pathname === route)
+  const isPublicAPI = PUBLIC_API_PREFIXES.some(prefix => pathname.startsWith(prefix))
+  const isPublicRoute = isPublicPage || isPublicAPI
 
   if (!user && !isPublicRoute) {
+    // For protected API routes, return 401 JSON instead of redirect
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    // For pages, redirect to login
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    url.searchParams.set('redirect', request.nextUrl.pathname)
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
 
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
+  if (user && (pathname === '/login' || pathname === '/signup')) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)

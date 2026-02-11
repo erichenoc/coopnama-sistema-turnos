@@ -38,12 +38,12 @@ export function NewAgentModeWrapper({
 
   return (
     <div>
-      <div className="bg-blue-50 border border-blue-200 rounded-neu-sm p-3 mb-3">
+      <div className="bg-[#009e59]/10 border border-[#009e59]/20 rounded-neu-sm p-3 mb-3">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-blue-500 text-sm">💡</span>
-          <h5 className="text-xs font-semibold text-blue-800">{help.title}</h5>
+          <span className="text-emerald-400 text-sm">💡</span>
+          <h5 className="text-xs font-semibold text-emerald-300">{help.title}</h5>
         </div>
-        <p className="text-xs text-blue-600">{help.description}</p>
+        <p className="text-xs text-emerald-300">{help.description}</p>
       </div>
       {children}
     </div>

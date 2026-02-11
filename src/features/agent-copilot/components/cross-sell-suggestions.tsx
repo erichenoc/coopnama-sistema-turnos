@@ -53,17 +53,17 @@ export function CrossSellSuggestions({ ticket, context }: CrossSellSuggestionsPr
 
   return (
     <div>
-      <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+      <h4 className="text-xs font-semibold text-gray-300 uppercase mb-2">
         Servicios Sugeridos
       </h4>
       <div className="space-y-2">
         {suggestions.map((s, i) => (
           <div
             key={i}
-            className="bg-green-50 border border-green-200 p-2 rounded-neu-sm"
+            className="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-neu-sm"
           >
-            <p className="text-sm font-medium text-green-800">{s.serviceName}</p>
-            <p className="text-xs text-green-600">{s.reason}</p>
+            <p className="text-sm font-medium text-emerald-300">{s.serviceName}</p>
+            <p className="text-xs text-emerald-300">{s.reason}</p>
           </div>
         ))}
       </div>

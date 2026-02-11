@@ -97,7 +97,14 @@ export default function AgentWorkstationPage() {
   useEffect(() => { fetchCurrentTicket() }, [fetchCurrentTicket])
 
   const handleCallNext = async () => {
-    if (!selectedStation || !agentId) return
+    if (!agentId) {
+      setActionError('No se pudo identificar al agente. Recarga la pagina.')
+      return
+    }
+    if (!selectedStation) {
+      setActionError('No hay ventanilla seleccionada. Configura una ventanilla primero.')
+      return
+    }
     setActionLoading('call')
     setActionError(null)
     const result = await callNextTicketAction(selectedStation, agentId)
@@ -224,15 +231,15 @@ export default function AgentWorkstationPage() {
     <>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Estacion del Agente</h1>
-          <p className="text-gray-500">Atiende los turnos desde tu ventanilla</p>
+          <h1 className="text-2xl font-bold text-white">Estacion del Agente</h1>
+          <p className="text-gray-400">Atiende los turnos desde tu ventanilla</p>
         </div>
         <div className="flex items-center gap-3">
-          <label className="text-sm text-gray-600">Ventanilla:</label>
+          <label className="text-sm text-gray-300">Ventanilla:</label>
           <select
             value={selectedStation || ''}
             onChange={(e) => setSelectedStation(e.target.value)}
-            className="px-4 py-2 bg-neu-bg shadow-neu-xs rounded-neu-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+            className="px-4 py-2 bg-white/[0.06] shadow-neu-xs rounded-neu-sm text-gray-200 focus:outline-none focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/20"
           >
             {stations.map((s) => (
               <option key={s.id} value={s.id}>{s.name} (#{s.station_number})</option>
@@ -242,9 +249,9 @@ export default function AgentWorkstationPage() {
       </div>
 
       {actionError && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-center justify-between">
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-300 text-sm flex items-center justify-between">
           <span>{actionError}</span>
-          <button onClick={() => setActionError(null)} className="text-red-400 hover:text-red-600 ml-4">
+          <button onClick={() => setActionError(null)} className="text-red-500 hover:text-red-300 ml-4">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -258,30 +265,42 @@ export default function AgentWorkstationPage() {
           {/* Call Next Button */}
           {!currentTicket && (
             <div className="text-center py-12">
-              <button
-                onClick={handleCallNext}
-                disabled={actionLoading === 'call' || waiting.length === 0 || !agentId}
-                className={`
-                  inline-flex items-center justify-center gap-3
-                  px-12 py-6
-                  bg-coopnama-primary text-white
-                  text-2xl font-bold
-                  rounded-neu-lg shadow-neu-lg
-                  hover:bg-blue-700 active:shadow-neu-inset
-                  transition-all duration-200
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                `}
-              >
-                {actionLoading === 'call' ? (
-                  <Spinner size="md" />
-                ) : (
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+              {stations.length === 0 ? (
+                <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                  <svg className="w-12 h-12 text-amber-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
-                )}
-                Llamar Siguiente
-              </button>
-              <p className="mt-4 text-gray-500">{waiting.length} turnos en espera</p>
+                  <p className="text-amber-300 font-medium">No hay ventanillas configuradas para esta sucursal</p>
+                  <p className="text-amber-300 text-sm mt-1">Configura ventanillas desde el panel de administracion</p>
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={handleCallNext}
+                    disabled={actionLoading === 'call' || waiting.length === 0 || !agentId || !selectedStation}
+                    className={`
+                      inline-flex items-center justify-center gap-3
+                      px-12 py-6
+                      bg-coopnama-primary text-white
+                      text-2xl font-bold
+                      rounded-neu-lg shadow-neu-lg
+                      hover:bg-[#008a4e] active:shadow-neu-inset
+                      transition-all duration-200
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                    `}
+                  >
+                    {actionLoading === 'call' ? (
+                      <Spinner size="md" />
+                    ) : (
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                      </svg>
+                    )}
+                    Llamar Siguiente
+                  </button>
+                  <p className="mt-4 text-gray-500">{waiting.length} turnos en espera</p>
+                </>
+              )}
             </div>
           )}
 
@@ -304,8 +323,8 @@ export default function AgentWorkstationPage() {
                   <span className="font-mono font-bold text-6xl text-coopnama-primary block mb-2">
                     {currentTicket.ticket_number}
                   </span>
-                  <p className="text-xl text-gray-700">{currentTicket.customer_name || 'Sin nombre'}</p>
-                  <p className="text-gray-500">{currentTicket.service?.name}</p>
+                  <p className="text-xl text-gray-200">{currentTicket.customer_name || 'Sin nombre'}</p>
+                  <p className="text-gray-400">{currentTicket.service?.name}</p>
                   <div className="flex items-center justify-center gap-2 mt-2">
                     <StatusBadge status={currentTicket.status} />
                     <PriorityBadge priority={PRIORITY_NAME_MAP[currentTicket.priority]} />
@@ -341,12 +360,12 @@ export default function AgentWorkstationPage() {
 
                 {/* Transfer Panel */}
                 {showTransfer && currentTicket.status === 'serving' && (
-                  <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
-                    <p className="text-sm font-medium text-amber-800">Transferir a otro servicio</p>
+                  <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg space-y-3">
+                    <p className="text-sm font-medium text-amber-300">Transferir a otro servicio</p>
                     <select
                       value={transferServiceId}
                       onChange={(e) => setTransferServiceId(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-amber-200 rounded text-sm"
+                      className="w-full px-3 py-2 bg-slate-900/95 border border-amber-500/20 rounded text-sm"
                     >
                       <option value="">Seleccionar servicio...</option>
                       {services
@@ -361,7 +380,7 @@ export default function AgentWorkstationPage() {
                       value={transferReason}
                       onChange={(e) => setTransferReason(e.target.value)}
                       placeholder="Razon de transferencia (opcional)"
-                      className="w-full px-3 py-2 bg-white border border-amber-200 rounded text-sm"
+                      className="w-full px-3 py-2 bg-slate-900/95 border border-amber-500/20 rounded text-sm"
                     />
                     <div className="flex gap-2">
                       <Button
@@ -388,7 +407,7 @@ export default function AgentWorkstationPage() {
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Notas del servicio..."
                       rows={2}
-                      className="w-full px-4 py-3 bg-neu-bg shadow-neu-inset-xs rounded-neu-sm text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-coopnama-primary/30"
+                      className="w-full px-4 py-3 bg-white/[0.06] shadow-neu-inset-xs rounded-neu-sm text-gray-200 text-sm focus:outline-none focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/20 placeholder:text-gray-500"
                     />
                   </div>
                 )}
@@ -409,11 +428,11 @@ export default function AgentWorkstationPage() {
               ) : (
                 <div className="space-y-2">
                   {waiting.slice(0, 8).map((ticket, i) => (
-                    <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-neu-sm hover:bg-gray-50 transition-colors">
+                    <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-neu-sm hover:bg-white/[0.06] transition-colors">
                       <span className="text-sm text-gray-400 w-5">{i + 1}</span>
                       <span className="font-mono font-bold text-coopnama-primary">{ticket.ticket_number}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-700 truncate">{ticket.customer_name || '-'}</p>
+                        <p className="text-sm font-medium text-gray-200 truncate">{ticket.customer_name || '-'}</p>
                         <p className="text-xs text-gray-400">{ticket.service?.name}</p>
                       </div>
                       <PriorityBadge priority={PRIORITY_NAME_MAP[ticket.priority]} />

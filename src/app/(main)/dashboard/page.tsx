@@ -233,33 +233,33 @@ export default function DashboardPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Sucursal</th>
-                        <th className="text-center py-3 px-3 font-semibold text-gray-700">Turnos</th>
-                        <th className="text-center py-3 px-3 font-semibold text-gray-700">Espera</th>
-                        <th className="text-center py-3 px-3 font-semibold text-gray-700">Atendiendo</th>
-                        <th className="text-center py-3 px-3 font-semibold text-gray-700">Completados</th>
-                        <th className="text-center py-3 px-3 font-semibold text-gray-700">Prom. Espera</th>
-                        <th className="text-center py-3 px-3 font-semibold text-gray-700">Agentes</th>
+                      <tr className="border-b border-white/[0.08]">
+                        <th className="text-left py-3 px-4 font-semibold text-gray-200">Sucursal</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-200">Turnos</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-200">Espera</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-200">Atendiendo</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-200">Completados</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-200">Prom. Espera</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-200">Agentes</th>
                       </tr>
                     </thead>
                     <tbody>
                       {branchStats.map((b) => (
-                        <tr key={b.branch_id} className="border-b border-gray-100 hover:bg-gray-50/50">
-                          <td className="py-3 px-4 font-medium text-gray-800">{b.branch_name}</td>
+                        <tr key={b.branch_id} className="border-b border-white/[0.06] hover:bg-white/[0.06]">
+                          <td className="py-3 px-4 font-medium text-white">{b.branch_name}</td>
                           <td className="text-center py-3 px-3">{Number(b.total_tickets)}</td>
                           <td className="text-center py-3 px-3">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-300">
                               {Number(b.waiting_tickets)}
                             </span>
                           </td>
                           <td className="text-center py-3 px-3">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-300">
                               {Number(b.serving_tickets)}
                             </span>
                           </td>
                           <td className="text-center py-3 px-3">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-300">
                               {Number(b.completed_tickets)}
                             </span>
                           </td>
@@ -285,29 +285,29 @@ export default function DashboardPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{bq.branchName}</CardTitle>
-                    <span className="px-2 py-0.5 bg-coopnama-primary/10 text-coopnama-primary text-xs font-medium rounded-full">
+                    <span className="px-2 py-0.5 bg-[#009e59]/10 text-[#009e59] text-xs font-medium rounded-full">
                       {bq.total} activos
                     </span>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-4 text-sm mb-3">
-                    <span className="text-yellow-600">{bq.waiting.length} esperando</span>
-                    <span className="text-blue-600">{bq.called.length} llamados</span>
-                    <span className="text-green-600">{bq.serving.length} atendiendo</span>
+                    <span className="text-yellow-400">{bq.waiting.length} esperando</span>
+                    <span className="text-emerald-400">{bq.called.length} llamados</span>
+                    <span className="text-green-400">{bq.serving.length} atendiendo</span>
                   </div>
                   {bq.total === 0 ? (
-                    <p className="text-sm text-gray-400">Sin turnos activos</p>
+                    <p className="text-sm text-gray-300">Sin turnos activos</p>
                   ) : (
                     <div className="space-y-2">
                       {[...bq.serving, ...bq.called, ...bq.waiting].slice(0, 4).map((ticket) => (
                         <div
                           key={ticket.id}
-                          className="flex items-center justify-between p-2 bg-neu-bg shadow-neu-xs rounded-neu-sm text-sm"
+                          className="flex items-center justify-between p-2 bg-white/[0.06] shadow-neu-xs rounded-neu-sm text-sm"
                         >
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-coopnama-primary">{ticket.ticket_number}</span>
-                            <span className="text-gray-500">{ticket.service?.name}</span>
+                            <span className="font-mono font-bold text-[#009e59]">{ticket.ticket_number}</span>
+                            <span className="text-gray-300">{ticket.service?.name}</span>
                           </div>
                           <StatusBadge status={ticket.status} />
                         </div>
@@ -335,10 +335,10 @@ export default function DashboardPage() {
                   <Link
                     key={index}
                     href={action.href}
-                    className="flex flex-col items-center gap-2 p-4 bg-neu-bg shadow-neu-sm rounded-neu-sm hover:shadow-neu-xs active:shadow-neu-inset-xs transition-all"
+                    className="flex flex-col items-center gap-2 p-4 bg-white/[0.06] shadow-neu-sm rounded-neu-sm hover:shadow-neu-xs active:shadow-neu-inset-xs transition-all"
                   >
                     <span className="text-2xl">{action.icon}</span>
-                    <span className="font-medium text-sm text-gray-700">{action.label}</span>
+                    <span className="font-medium text-sm text-gray-200">{action.label}</span>
                   </Link>
                 ))}
               </div>
@@ -363,20 +363,20 @@ export default function DashboardPage() {
               <CardContent>
                 {tickets.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-gray-400">No hay turnos activos</p>
+                    <p className="text-gray-300">No hay turnos activos</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {tickets.slice(0, 8).map((ticket) => (
                       <div
                         key={ticket.id}
-                        className="flex items-center justify-between p-4 bg-neu-bg shadow-neu-sm rounded-neu-sm hover:shadow-neu-xs transition-shadow"
+                        className="flex items-center justify-between p-4 bg-white/[0.06] shadow-neu-sm rounded-neu-sm hover:shadow-neu-xs transition-shadow"
                       >
                         <div className="flex items-center gap-4">
-                          <span className="font-mono font-bold text-lg text-coopnama-primary">{ticket.ticket_number}</span>
+                          <span className="font-mono font-bold text-lg text-[#009e59]">{ticket.ticket_number}</span>
                           <div>
-                            <p className="font-medium text-gray-800">{ticket.customer_name || 'Sin nombre'}</p>
-                            <p className="text-sm text-gray-500">{ticket.service?.name}</p>
+                            <p className="font-medium text-white">{ticket.customer_name || 'Sin nombre'}</p>
+                            <p className="text-sm text-gray-300">{ticket.service?.name}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -387,7 +387,7 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 )}
-                <Link href="/queue" className="block w-full mt-4 py-2 text-center text-coopnama-primary font-medium rounded-neu-sm hover:bg-coopnama-primary/5 transition-colors">
+                <Link href="/queue" className="block w-full mt-4 py-2 text-center text-emerald-400 font-medium rounded-neu-sm hover:bg-emerald-400/10 transition-colors">
                   Ver todos los turnos
                 </Link>
               </CardContent>
@@ -400,19 +400,19 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="space-y-3">
                   {[
-                    { label: 'Estacion del Agente', href: '/agents', icon: '&#128227;', color: 'text-coopnama-accent' },
-                    { label: 'Pantalla TV', href: '/tv', icon: '&#128250;', color: 'text-coopnama-primary' },
-                    { label: 'Modo Kiosko', href: '/kiosk', icon: '&#128421;', color: 'text-coopnama-secondary' },
-                    { label: 'Gestion de Miembros', href: '/members', icon: '&#128100;', color: 'text-gray-500' },
+                    { label: 'Estacion del Agente', href: '/agents', icon: '&#128227;', color: 'text-emerald-400' },
+                    { label: 'Pantalla TV', href: '/tv', icon: '&#128250;', color: 'text-emerald-400' },
+                    { label: 'Modo Kiosko', href: '/kiosk', icon: '&#128421;', color: 'text-emerald-400' },
+                    { label: 'Gestion de Miembros', href: '/members', icon: '&#128100;', color: 'text-gray-400' },
                   ].map((action, index) => (
                     <Link
                       key={index}
                       href={action.href}
                       target={action.href === '/tv' || action.href === '/kiosk' ? '_blank' : undefined}
-                      className="flex items-center gap-3 p-4 bg-neu-bg shadow-neu-sm rounded-neu-sm hover:shadow-neu-xs active:shadow-neu-inset-xs transition-all"
+                      className="flex items-center gap-3 p-4 bg-white/[0.06] shadow-neu-sm rounded-neu-sm hover:shadow-neu-xs active:shadow-neu-inset-xs transition-all"
                     >
                       <span className="text-2xl" dangerouslySetInnerHTML={{ __html: action.icon }} />
-                      <span className="font-medium text-gray-700">{action.label}</span>
+                      <span className="font-medium text-gray-200">{action.label}</span>
                     </Link>
                   ))}
                 </div>
@@ -438,10 +438,10 @@ export default function DashboardPage() {
                     return (
                       <div key={index}>
                         <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium text-gray-700">{item.label}</span>
-                          <span className="text-sm text-gray-500">{item.value} ({pct}%)</span>
+                          <span className="text-sm font-medium text-gray-200">{item.label}</span>
+                          <span className="text-sm text-gray-400">{item.value} ({pct}%)</span>
                         </div>
-                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-white/[0.08] rounded-full overflow-hidden">
                           <div className={`h-full ${item.color} rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
                         </div>
                       </div>
@@ -457,21 +457,21 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="p-4 bg-coopnama-primary/5 rounded-neu-sm">
-                    <p className="text-sm text-gray-500">Tiempo promedio de espera</p>
-                    <p className="text-2xl font-bold text-coopnama-primary">{avgWaitMin} min</p>
+                  <div className="p-4 bg-[#009e59]/10 rounded-neu-sm">
+                    <p className="text-sm text-gray-300">Tiempo promedio de espera</p>
+                    <p className="text-2xl font-bold text-[#009e59]">{avgWaitMin} min</p>
                   </div>
-                  <div className="p-4 bg-coopnama-secondary/5 rounded-neu-sm">
-                    <p className="text-sm text-gray-500">Tiempo promedio de atencion</p>
-                    <p className="text-2xl font-bold text-coopnama-secondary">
+                  <div className="p-4 bg-emerald-500/10 rounded-neu-sm">
+                    <p className="text-sm text-gray-300">Tiempo promedio de atencion</p>
+                    <p className="text-2xl font-bold text-emerald-400">
                       {stats?.avg_service_time_seconds
                         ? (Number(stats.avg_service_time_seconds) / 60).toFixed(1)
                         : '0'} min
                     </p>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-neu-sm">
-                    <p className="text-sm text-gray-500">Total completados hoy</p>
-                    <p className="text-2xl font-bold text-gray-700">{stats?.completed_tickets ?? 0}</p>
+                  <div className="p-4 bg-white/[0.04] rounded-neu-sm">
+                    <p className="text-sm text-gray-300">Total completados hoy</p>
+                    <p className="text-2xl font-bold text-gray-200">{stats?.completed_tickets ?? 0}</p>
                   </div>
                 </div>
               </CardContent>

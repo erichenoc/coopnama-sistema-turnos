@@ -46,17 +46,17 @@ const CATEGORY_OPTIONS: SelectOption[] = [
 ]
 
 const CATEGORY_COLORS: Record<ServiceCategory, string> = {
-  creditos: 'bg-blue-500',
+  creditos: 'bg-emerald-500',
   ahorros: 'bg-green-500',
   servicios: 'bg-amber-500',
   general: 'bg-gray-500',
 }
 
 const CATEGORY_TEXT_COLORS: Record<ServiceCategory, string> = {
-  creditos: 'text-blue-600',
+  creditos: 'text-emerald-400',
   ahorros: 'text-green-600',
   servicios: 'text-amber-600',
-  general: 'text-gray-600',
+  general: 'text-gray-300',
 }
 
 const DEFAULT_COLORS = [
@@ -210,7 +210,7 @@ export default function ServicesPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setCategoryFilter('all')}
-            className={`px-4 py-2 rounded-neu-sm transition-all ${categoryFilter === 'all' ? 'shadow-neu-inset text-coopnama-primary' : 'shadow-neu'}`}
+            className={`px-4 py-2 rounded-neu-sm transition-all ${categoryFilter === 'all' ? 'shadow-neu-inset text-[#009e59]' : 'shadow-neu'}`}
           >
             Todos
           </button>
@@ -218,7 +218,7 @@ export default function ServicesPage() {
             <button
               key={cat.value}
               onClick={() => setCategoryFilter(cat.value as ServiceCategory)}
-              className={`px-4 py-2 rounded-neu-sm transition-all ${categoryFilter === cat.value ? 'shadow-neu-inset text-coopnama-primary' : 'shadow-neu'}`}
+              className={`px-4 py-2 rounded-neu-sm transition-all ${categoryFilter === cat.value ? 'shadow-neu-inset text-[#009e59]' : 'shadow-neu'}`}
             >
               {cat.label}
             </button>
@@ -249,9 +249,9 @@ export default function ServicesPage() {
             </CardHeader>
             <CardContent>
               {service.description && (
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{service.description}</p>
+                <p className="text-sm text-gray-200 mb-3 line-clamp-2">{service.description}</p>
               )}
-              <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-4 text-sm text-gray-300">
                 <div className="flex items-center gap-1">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -276,7 +276,7 @@ export default function ServicesPage() {
       <Modal isOpen={isModalOpen} onClose={closeModal} size="lg">
         <form onSubmit={handleSubmit}>
           <ModalHeader>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-white">
               {editingService ? 'Editar Servicio' : 'Nuevo Servicio'}
             </h2>
           </ModalHeader>
@@ -316,14 +316,14 @@ export default function ServicesPage() {
                 min={1}
               />
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-2">Color</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Color</label>
                 <div className="flex gap-2 flex-wrap">
                   {DEFAULT_COLORS.map((color) => (
                     <button
                       key={color}
                       type="button"
                       onClick={() => setFormData({ ...formData, color })}
-                      className={`w-10 h-10 rounded-full shadow-neu transition-all ${formData.color === color ? 'ring-4 ring-coopnama-primary' : ''}`}
+                      className={`w-10 h-10 rounded-full shadow-neu transition-all ${formData.color === color ? 'ring-4 ring-[#009e59]' : ''}`}
                       style={{ backgroundColor: color }}
                     />
                   ))}

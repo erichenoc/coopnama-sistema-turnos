@@ -76,7 +76,7 @@ export function Member360Card({ ticket }: Member360CardProps) {
 
   if (!ticket?.member_id) {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-300 py-8">
         No hay miembro asociado a este turno
       </div>
     )
@@ -92,7 +92,7 @@ export function Member360Card({ ticket }: Member360CardProps) {
 
   if (!member) {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-300 py-8">
         No se encontro informacion del miembro
       </div>
     )
@@ -100,9 +100,9 @@ export function Member360Card({ ticket }: Member360CardProps) {
 
   const priorityLabels: Record<number, string> = { 0: 'Normal', 1: 'Preferencial', 2: 'VIP' }
   const priorityColors: Record<number, string> = {
-    0: 'bg-gray-100 text-gray-700',
-    1: 'bg-yellow-100 text-yellow-700',
-    2: 'bg-purple-100 text-purple-700',
+    0: 'bg-white/[0.06] text-gray-200',
+    1: 'bg-yellow-500/10 text-yellow-300',
+    2: 'bg-purple-500/10 text-purple-300',
   }
 
   const sentimentEmoji: Record<string, string> = {
@@ -130,18 +130,18 @@ export function Member360Card({ ticket }: Member360CardProps) {
         {'☆'.repeat(5 - r)}
       </span>
     ) : (
-      <span className="text-gray-400 text-xs">Sin calif.</span>
+      <span className="text-gray-300 text-xs">Sin calif.</span>
     )
 
   return (
     <div className="space-y-4">
       {/* Profile Card */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-neu-sm shadow-neu-xs">
+      <div className="bg-[#009e59]/10 p-4 rounded-neu-sm shadow-neu-xs">
         <div className="flex items-start justify-between mb-2">
           <div>
-            <h3 className="font-semibold text-gray-800">{member.full_name}</h3>
+            <h3 className="font-semibold text-white">{member.full_name}</h3>
             {member.cedula && (
-              <p className="text-xs text-gray-500">Cedula: {member.cedula}</p>
+              <p className="text-xs text-gray-300">Cedula: {member.cedula}</p>
             )}
           </div>
           <span
@@ -153,39 +153,39 @@ export function Member360Card({ ticket }: Member360CardProps) {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mt-3">
+        <div className="grid grid-cols-2 gap-2 text-xs text-gray-300 mt-3">
           {member.phone && (
             <div>
-              <span className="text-gray-400">Tel:</span> {member.phone}
+              <span className="text-gray-300">Tel:</span> {member.phone}
             </div>
           )}
           {member.email && (
             <div>
-              <span className="text-gray-400">Email:</span> {member.email}
+              <span className="text-gray-300">Email:</span> {member.email}
             </div>
           )}
           {member.member_number && (
             <div>
-              <span className="text-gray-400">No.:</span> {member.member_number}
+              <span className="text-gray-300">No.:</span> {member.member_number}
             </div>
           )}
           <div>
-            <span className="text-gray-400">Visitas:</span>{' '}
+            <span className="text-gray-300">Visitas:</span>{' '}
             <span className="font-medium">{member.total_visits}</span>
           </div>
         </div>
 
         {/* Sentiment + Rating row */}
-        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-blue-100">
+        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#009e59]/20">
           {avgRating !== null && (
             <div className="flex items-center gap-1 text-sm">
               <span className="text-yellow-500">★</span>
               <span className="font-medium">{avgRating}</span>
-              <span className="text-xs text-gray-400">prom</span>
+              <span className="text-xs text-gray-300">prom</span>
             </div>
           )}
           {sentimentTrend && (
-            <div className="flex items-center gap-1 text-xs text-gray-600">
+            <div className="flex items-center gap-1 text-xs text-gray-300">
               <span>{sentimentEmoji[sentimentTrend]}</span>
               <span>
                 {sentimentTrend === 'improving'
@@ -199,19 +199,19 @@ export function Member360Card({ ticket }: Member360CardProps) {
         </div>
 
         {member.notes && (
-          <div className="mt-2 pt-2 border-t border-blue-100">
-            <p className="text-xs text-gray-600 italic">{member.notes}</p>
+          <div className="mt-2 pt-2 border-t border-[#009e59]/20">
+            <p className="text-xs text-gray-300 italic">{member.notes}</p>
           </div>
         )}
       </div>
 
       {/* Visit History */}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+        <h4 className="text-xs font-semibold text-gray-300 uppercase mb-2">
           Historial Reciente
         </h4>
         {visits.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-4">
+          <p className="text-sm text-gray-300 text-center py-4">
             No hay historial disponible
           </p>
         ) : (
@@ -219,14 +219,14 @@ export function Member360Card({ ticket }: Member360CardProps) {
             {visits.slice(0, 5).map((visit) => (
               <div
                 key={visit.ticket_number}
-                className="bg-gray-50 p-3 rounded-neu-sm shadow-neu-xs"
+                className="bg-white/[0.06] p-3 rounded-neu-sm shadow-neu-xs"
               >
                 <div className="flex justify-between items-start mb-1">
                   <div>
-                    <p className="font-medium text-gray-800 text-sm">
+                    <p className="font-medium text-white text-sm">
                       {visit.service?.name || 'N/A'}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-300">
                       {new Date(visit.created_at).toLocaleDateString('es-DO', {
                         year: 'numeric',
                         month: 'short',
@@ -236,12 +236,12 @@ export function Member360Card({ ticket }: Member360CardProps) {
                   </div>
                   <div className="text-right text-xs">{renderStars(visit.rating)}</div>
                 </div>
-                <div className="flex gap-4 text-xs text-gray-600">
+                <div className="flex gap-4 text-xs text-gray-300">
                   <span>Espera: {formatTime(visit.wait_time_seconds)}</span>
                   <span>Servicio: {formatTime(visit.service_time_seconds)}</span>
                 </div>
                 {visit.feedback_comment && (
-                  <p className="text-xs text-gray-500 italic mt-1">
+                  <p className="text-xs text-gray-300 italic mt-1">
                     &quot;{visit.feedback_comment}&quot;
                   </p>
                 )}

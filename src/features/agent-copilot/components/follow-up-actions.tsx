@@ -106,7 +106,7 @@ export function FollowUpActions({ ticket, context }: FollowUpActionsProps) {
 
   return (
     <div>
-      <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+      <h4 className="text-xs font-semibold text-gray-300 uppercase mb-2">
         Acciones de Seguimiento
       </h4>
 
@@ -119,7 +119,7 @@ export function FollowUpActions({ ticket, context }: FollowUpActionsProps) {
             onChange={(e) => setNewTask(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addTask()}
             placeholder="Nueva accion..."
-            className="flex-1 px-3 py-2 rounded-neu-sm shadow-neu-inset text-sm focus:outline-none focus:ring-2 focus:ring-coopnama-primary"
+            className="flex-1 px-3 py-2 rounded-neu-sm shadow-neu-inset text-sm focus:outline-none focus:border-[#009e59]/50 focus:ring-2 focus:ring-[#009e59]/20 bg-white/[0.04] text-white placeholder:text-gray-400"
           />
           <Button
             onClick={addTask}
@@ -138,7 +138,7 @@ export function FollowUpActions({ ticket, context }: FollowUpActionsProps) {
           <Spinner size="sm" />
         </div>
       ) : tasks.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-4">
+        <p className="text-sm text-gray-300 text-center py-4">
           No hay acciones pendientes
         </p>
       ) : (
@@ -147,26 +147,26 @@ export function FollowUpActions({ ticket, context }: FollowUpActionsProps) {
             <div
               key={task.id}
               className={`flex items-start gap-2 p-2 rounded-neu-sm ${
-                task.is_completed ? 'bg-gray-100 opacity-60' : 'bg-gray-50 shadow-neu-xs'
+                task.is_completed ? 'bg-white/[0.06] opacity-60' : 'bg-white/[0.06] shadow-neu-xs'
               }`}
             >
               <input
                 type="checkbox"
                 checked={task.is_completed}
                 onChange={() => toggleTask(task.id)}
-                className="mt-0.5 accent-coopnama-primary"
+                className="mt-0.5 accent-[#009e59]"
               />
               <div className="flex-1 min-w-0">
                 <p
                   className={`text-sm ${
                     task.is_completed
-                      ? 'line-through text-gray-400'
-                      : 'text-gray-700'
+                      ? 'line-through text-gray-300'
+                      : 'text-gray-200'
                   }`}
                 >
                   {task.task_description}
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-300">
                   {new Date(task.created_at).toLocaleDateString('es-DO', {
                     month: 'short',
                     day: 'numeric',

@@ -20,7 +20,7 @@ const CHANNELS = [
   {
     title: 'Kiosko Tactil',
     description: 'Auto-servicio 24/7 con busqueda por cedula, prioridad automatica para VIP e impresion de recibo termica.',
-    gradient: 'from-blue-600 to-blue-800',
+    gradient: 'from-[#009e59] to-[#00c96f]',
     icon: 'kiosk',
   },
   {
@@ -48,7 +48,7 @@ const FEATURES = [
     number: '01',
     title: 'Cola Inteligente con Prioridades',
     description: 'Asignacion automatica de prioridad para socios VIP, personas mayores y embarazadas. Transferencias entre servicios sin perder el lugar en la fila.',
-    gradient: 'from-blue-600 to-blue-800',
+    gradient: 'from-[#009e59] to-[#00c96f]',
   },
   {
     number: '02',
@@ -104,7 +104,7 @@ const AI_CAPABILITIES = [
 const ROLE_BENEFITS = [
   {
     role: 'Para la Gerencia',
-    gradient: 'from-blue-600 to-blue-800',
+    gradient: 'from-[#009e59] to-[#00c96f]',
     benefits: [
       'Visibilidad total de operaciones en tiempo real',
       'Prediccion de demanda para planificacion de personal',
@@ -210,7 +210,7 @@ function ChannelIcon({ type }: { type: string }) {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-neu-bg">
+    <main className="min-h-screen bg-slate-950">
       {/* Decorative Background */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-60 -right-60 w-[500px] h-[500px] bg-coopnama-primary/[0.04] rounded-full blur-3xl" />
@@ -229,20 +229,20 @@ export default function Home() {
             priority
           />
           <div>
-            <span className="font-bold text-lg text-gray-800 leading-none block">COOPNAMA</span>
-            <span className="text-[11px] text-gray-500 leading-none">Sistema de Turnos</span>
+            <span className="font-bold text-lg text-white leading-none block">COOPNAMA</span>
+            <span className="text-[11px] text-gray-400 leading-none">Sistema de Turnos</span>
           </div>
         </div>
         <nav className="flex items-center gap-3">
           <Link
             href="/login"
-            className="px-4 py-2 text-sm text-gray-600 hover:text-coopnama-primary transition-colors"
+            className="px-4 py-2 text-sm text-gray-300 hover:text-[#009e59] transition-colors"
           >
             Iniciar Sesion
           </Link>
           <Link
             href="/signup"
-            className="px-5 py-2.5 bg-coopnama-primary text-white text-sm font-medium rounded-neu-sm shadow-neu-xs hover:bg-blue-700 active:shadow-neu-inset-xs transition-all duration-150"
+            className="px-5 py-2.5 bg-gradient-to-r from-[#009e59] to-[#00c96f] text-white text-sm font-medium rounded-neu-sm shadow-neu-xs hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,158,89,0.3)] active:shadow-neu-inset-xs transition-all duration-150"
           >
             Registrarse
           </Link>
@@ -252,20 +252,20 @@ export default function Home() {
       {/* Hero Section */}
       <section className="max-w-5xl mx-auto px-6 pt-16 pb-20 text-center">
         <div className="mb-6">
-          <span className="inline-block px-4 py-1.5 bg-coopnama-primary/[0.08] text-coopnama-primary text-xs font-semibold tracking-wide uppercase rounded-full">
+          <span className="inline-block px-4 py-1.5 bg-[#009e59]/10 text-[#009e59] text-xs font-semibold tracking-wide uppercase rounded-full">
             Potenciado con Inteligencia Artificial
           </span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] mb-6 tracking-tight">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6 tracking-tight">
           La experiencia de{' '}
-          <span className="bg-gradient-to-r from-coopnama-primary to-blue-500 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#009e59] to-[#00c96f] bg-clip-text text-transparent">
             atencion
           </span>{' '}
           que tus socios merecen
         </h1>
 
-        <p className="text-lg text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed">
           Plataforma integral de gestion de turnos y citas con IA integrada. Elimina filas fisicas,
           predice demanda, asiste a tus agentes y transforma cada visita en una experiencia eficiente.
         </p>
@@ -273,13 +273,19 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/kiosk"
-            className="px-8 py-3.5 bg-coopnama-primary text-white text-base font-semibold rounded-neu shadow-neu hover:bg-blue-700 active:shadow-neu-inset transition-all duration-200 w-full sm:w-auto"
+            className="px-8 py-3.5 bg-gradient-to-r from-[#009e59] to-[#00c96f] text-white text-base font-semibold rounded-neu shadow-neu hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,158,89,0.3)] active:shadow-neu-inset transition-all duration-200 w-full sm:w-auto"
           >
             Obtener Turno
           </Link>
           <Link
+            href="/booking"
+            className="px-8 py-3.5 bg-white/[0.06] text-gray-200 text-base font-semibold rounded-neu shadow-neu hover:shadow-neu-sm active:shadow-neu-inset transition-all duration-200 w-full sm:w-auto border border-white/[0.08]"
+          >
+            Agendar Cita
+          </Link>
+          <Link
             href="/dashboard"
-            className="px-8 py-3.5 bg-neu-bg text-gray-700 text-base font-semibold rounded-neu shadow-neu hover:shadow-neu-sm active:shadow-neu-inset transition-all duration-200 w-full sm:w-auto"
+            className="px-8 py-3.5 bg-white/[0.06] text-gray-200 text-base font-semibold rounded-neu shadow-neu hover:shadow-neu-sm active:shadow-neu-inset transition-all duration-200 w-full sm:w-auto"
           >
             Ver Dashboard
           </Link>
@@ -288,14 +294,14 @@ export default function Home() {
 
       {/* Impact Stats */}
       <section className="max-w-5xl mx-auto px-6 pb-20">
-        <div className="bg-neu-bg shadow-neu rounded-neu-lg p-8">
+        <div className="bg-white/[0.06] shadow-neu rounded-neu-lg p-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {IMPACT_STATS.map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-3xl lg:text-4xl font-bold text-coopnama-primary mb-1">
+                <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-1">
                   {stat.value}
                 </div>
-                <div className="text-sm text-gray-500 leading-snug">
+                <div className="text-sm text-gray-300 leading-snug">
                   {stat.label}
                 </div>
               </div>
@@ -307,10 +313,10 @@ export default function Home() {
       {/* 4 Channels */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             4 canales para obtener turno
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <p className="text-gray-300 max-w-xl mx-auto">
             Tus socios eligen como y desde donde quieren tomar su turno.
             Sin filas, sin friccion.
           </p>
@@ -320,15 +326,15 @@ export default function Home() {
           {CHANNELS.map((channel) => (
             <div
               key={channel.title}
-              className="bg-neu-bg shadow-neu rounded-neu-lg p-6 hover:shadow-neu-md transition-shadow duration-300"
+              className="bg-white/[0.06] shadow-neu rounded-neu-lg p-6 hover:shadow-neu-md transition-shadow duration-300"
             >
               <div className={`inline-flex items-center justify-center w-12 h-12 rounded-neu-sm bg-gradient-to-br ${channel.gradient} text-white mb-5`}>
                 <ChannelIcon type={channel.icon} />
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
+              <h3 className="text-lg font-bold text-white mb-2">
                 {channel.title}
               </h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
+              <p className="text-gray-300 text-sm leading-relaxed">
                 {channel.description}
               </p>
             </div>
@@ -339,10 +345,10 @@ export default function Home() {
       {/* Core Features */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Todo lo que necesitas para una atencion excepcional
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <p className="text-gray-300 max-w-xl mx-auto">
             Herramientas disenadas para optimizar cada punto de contacto
             entre la cooperativa y sus socios.
           </p>
@@ -352,15 +358,15 @@ export default function Home() {
           {FEATURES.map((feature) => (
             <div
               key={feature.number}
-              className="group bg-neu-bg shadow-neu rounded-neu-lg p-8 hover:shadow-neu-md transition-shadow duration-300"
+              className="group bg-white/[0.06] shadow-neu rounded-neu-lg p-8 hover:shadow-neu-md transition-shadow duration-300"
             >
               <div className={`inline-flex items-center justify-center w-12 h-12 rounded-neu-sm bg-gradient-to-br ${feature.gradient} text-white text-sm font-bold mb-6`}>
                 {feature.number}
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">
+              <h3 className="text-xl font-bold text-white mb-3">
                 {feature.title}
               </h3>
-              <p className="text-gray-500 leading-relaxed text-[15px]">
+              <p className="text-gray-300 leading-relaxed text-[15px]">
                 {feature.description}
               </p>
             </div>
@@ -372,13 +378,13 @@ export default function Home() {
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-neu-lg p-10 md:p-14">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 bg-white/10 text-blue-300 text-xs font-semibold tracking-wide uppercase rounded-full mb-4">
+            <span className="inline-block px-4 py-1.5 bg-white/10 text-emerald-300 text-xs font-semibold tracking-wide uppercase rounded-full mb-4">
               Inteligencia Artificial
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               IA que trabaja para tu equipo
             </h2>
-            <p className="text-gray-400 max-w-xl mx-auto">
+            <p className="text-gray-300 max-w-xl mx-auto">
               No es solo automatizacion. Es inteligencia que predice, asiste,
               analiza y aprende de cada interaccion.
             </p>
@@ -391,14 +397,14 @@ export default function Home() {
                 className="bg-white/[0.06] border border-white/[0.08] rounded-neu-sm p-6 hover:bg-white/[0.1] transition-colors"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xs font-bold">
                     {String(i + 1).padStart(2, '0')}
                   </div>
                   <h3 className="text-lg font-bold text-white">
                     {cap.title}
                   </h3>
                 </div>
-                <p className="text-gray-400 text-sm leading-relaxed">
+                <p className="text-gray-300 text-sm leading-relaxed">
                   {cap.description}
                 </p>
               </div>
@@ -410,10 +416,10 @@ export default function Home() {
       {/* Benefits by Role */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Beneficios para cada rol
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <p className="text-gray-300 max-w-xl mx-auto">
             Cada persona en la organizacion obtiene herramientas
             disenadas para su funcion.
           </p>
@@ -423,7 +429,7 @@ export default function Home() {
           {ROLE_BENEFITS.map((role) => (
             <div
               key={role.role}
-              className="bg-neu-bg shadow-neu rounded-neu-lg overflow-hidden"
+              className="bg-white/[0.06] shadow-neu rounded-neu-lg overflow-hidden"
             >
               <div className={`bg-gradient-to-r ${role.gradient} px-6 py-4`}>
                 <h3 className="text-lg font-bold text-white">{role.role}</h3>
@@ -431,8 +437,8 @@ export default function Home() {
               <ul className="px-6 py-5 space-y-3">
                 {role.benefits.map((benefit) => (
                   <li key={benefit} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-coopnama-primary mt-2 flex-shrink-0" />
-                    <span className="text-sm text-gray-600 leading-snug">{benefit}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#009e59] mt-2 flex-shrink-0" />
+                    <span className="text-sm text-gray-200 leading-snug">{benefit}</span>
                   </li>
                 ))}
               </ul>
@@ -444,10 +450,10 @@ export default function Home() {
       {/* Operational Features Grid */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Gestion operativa completa
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <p className="text-gray-300 max-w-xl mx-auto">
             Todo lo que necesita la gerencia para tener control total
             de las operaciones.
           </p>
@@ -462,9 +468,9 @@ export default function Home() {
             { title: 'White-Label', desc: 'Logo, colores, dominio propio y CSS personalizado. El sistema refleja tu marca, no la nuestra.' },
             { title: '8 Roles de Seguridad', desc: 'Desde Super Admin hasta Viewer. RLS por organizacion, MFA disponible y audit log completo.' },
           ].map((item) => (
-            <div key={item.title} className="bg-neu-bg shadow-neu-sm rounded-neu-sm p-6">
-              <h3 className="font-bold text-gray-800 mb-2">{item.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+            <div key={item.title} className="bg-white/[0.06] shadow-neu-sm rounded-neu-sm p-6">
+              <h3 className="font-bold text-white mb-2">{item.title}</h3>
+              <p className="text-gray-300 text-sm leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -473,39 +479,39 @@ export default function Home() {
       {/* Differentiators */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Por que COOPNAMA Turnos
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <p className="text-gray-300 max-w-xl mx-auto">
             Comparacion directa con soluciones tipicas del mercado.
           </p>
         </div>
 
-        <div className="bg-neu-bg shadow-neu rounded-neu-lg overflow-hidden">
+        <div className="bg-white/[0.06] shadow-neu rounded-neu-lg overflow-hidden">
           <div className="grid grid-cols-[1fr_auto_auto] text-sm">
             {/* Header */}
-            <div className="px-6 py-3 bg-gray-100 font-semibold text-gray-700 border-b border-gray-200">Caracteristica</div>
-            <div className="px-6 py-3 bg-gray-100 font-semibold text-coopnama-primary border-b border-gray-200 text-center min-w-[100px]">Nosotros</div>
-            <div className="px-6 py-3 bg-gray-100 font-semibold text-gray-500 border-b border-gray-200 text-center min-w-[100px]">Otros</div>
+            <div className="px-6 py-3 bg-white/[0.06] font-semibold text-gray-200 border-b border-white/[0.08]">Caracteristica</div>
+            <div className="px-6 py-3 bg-white/[0.06] font-semibold text-[#009e59] border-b border-white/[0.08] text-center min-w-[100px]">Nosotros</div>
+            <div className="px-6 py-3 bg-white/[0.06] font-semibold text-gray-300 border-b border-white/[0.08] text-center min-w-[100px]">Otros</div>
 
             {/* Rows */}
             {DIFFERENTIATORS.map((row, i) => (
               <div key={row.feature} className="contents">
-                <div className={`px-6 py-3 text-gray-700 ${i < DIFFERENTIATORS.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                <div className={`px-6 py-3 text-gray-200 ${i < DIFFERENTIATORS.length - 1 ? 'border-b border-white/[0.06]' : ''}`}>
                   {row.feature}
                 </div>
-                <div className={`px-6 py-3 text-center ${i < DIFFERENTIATORS.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                <div className={`px-6 py-3 text-center ${i < DIFFERENTIATORS.length - 1 ? 'border-b border-white/[0.06]' : ''}`}>
                   <span className="inline-block w-5 h-5 rounded-full bg-coopnama-secondary/20 text-coopnama-secondary text-xs font-bold leading-5">
                     &#10003;
                   </span>
                 </div>
-                <div className={`px-6 py-3 text-center text-gray-400 ${i < DIFFERENTIATORS.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                <div className={`px-6 py-3 text-center text-gray-300 ${i < DIFFERENTIATORS.length - 1 ? 'border-b border-white/[0.06]' : ''}`}>
                   {row.them === false ? (
-                    <span className="inline-block w-5 h-5 rounded-full bg-gray-100 text-gray-400 text-xs font-bold leading-5">
+                    <span className="inline-block w-5 h-5 rounded-full bg-white/[0.06] text-gray-300 text-xs font-bold leading-5">
                       &#10007;
                     </span>
                   ) : (
-                    <span className="text-xs text-gray-400">{row.them}</span>
+                    <span className="text-xs text-gray-300">{row.them}</span>
                   )}
                 </div>
               </div>
@@ -517,10 +523,10 @@ export default function Home() {
       {/* How it Works */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Simple de usar, poderoso por dentro
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <p className="text-gray-300 max-w-xl mx-auto">
             Tres pasos para transformar la atencion al socio.
           </p>
         </div>
@@ -532,13 +538,13 @@ export default function Home() {
                 <div className="hidden md:block absolute top-8 left-[calc(50%+40px)] w-[calc(100%-80px)] h-px bg-gradient-to-r from-gray-300 to-gray-200" />
               )}
               <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neu-bg shadow-neu text-2xl font-bold text-coopnama-primary mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/[0.06] shadow-neu text-2xl font-bold text-[#009e59] mb-6">
                   {item.step}
                 </div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">
+                <h3 className="text-lg font-bold text-white mb-2">
                   {item.title}
                 </h3>
-                <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
+                <p className="text-gray-300 text-sm leading-relaxed max-w-xs mx-auto">
                   {item.description}
                 </p>
               </div>
@@ -550,7 +556,7 @@ export default function Home() {
       {/* Quick Access Cards */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div className="text-center mb-10">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Accesos Directos
           </h2>
         </div>
@@ -558,17 +564,17 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link
             href="/tv"
-            className="group bg-neu-bg shadow-neu rounded-neu-lg p-8 hover:shadow-neu-md transition-all duration-300 block"
+            className="group bg-white/[0.06] shadow-neu rounded-neu-lg p-8 hover:shadow-neu-md transition-all duration-300 block"
           >
             <div className="flex items-start gap-5">
               <div className="flex-shrink-0 w-14 h-14 rounded-neu bg-gradient-to-br from-coopnama-accent/20 to-coopnama-accent/5 flex items-center justify-center">
                 <div className="w-7 h-5 rounded-sm border-2 border-coopnama-accent/70" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-800 group-hover:text-coopnama-primary transition-colors mb-1">
+                <h3 className="text-xl font-bold text-white group-hover:text-[#009e59] transition-colors mb-1">
                   Pantalla TV
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-300 text-sm">
                   Vista optimizada para pantallas en sala de espera. Muestra los turnos
                   llamados en tiempo real con anuncios de voz IA.
                 </p>
@@ -578,17 +584,17 @@ export default function Home() {
 
           <Link
             href="/kiosk"
-            className="group bg-neu-bg shadow-neu rounded-neu-lg p-8 hover:shadow-neu-md transition-all duration-300 block"
+            className="group bg-white/[0.06] shadow-neu rounded-neu-lg p-8 hover:shadow-neu-md transition-all duration-300 block"
           >
             <div className="flex items-start gap-5">
               <div className="flex-shrink-0 w-14 h-14 rounded-neu bg-gradient-to-br from-coopnama-secondary/20 to-coopnama-secondary/5 flex items-center justify-center">
                 <div className="w-5 h-7 rounded-sm border-2 border-coopnama-secondary/70" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-800 group-hover:text-coopnama-primary transition-colors mb-1">
+                <h3 className="text-xl font-bold text-white group-hover:text-[#009e59] transition-colors mb-1">
                   Kiosko de Turnos
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-300 text-sm">
                   Terminal de autoservicio para que el socio seleccione su servicio
                   y obtenga su numero de turno al instante.
                 </p>
@@ -600,18 +606,18 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
-        <div className="bg-gradient-to-br from-coopnama-primary to-blue-700 rounded-neu-lg p-12 text-center text-white shadow-neu-lg">
+        <div className="bg-gradient-to-br from-[#009e59] to-[#00c96f] rounded-neu-lg p-12 text-center text-white shadow-neu-lg">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
             Listo para transformar la atencion al socio?
           </h2>
-          <p className="text-blue-100 max-w-lg mx-auto mb-8 text-lg">
+          <p className="text-emerald-100 max-w-lg mx-auto mb-8 text-lg">
             Registra tu cooperativa y comienza a ofrecer una experiencia
             de atencion moderna, inteligente y eficiente.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/signup"
-              className="px-8 py-3.5 bg-white text-coopnama-primary text-base font-semibold rounded-neu hover:bg-blue-50 transition-colors w-full sm:w-auto"
+              className="px-8 py-3.5 bg-white text-[#009e59] text-base font-semibold rounded-neu hover:bg-emerald-50 transition-colors w-full sm:w-auto"
             >
               Comenzar Ahora
             </Link>
@@ -626,7 +632,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200">
+      <footer className="border-t border-white/[0.08]">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -638,8 +644,8 @@ export default function Home() {
                 className="rounded-lg object-contain"
               />
               <div>
-                <p className="font-bold text-gray-800 text-sm">COOPNAMA</p>
-                <p className="text-xs text-gray-500">Cooperativa Nacional de Maestros</p>
+                <p className="font-bold text-white text-sm">COOPNAMA</p>
+                <p className="text-xs text-gray-400">Cooperativa Nacional de Maestros</p>
               </div>
             </div>
             <p className="text-gray-400 text-xs">

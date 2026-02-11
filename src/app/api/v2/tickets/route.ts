@@ -3,8 +3,15 @@ import { createClient } from '@/lib/supabase/server'
 
 function validateApiKey(request: NextRequest): boolean {
   const key = request.headers.get('x-api-key')
-  const validKey = process.env.API_SECRET_KEY || process.env.OPENROUTER_API_KEY
-  return !!key && !!validKey && key === validKey
+  const validKey = process.env.API_SECRET_KEY
+  if (!key || !validKey) return false
+  // Use constant-time comparison to prevent timing attacks
+  if (key.length !== validKey.length) return false
+  let result = 0
+  for (let i = 0; i < key.length; i++) {
+    result |= key.charCodeAt(i) ^ validKey.charCodeAt(i)
+  }
+  return result === 0
 }
 
 export async function GET(request: NextRequest) {

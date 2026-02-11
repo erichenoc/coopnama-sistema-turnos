@@ -92,11 +92,11 @@ export function PricingCards() {
   return (
     <div>
       <div className="flex justify-center mb-8">
-        <div className="bg-gray-100 p-1 rounded-lg inline-flex">
+        <div className="bg-white/[0.06] p-1 rounded-lg inline-flex">
           <button
             onClick={() => setBilling('monthly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              billing === 'monthly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
+              billing === 'monthly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-300'
             }`}
           >
             Mensual
@@ -104,7 +104,7 @@ export function PricingCards() {
           <button
             onClick={() => setBilling('yearly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              billing === 'yearly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
+              billing === 'yearly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-300'
             }`}
           >
             Anual
@@ -123,22 +123,22 @@ export function PricingCards() {
           return (
             <Card
               key={plan.id}
-              className={`relative ${isPopular ? 'ring-2 ring-coopnama-primary' : ''}`}
+              className={`relative ${isPopular ? 'ring-2 ring-[#009e59]' : ''}`}
             >
               {isPopular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-coopnama-primary text-white text-xs font-bold rounded-full">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-[#009e59] to-[#00c96f] text-white text-xs font-bold rounded-full">
                   Popular
                 </div>
               )}
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
-                <p className="text-sm text-gray-500 mt-1">{plan.description}</p>
+                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
+                <p className="text-sm text-gray-300 mt-1">{plan.description}</p>
 
                 <div className="mt-4 mb-6">
-                  <span className="text-4xl font-bold text-gray-900">
+                  <span className="text-4xl font-bold text-white">
                     ${price.toFixed(0)}
                   </span>
-                  <span className="text-gray-500 text-sm">/mes</span>
+                  <span className="text-gray-300 text-sm">/mes</span>
                   {billing === 'yearly' && plan.price_yearly > 0 && (
                     <p className="text-xs text-green-600 mt-1">
                       ${plan.price_yearly.toFixed(0)}/ano facturado anualmente
@@ -147,17 +147,17 @@ export function PricingCards() {
                 </div>
 
                 <div className="space-y-2 mb-6">
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-300">
                     <span className="font-medium">
                       {plan.max_branches === -1 ? 'Ilimitadas' : plan.max_branches}
                     </span> sucursales
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-300">
                     <span className="font-medium">
                       {plan.max_agents === -1 ? 'Ilimitados' : plan.max_agents}
                     </span> agentes
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-300">
                     <span className="font-medium">
                       {plan.max_tickets_per_day === -1 ? 'Ilimitados' : plan.max_tickets_per_day}
                     </span> turnos/dia
@@ -166,8 +166,8 @@ export function PricingCards() {
 
                 <ul className="space-y-2 mb-6">
                   {(plan.features as string[]).map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm text-gray-600">
-                      <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <li key={feature} className="flex items-center gap-2 text-sm text-gray-300">
+                      <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                       {FEATURE_LABELS[feature] || feature}

@@ -17,9 +17,9 @@ import Link from 'next/link'
  */
 
 const BREACH_COLORS = {
-  warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  critical: 'bg-orange-100 text-orange-800 border-orange-200',
-  breached: 'bg-red-100 text-red-800 border-red-200',
+  warning: 'bg-yellow-500/10 text-yellow-300 border-yellow-500/20',
+  critical: 'bg-orange-500/10 text-orange-300 border-orange-500/20',
+  breached: 'bg-red-500/10 text-red-300 border-red-500/20',
 }
 
 const BREACH_LABELS = {
@@ -151,7 +151,7 @@ export function SLAAlerts() {
           <div className="flex items-center gap-2">
             <CardTitle>Alertas SLA</CardTitle>
             {breaches.length > 0 && (
-              <span className="px-2.5 py-0.5 bg-red-100 text-red-800 text-xs font-semibold rounded-full">
+              <span className="px-2.5 py-0.5 bg-red-500/10 text-red-300 text-xs font-semibold rounded-full">
                 {breaches.length}
               </span>
             )}
@@ -159,7 +159,7 @@ export function SLAAlerts() {
           {breaches.length > 5 && (
             <Link
               href="/dashboard/sla"
-              className="text-sm font-medium text-coopnama-primary hover:underline"
+              className="text-sm font-medium text-[#009e59] hover:underline"
             >
               Ver todo
             </Link>
@@ -169,14 +169,14 @@ export function SLAAlerts() {
       <CardContent>
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-gray-300 border-t-coopnama-primary rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-gray-300 border-t-[#009e59] rounded-full animate-spin" />
           </div>
         ) : (
           <div className="space-y-3">
             {breaches.slice(0, 5).map((breach) => (
               <div
                 key={breach.id}
-                className={`p-4 rounded-neu-sm border ${
+                className={`p-4 rounded-lg border ${
                   BREACH_COLORS[breach.breach_type as keyof typeof BREACH_COLORS]
                 } flex items-start justify-between gap-3`}
               >
@@ -190,15 +190,15 @@ export function SLAAlerts() {
                     </span>
                   </div>
 
-                  <p className="text-sm font-medium text-gray-800 mb-0.5">
+                  <p className="text-sm font-medium text-white mb-0.5">
                     {breach.ticket?.service?.name || 'Servicio desconocido'}
                   </p>
 
-                  <div className="flex items-center gap-3 text-xs text-gray-600">
+                  <div className="flex items-center gap-3 text-xs text-gray-300">
                     <span>
                       Espera: <strong>{breach.wait_minutes} min</strong>
                     </span>
-                    <span className="text-gray-400">•</span>
+                    <span className="text-gray-500">•</span>
                     <span>{formatRelativeTime(breach.created_at)}</span>
                   </div>
                 </div>

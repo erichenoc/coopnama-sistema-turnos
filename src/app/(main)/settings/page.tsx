@@ -31,8 +31,9 @@ import { useOrg } from '@/shared/providers/org-provider'
 import { SLAConfigPanel } from '@/features/sla/components/sla-config-panel'
 import { PriorityRulesManager } from '@/features/priority-rules/components/priority-rules-manager'
 import { SignageContentManager } from '@/features/tv-signage/components/signage-content-manager'
+import { TeamManager } from '@/features/team/components/team-manager'
 
-type Tab = 'general' | 'marca' | 'facturacion' | 'whitelabel' | 'api' | 'sla' | 'prioridad' | 'signage' | 'notificaciones' | 'integraciones' | 'cuenta'
+type Tab = 'general' | 'equipo' | 'marca' | 'facturacion' | 'whitelabel' | 'api' | 'sla' | 'prioridad' | 'signage' | 'notificaciones' | 'integraciones' | 'cuenta'
 
 interface OrgSettings {
   name: string
@@ -89,7 +90,7 @@ export default function SettingsPage() {
   // General settings
   const [orgSettings, setOrgSettings] = useState<OrgSettings>({
     name: '',
-    primary_color: '#1e40af',
+    primary_color: '#009e59',
     secondary_color: '#059669',
     timezone: 'America/Santo_Domingo',
     logo_url: null,
@@ -168,7 +169,7 @@ export default function SettingsPage() {
       if (org) {
         setOrgSettings({
           name: org.name || '',
-          primary_color: org.primary_color || '#1e40af',
+          primary_color: org.primary_color || '#009e59',
           secondary_color: org.secondary_color || '#059669',
           timezone: org.timezone || 'America/Santo_Domingo',
           logo_url: org.logo_url || null,
@@ -301,6 +302,7 @@ export default function SettingsPage() {
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: 'general', label: 'General', icon: '⚙️' },
+    { id: 'equipo', label: 'Equipo', icon: '👥' },
     { id: 'marca', label: 'Marca', icon: '🎨' },
     { id: 'facturacion', label: 'Facturacion', icon: '💳' },
     { id: 'whitelabel', label: 'White-label', icon: '🌐' },
@@ -324,8 +326,8 @@ export default function SettingsPage() {
   return (
     <div className={`mx-auto p-6 ${activeTab === 'facturacion' ? 'max-w-7xl' : 'max-w-5xl'}`}>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Configuracion</h1>
-        <p className="text-gray-500 mt-1">Administra las preferencias del sistema</p>
+        <h1 className="text-3xl font-bold text-white">Configuracion</h1>
+        <p className="text-gray-400 mt-1">Administra las preferencias del sistema</p>
       </div>
 
       {/* Tabs */}
@@ -337,8 +339,8 @@ export default function SettingsPage() {
             className={`
               flex items-center gap-2 px-4 py-2 rounded-neu-sm font-medium transition-all whitespace-nowrap
               ${activeTab === tab.id
-                ? 'bg-neu-bg shadow-neu-inset text-coopnama-primary'
-                : 'bg-neu-bg shadow-neu text-gray-600 hover:text-coopnama-primary'
+                ? 'bg-white/[0.08] border border-coopnama-primary/30 text-coopnama-primary'
+                : 'bg-white/[0.06] border border-white/[0.08] text-gray-300 hover:text-coopnama-primary'
               }
             `}
           >
@@ -357,7 +359,7 @@ export default function SettingsPage() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Nombre de la Organizacion
                 </label>
                 <Input
@@ -368,13 +370,13 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Zona Horaria
                 </label>
                 <Input
                   value={orgSettings.timezone}
                   disabled
-                  className="bg-gray-100"
+                  className="bg-white/[0.06]"
                 />
               </div>
 
@@ -389,6 +391,10 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {activeTab === 'equipo' && (
+        <TeamManager organizationId={organizationId} />
       )}
 
       {activeTab === 'marca' && (
@@ -424,8 +430,8 @@ export default function SettingsPage() {
                 />
 
                 {/* Live Preview */}
-                <div className="mt-6 p-4 rounded-lg border border-gray-200">
-                  <p className="text-sm font-medium text-gray-700 mb-3">Vista Previa</p>
+                <div className="mt-6 p-4 rounded-lg border border-white/[0.08]">
+                  <p className="text-sm font-medium text-gray-200 mb-3">Vista Previa</p>
                   <div className="flex gap-3">
                     <div
                       className="flex-1 h-16 rounded-lg flex items-center justify-center text-white font-bold"
@@ -569,12 +575,12 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 Voz profesional en espanol para anuncios de turnos en pantalla TV y estaciones.
               </p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">API Key</label>
                   <Input
                     type="password"
                     value={integrationConfig.inworld_tts_key}
@@ -613,12 +619,12 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 Notificaciones por WhatsApp a clientes via workflow n8n.
               </p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Webhook URL</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">Webhook URL</label>
                   <Input
                     value={integrationConfig.whatsapp_webhook_url}
                     onChange={(e) => setIntegrationConfig({ ...integrationConfig, whatsapp_webhook_url: e.target.value })}
@@ -656,12 +662,12 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 SMS de notificacion cuando se llama el turno. Soporta numeros dominicanos (809, 829, 849).
               </p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Account SID</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">Account SID</label>
                   <Input
                     value={integrationConfig.twilio_account_sid}
                     onChange={(e) => setIntegrationConfig({ ...integrationConfig, twilio_account_sid: e.target.value })}
@@ -669,7 +675,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Auth Token</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">Auth Token</label>
                   <Input
                     type="password"
                     value={integrationConfig.twilio_auth_token}
@@ -678,7 +684,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Numero de Telefono</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">Numero de Telefono</label>
                   <Input
                     value={integrationConfig.twilio_phone_number}
                     onChange={(e) => setIntegrationConfig({ ...integrationConfig, twilio_phone_number: e.target.value })}
@@ -720,12 +726,12 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 Notificaciones del navegador para clientes y agentes. Funciona en desktop y movil.
               </p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">VAPID Public Key</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">VAPID Public Key</label>
                   <Input
                     value={integrationConfig.vapid_public_key}
                     onChange={(e) => setIntegrationConfig({ ...integrationConfig, vapid_public_key: e.target.value })}
@@ -733,7 +739,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">VAPID Private Key</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">VAPID Private Key</label>
                   <Input
                     type="password"
                     value={integrationConfig.vapid_private_key}
@@ -775,12 +781,12 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 IA para prediccion de tiempos, copilot de agentes, analisis de sentimiento y chatbot. Soporta 300+ modelos via OpenRouter.
               </p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">OpenRouter API Key</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">OpenRouter API Key</label>
                   <Input
                     type="password"
                     value={integrationConfig.openrouter_api_key}
@@ -819,12 +825,12 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 Envio de emails transaccionales (confirmaciones, recordatorios de citas).
               </p>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Resend API Key</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1">Resend API Key</label>
                   <Input
                     type="password"
                     value={integrationConfig.resend_api_key}
@@ -907,8 +913,8 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-700">{orgUser?.full_name || 'Usuario'}</p>
-                  <p className="text-xs text-gray-500 capitalize">{orgUser?.role || 'admin'}</p>
+                  <p className="text-sm font-medium text-gray-200">{orgUser?.full_name || 'Usuario'}</p>
+                  <p className="text-xs text-gray-400 capitalize">{orgUser?.role || 'admin'}</p>
                   <p className="text-xs text-gray-400 mt-2">PNG, JPG o WebP. Max 2MB.</p>
                 </div>
               </div>
@@ -922,13 +928,13 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Correo Electronico
                 </label>
                 <Input
                   value={userEmail}
                   disabled
-                  className="bg-gray-100"
+                  className="bg-white/[0.06]"
                 />
               </div>
             </CardContent>
@@ -945,7 +951,7 @@ export default function SettingsPage() {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
                     Contrasena Actual
                   </label>
                   <Input
@@ -957,7 +963,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
                     Nueva Contrasena
                   </label>
                   <Input
@@ -969,7 +975,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
                     Confirmar Nueva Contrasena
                   </label>
                   <Input
@@ -1015,7 +1021,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-300">
                   La eliminacion de cuenta es permanente y no se puede deshacer.
                 </p>
                 <Button

@@ -35,8 +35,8 @@ export default function QueuePage() {
     <>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Gestion de Turnos</h1>
-          <p className="text-gray-500">Cola en tiempo real - {tickets.length} turnos activos</p>
+          <h1 className="text-2xl font-bold text-white">Gestion de Turnos</h1>
+          <p className="text-gray-300">Cola en tiempo real - {tickets.length} turnos activos</p>
         </div>
         <Button variant="ghost" onClick={refresh}>
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,15 +50,15 @@ export default function QueuePage() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="p-4 bg-status-waiting/10 rounded-neu-sm shadow-neu-xs text-center">
           <p className="text-3xl font-bold text-status-waiting">{waiting.length}</p>
-          <p className="text-sm text-gray-600">En Espera</p>
+          <p className="text-sm text-gray-300">En Espera</p>
         </div>
         <div className="p-4 bg-status-called/10 rounded-neu-sm shadow-neu-xs text-center">
           <p className="text-3xl font-bold text-status-called">{called.length}</p>
-          <p className="text-sm text-gray-600">Llamados</p>
+          <p className="text-sm text-gray-300">Llamados</p>
         </div>
         <div className="p-4 bg-status-serving/10 rounded-neu-sm shadow-neu-xs text-center">
           <p className="text-3xl font-bold text-status-serving">{serving.length}</p>
-          <p className="text-sm text-gray-600">Atendiendo</p>
+          <p className="text-sm text-gray-300">Atendiendo</p>
         </div>
       </div>
 
@@ -76,7 +76,7 @@ export default function QueuePage() {
                     <span className="font-mono font-bold text-2xl text-status-serving">{ticket.ticket_number}</span>
                     <div>
                       <p className="font-medium">{ticket.customer_name || 'Sin nombre'}</p>
-                      <p className="text-sm text-gray-500">{ticket.service?.name} - {ticket.station?.name || 'Sin ventanilla'}</p>
+                      <p className="text-sm text-gray-400">{ticket.service?.name} - {ticket.station?.name || 'Sin ventanilla'}</p>
                     </div>
                   </div>
                   <StatusBadge status="serving" />
@@ -101,7 +101,7 @@ export default function QueuePage() {
                     <span className="font-mono font-bold text-2xl text-status-called">{ticket.ticket_number}</span>
                     <div>
                       <p className="font-medium">{ticket.customer_name || 'Sin nombre'}</p>
-                      <p className="text-sm text-gray-500">{ticket.service?.name} - {ticket.station?.name}</p>
+                      <p className="text-sm text-gray-400">{ticket.service?.name} - {ticket.station?.name}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ export default function QueuePage() {
           {waiting.length === 0 ? (
             <div className="text-center py-12">
               <span className="text-5xl mb-4 block">&#128522;</span>
-              <p className="text-gray-500 text-lg">No hay turnos en espera</p>
+              <p className="text-gray-300 text-lg">No hay turnos en espera</p>
               <p className="text-gray-400 text-sm mt-1">Los nuevos turnos apareceran aqui automaticamente</p>
             </div>
           ) : (
@@ -134,27 +134,27 @@ export default function QueuePage() {
               {waiting.map((ticket, index) => (
                 <div
                   key={ticket.id}
-                  className="flex items-center justify-between p-4 bg-neu-bg shadow-neu-xs rounded-neu-sm hover:shadow-neu-sm transition-shadow"
+                  className="flex items-center justify-between p-4 bg-white/[0.06] shadow-neu-xs rounded-neu-sm hover:shadow-neu-sm transition-shadow"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-sm font-medium text-gray-500">
+                    <span className="w-8 h-8 flex items-center justify-center bg-white/[0.06] rounded-full text-sm font-medium text-gray-400">
                       {index + 1}
                     </span>
-                    <span className="font-mono font-bold text-xl text-coopnama-primary">{ticket.ticket_number}</span>
+                    <span className="font-mono font-bold text-xl text-[#009e59]">{ticket.ticket_number}</span>
                     <div>
-                      <p className="font-medium text-gray-800">{ticket.customer_name || 'Sin nombre'}</p>
-                      <p className="text-sm text-gray-500">{ticket.service?.name}</p>
+                      <p className="font-medium text-white">{ticket.customer_name || 'Sin nombre'}</p>
+                      <p className="text-sm text-gray-300">{ticket.service?.name}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-400">
+                    <span className="text-sm text-gray-500">
                       {formatDistanceToNow(new Date(ticket.created_at), { locale: es, addSuffix: true })}
                     </span>
                     <PriorityBadge priority={PRIORITY_NAME_MAP[ticket.priority]} />
                     <button
                       onClick={() => handleCancel(ticket.id)}
                       disabled={cancelling === ticket.id}
-                      className="p-2 text-gray-400 hover:text-coopnama-danger rounded-lg hover:bg-coopnama-danger/10 transition-colors"
+                      className="p-2 text-gray-500 hover:text-coopnama-danger rounded-lg hover:bg-coopnama-danger/10 transition-colors"
                       title="Cancelar turno"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

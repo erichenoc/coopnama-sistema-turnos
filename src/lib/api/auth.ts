@@ -60,35 +60,37 @@ export async function checkRateLimit(keyInfo: APIKeyInfo): Promise<{ allowed: bo
   const now = new Date()
   const windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes()).toISOString()
 
-  const { data: existing } = await supabase
-    .from('api_rate_limits')
-    .select('request_count')
-    .eq('api_key_id', keyInfo.id)
-    .eq('window_start', windowStart)
-    .single()
+  // Atomic upsert: increment counter and return new value in one operation
+  // This avoids the read-then-write race condition
+  const { data, error } = await supabase.rpc('increment_rate_limit', {
+    p_api_key_id: keyInfo.id,
+    p_window_start: windowStart,
+  })
 
-  const currentCount = existing?.request_count || 0
+  if (error) {
+    // If RPC doesn't exist, fall back to upsert with ON CONFLICT
+    const { data: upserted } = await supabase
+      .from('api_rate_limits')
+      .upsert(
+        { api_key_id: keyInfo.id, window_start: windowStart, request_count: 1 },
+        { onConflict: 'api_key_id,window_start' }
+      )
+      .select('request_count')
+      .single()
 
-  if (currentCount >= keyInfo.rateLimitPerMinute) {
+    const count = upserted?.request_count || 1
+    if (count > keyInfo.rateLimitPerMinute) {
+      return { allowed: false, remaining: 0 }
+    }
+    return { allowed: true, remaining: keyInfo.rateLimitPerMinute - count }
+  }
+
+  const newCount = (data as number) || 1
+  if (newCount > keyInfo.rateLimitPerMinute) {
     return { allowed: false, remaining: 0 }
   }
 
-  // Upsert rate limit counter
-  if (existing) {
-    await supabase
-      .from('api_rate_limits')
-      .update({ request_count: currentCount + 1 })
-      .eq('api_key_id', keyInfo.id)
-      .eq('window_start', windowStart)
-  } else {
-    await supabase.from('api_rate_limits').insert({
-      api_key_id: keyInfo.id,
-      window_start: windowStart,
-      request_count: 1,
-    })
-  }
-
-  return { allowed: true, remaining: keyInfo.rateLimitPerMinute - currentCount - 1 }
+  return { allowed: true, remaining: keyInfo.rateLimitPerMinute - newCount }
 }
 
 async function hashKey(key: string): Promise<string> {

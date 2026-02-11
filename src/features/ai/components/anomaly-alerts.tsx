@@ -18,10 +18,10 @@ interface Anomaly {
 }
 
 const SEVERITY_STYLES: Record<string, { bg: string; border: string; text: string; icon: string }> = {
-  critical: { bg: 'bg-red-50', border: 'border-red-300', text: 'text-red-800', icon: '🔴' },
-  high: { bg: 'bg-orange-50', border: 'border-orange-300', text: 'text-orange-800', icon: '🟠' },
-  medium: { bg: 'bg-yellow-50', border: 'border-yellow-300', text: 'text-yellow-800', icon: '🟡' },
-  low: { bg: 'bg-blue-50', border: 'border-blue-300', text: 'text-blue-800', icon: '🔵' },
+  critical: { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-300', icon: '🔴' },
+  high: { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-300', icon: '🟠' },
+  medium: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/20', text: 'text-yellow-300', icon: '🟡' },
+  low: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', icon: '🔵' },
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -88,7 +88,7 @@ export function AnomalyAlerts() {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <span>Alertas AI</span>
-            <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
+            <span className="px-2 py-0.5 bg-orange-500/10 text-orange-300 text-xs font-medium rounded-full">
               {anomalies.length}
             </span>
           </CardTitle>
@@ -107,18 +107,18 @@ export function AnomalyAlerts() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className={`text-sm font-semibold ${style.text}`}>{anomaly.title}</span>
-                    <span className="px-1.5 py-0.5 bg-white/60 text-xs rounded">
+                    <span className="px-1.5 py-0.5 bg-white/[0.06] text-xs rounded">
                       {TYPE_LABELS[anomaly.anomaly_type] || anomaly.anomaly_type}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-600">{anomaly.description}</p>
+                  <p className="text-xs text-gray-300">{anomaly.description}</p>
                   <p className="text-xs text-gray-400 mt-1">
                     {new Date(anomaly.created_at).toLocaleString('es-DO', { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
                 <button
                   onClick={() => handleDismiss(anomaly.id)}
-                  className="text-gray-400 hover:text-gray-600 p-1"
+                  className="text-gray-400 hover:text-gray-300 p-1"
                   title="Descartar"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

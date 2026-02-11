@@ -50,7 +50,7 @@ const Avatar = forwardRef<HTMLImageElement, AvatarProps>(
     const getColorFromName = (name?: string) => {
       if (!name) return 'bg-gray-400'
       const colors = [
-        'bg-blue-500',
+        'bg-emerald-500',
         'bg-green-500',
         'bg-purple-500',
         'bg-pink-500',
@@ -76,7 +76,7 @@ const Avatar = forwardRef<HTMLImageElement, AvatarProps>(
             className={cn(
               'rounded-full object-cover',
               'shadow-neu-xs',
-              'border-2 border-neu-bg',
+              'border-2 border-slate-900',
               sizeStyles[size],
               className
             )}
@@ -87,7 +87,7 @@ const Avatar = forwardRef<HTMLImageElement, AvatarProps>(
             className={cn(
               'rounded-full flex items-center justify-center',
               'shadow-neu-xs',
-              'border-2 border-neu-bg',
+              'border-2 border-slate-900',
               'text-white font-medium',
               getColorFromName(name),
               sizeStyles[size],
@@ -103,7 +103,7 @@ const Avatar = forwardRef<HTMLImageElement, AvatarProps>(
           <span
             className={cn(
               'absolute bottom-0 right-0 rounded-full',
-              'ring-2 ring-neu-bg',
+              'ring-2 ring-slate-900',
               statusColors[status],
               statusSizeStyles[size]
             )}
@@ -158,8 +158,8 @@ const AvatarGroup = ({
         <div
           className={cn(
             'rounded-full flex items-center justify-center',
-            'bg-gray-200 text-gray-600 font-medium',
-            'shadow-neu-xs border-2 border-neu-bg',
+            'bg-white/[0.10] text-gray-300 font-medium',
+            'shadow-neu-xs border-2 border-slate-900',
             overlapStyles[size],
             {
               xs: 'w-6 h-6 text-xs',

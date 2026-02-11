@@ -19,7 +19,7 @@ export function Spinner({ size = 'md', className, label = 'Cargando...' }: Spinn
   return (
     <div className={cn('inline-flex items-center gap-2', className)} role="status">
       <svg
-        className={cn('animate-spin text-coopnama-primary', sizeClasses[size])}
+        className={cn('animate-spin text-emerald-400', sizeClasses[size])}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -47,10 +47,10 @@ export function Spinner({ size = 'md', className, label = 'Cargando...' }: Spinn
 // Full page loading spinner
 export function LoadingScreen({ message = 'Cargando...' }: { message?: string }) {
   return (
-    <div className="fixed inset-0 bg-neu-bg flex flex-col items-center justify-center z-50">
+    <div className="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center z-50">
       <div className="neu-card p-8 flex flex-col items-center gap-4">
         <Spinner size="xl" />
-        <p className="text-gray-600 font-medium">{message}</p>
+        <p className="text-gray-400 font-medium">{message}</p>
       </div>
     </div>
   )
@@ -60,9 +60,9 @@ export function LoadingScreen({ message = 'Cargando...' }: { message?: string })
 export function LoadingDots({ className }: { className?: string }) {
   return (
     <span className={cn('inline-flex gap-1', className)}>
-      <span className="w-2 h-2 bg-coopnama-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
-      <span className="w-2 h-2 bg-coopnama-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
-      <span className="w-2 h-2 bg-coopnama-primary rounded-full animate-bounce" />
+      <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+      <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+      <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
     </span>
   )
 }
