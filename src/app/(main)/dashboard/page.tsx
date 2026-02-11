@@ -70,75 +70,34 @@ export default function DashboardPage() {
     return totals
   }
 
-  const fetchStats = useCallback(async (dateOverride?: string) => {
+  const fetchStats = useCallback(async () => {
     const supabase = createClient()
-    const targetDate = dateOverride ?? selectedDate
 
     if (isAllBranches) {
       const { data } = await supabase.rpc('get_org_daily_stats', {
         p_organization_id: organizationId,
-        p_date: targetDate,
+        p_date: selectedDate,
       })
 
       if (data && data.length > 0) {
-        const totals = aggregateBranchStats(data as BranchDailyStats[])
-        if (totals.total_tickets > 0) {
-          setBranchStats(data as BranchDailyStats[])
-          setStats(totals)
-          setStatsDate(targetDate === getToday() ? null : targetDate)
-        } else if (targetDate === getToday()) {
-          // Today has no tickets on initial load - auto-jump to last active day
-          const { data: recentData } = await supabase.rpc('get_recent_org_daily_stats', {
-            p_organization_id: organizationId,
-          })
-          if (recentData && recentData.length > 0) {
-            const recentBranch = recentData as (BranchDailyStats & { stats_date: string })[]
-            const recentDate = recentBranch[0]?.stats_date
-            setBranchStats(recentBranch)
-            setStats(aggregateBranchStats(recentBranch))
-            setStatsDate(recentDate || null)
-            if (recentDate) setSelectedDate(recentDate)
-          } else {
-            setBranchStats([])
-            setStats(null)
-            setStatsDate(null)
-          }
-        } else {
-          setBranchStats(data as BranchDailyStats[])
-          setStats(totals)
-          setStatsDate(targetDate)
-        }
+        setBranchStats(data as BranchDailyStats[])
+        setStats(aggregateBranchStats(data as BranchDailyStats[]))
       } else {
         setBranchStats([])
         setStats(null)
-        setStatsDate(targetDate === getToday() ? null : targetDate)
       }
     } else {
       const { data } = await supabase.rpc('get_daily_stats', {
         p_branch_id: branchId,
-        p_date: targetDate,
+        p_date: selectedDate,
       })
-      if (data?.[0] && Number(data[0].total_tickets) > 0) {
+      if (data?.[0]) {
         setStats(data[0] as DailyStats)
-        setStatsDate(targetDate === getToday() ? null : targetDate)
-      } else if (targetDate === getToday()) {
-        // Today has no tickets on initial load - auto-jump to last active day
-        const { data: recentData } = await supabase.rpc('get_recent_daily_stats', {
-          p_branch_id: branchId,
-        })
-        if (recentData?.[0] && recentData[0].stats_date) {
-          setStats(recentData[0] as DailyStats)
-          setStatsDate(recentData[0].stats_date)
-          setSelectedDate(recentData[0].stats_date)
-        } else {
-          setStats(null)
-          setStatsDate(null)
-        }
       } else {
-        setStats(data?.[0] as DailyStats || null)
-        setStatsDate(targetDate)
+        setStats(null)
       }
     }
+    setStatsDate(selectedDate === getToday() ? null : selectedDate)
     setStatsLoading(false)
   }, [branchId, organizationId, isAllBranches, selectedDate])
 
